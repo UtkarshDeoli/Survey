@@ -1,16 +1,16 @@
 import React from 'react'
 
-interface LayoutProps {
+interface LayoutProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;
     className? : string;
 }
 
-function ButtonBordered({children, className} : LayoutProps) {
+function ButtonBordered({children, className,...props} : LayoutProps) {
   return (
-    <button className={`border border-primary-300 px-4 py-2 rounded-md text-primary-300 ${className}`}>
+    <button {...props} className={`border border-primary-300 px-4 py-2 rounded-md text-primary-300 ${className}`}>
         {children}
     </button>
   )
 }
 
-export default ButtonBordered
+export default ButtonBordered;
