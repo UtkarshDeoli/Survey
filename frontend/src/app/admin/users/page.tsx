@@ -31,17 +31,19 @@ function page() {
   
   return (
     <div className="w-full bg-my-gray-100">
-      <div className="bg-my-gray-105 w-full py-3 px-8 flex justify-between shadow-md  ">
-        <div className="text-[#7C7C7C]">
+
+      <nav className="bg-my-gray-105 w-full py-3 px-8 flex justify-between shadow-md  ">
+        <div className="text-my-gray-200">
           <h1 className="text-2xl">Users</h1>
         </div>
         <div className="flex justify-end space-x-3">
           <ButtonBordered className="bg-my-blue-600 text-white">Help</ButtonBordered>
-          <ButtonBordered className="bg-my-blue-400 text-white">Add Multiple Users</ButtonBordered>
+          <ButtonBordered onClick={()=>{router.push('./users/add-multiple-users')}} className="bg-my-blue-400 text-white">Add Multiple Users</ButtonBordered>
           <ButtonBordered onClick={()=>{router.push('./users/add-user')}} className="bg-my-blue-400 text-white">Add Users</ButtonBordered>
           <ButtonBordered className="bg-my-blue-400 text-white">Export Users</ButtonBordered>
         </div>
-      </div>
+      </nav>
+
       <div className="pt-10 px-5">
         <div className="flex">
           <div className="me-5">
@@ -60,7 +62,7 @@ function page() {
         <div className="w-full mt-2 text-center text-sm">
           <table className="w-full rounded-t-2xl overflow-hidden ">
             <thead className="bg-my-gray-105 ">
-              <tr className="w-full border-2 text-[#7C7C7C]">
+              <tr className="w-full border-2 text-my-gray-200">
                 <th className="rounded-tl-2xl px-4 py-2 w-1/5">Name</th>
                 <th className="px-4 py-2 w-1/5">Username</th>
                 <th className="px-4 py-2 w-1/4">Email</th>
