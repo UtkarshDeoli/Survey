@@ -1,4 +1,5 @@
 import React from 'react'
+import { twMerge } from 'tailwind-merge'
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -8,7 +9,7 @@ interface LayoutProps {
 
 function ButtonFilled({children, className,onClick} : LayoutProps) {
   return (
-    <button onClick={onClick} className={`border text-white bg-primary-300 px-4 py-2 rounded-md ${className}`}>
+    <button onClick={onClick} className={twMerge('border text-white bg-primary-300 px-4 py-2 rounded-md',className)}>
         {children}
     </button>
   )

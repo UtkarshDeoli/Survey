@@ -7,12 +7,12 @@ interface LayoutProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     onClick?:()=>void
 }
 
-function ButtonBordered({children, className,...props} : LayoutProps) {
+function FilledGreyButton({children, className,onClick} : LayoutProps) {
   return (
-    <button {...props} className={twMerge('border border-primary-300 px-4 py-2 rounded-md text-primary-300',className)}>
+    <button onClick={onClick} className={twMerge('border text-black bg-[#E0DCDC] rounded-lg px-4 py-2',className)}>
         {children}
     </button>
   )
 }
 
-export default ButtonBordered;
+export default FilledGreyButton;

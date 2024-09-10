@@ -15,8 +15,8 @@ function AllSurveys() {
      </div>
      
      {
-        [1,2,3,4,5,6,7,8,9].map((el)=>(
-            <div className="grid grid-cols-12 px-8 py-[16px] border border-secondary-200 w-full">
+        [1,2,3,4,5,6,7,8,9].map((el,index)=>(
+            <div key={index} className="grid grid-cols-12 px-8 py-[16px] border border-secondary-200 w-full">
                 <p className="col-span-4">All surveys</p>
                 <p className="col-span-2">Total responses</p>
                 <p className="col-span-2">Date created</p>
