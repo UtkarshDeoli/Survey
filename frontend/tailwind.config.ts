@@ -19,6 +19,12 @@ const config: Config = {
         "secondary-600":"#F5F7FA",
 
         "my-blue-700":"#2D4DA1",
+        // "secondary-100":"#7C7C7C",
+
+        "my-gray-100":"#f5f7fa",
+        "my-gray-105":"#F3F3F3",
+        "my-gray-200":"#7C7C7C",
+
         "my-blue-600":"#2C4C9E",
         "my-blue-400":"#3F6CE2",
         "my-blue-300":"#5D9CEC",
