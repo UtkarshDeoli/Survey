@@ -1,5 +1,5 @@
 const Mongoose = require("mongoose");
-const baseSchema = require("./baseSchema");
+const baseSchema = require("../baseSchema");
 const Schema = Mongoose.Schema;
 
 const decimalInputSchema = new Schema({
@@ -9,7 +9,7 @@ const decimalInputSchema = new Schema({
   precision: {
     type: Number,
   },
-  limitLength: {
+  limitValue: {
     from: Number,
     to: Number,
   },

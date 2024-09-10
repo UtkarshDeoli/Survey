@@ -1,5 +1,5 @@
 const Mongoose = require("mongoose");
-const baseSchema = require("./baseSchema");
+const baseSchema = require("../baseSchema");
 const Schema = Mongoose.Schema;
 
 const radioSchema = new Schema({

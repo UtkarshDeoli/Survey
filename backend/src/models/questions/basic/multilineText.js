@@ -1,12 +1,12 @@
 const Mongoose = require("mongoose");
-const baseSchema = require("./baseSchema");
+const baseSchema = require("../baseSchema");
 const Schema = Mongoose.Schema;
 
 const multilineTextSchema = new Schema({
   suffix: {
     type: String,
   },
-  limitLength: {
+  limitValue: {
     from: Number,
     to: Number,
   },

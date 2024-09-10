@@ -1,9 +1,9 @@
 const Mongoose = require("mongoose");
-const baseSchema = require("./baseSchema");
+const baseSchema = require("../baseSchema");
 const Schema = Mongoose.Schema;
 
 const numberPointSchema = new Schema({
-  limitLength: {
+  limitValue: {
     from: Number,
     to: Number,
   },
