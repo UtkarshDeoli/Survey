@@ -5,6 +5,7 @@ import Inactive from "@/components/ui/status/Inactive";
 import { FaRegEdit } from "react-icons/fa";
 import { MdBlock } from "react-icons/md";
 import { useRouter } from 'next/navigation'
+import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 
 
 function page() {
@@ -37,10 +38,10 @@ function page() {
           <h1 className="text-2xl">Users</h1>
         </div>
         <div className="flex justify-end space-x-3">
-          <ButtonBordered className="bg-my-blue-600 text-white">Help</ButtonBordered>
-          <ButtonBordered onClick={()=>{router.push('./users/add-multiple-users')}} className="bg-my-blue-400 text-white">Add Multiple Users</ButtonBordered>
-          <ButtonBordered onClick={()=>{router.push('./users/add-user')}} className="bg-my-blue-400 text-white">Add Users</ButtonBordered>
-          <ButtonBordered className="bg-my-blue-400 text-white">Export Users</ButtonBordered>
+          <ButtonBordered className="bg-my-blue-600 border-0 text-white">Help</ButtonBordered>
+          <ButtonFilled onClick={()=>{router.push('./users/add-multiple-users')}} className="bg-my-blue-400 text-white">Add Multiple Users</ButtonFilled>
+          <ButtonFilled onClick={()=>{router.push('./users/add-user')}} className="bg-my-blue-400 text-white">Add Users</ButtonFilled>
+          <ButtonFilled className="bg-my-blue-400 text-white">Export Users</ButtonFilled>
         </div>
       </nav>
 
@@ -53,22 +54,22 @@ function page() {
             <div className="bg-[#2A4999] w-8 h-8  "></div>
             <p className="text-sm font-medium">Hide Disabled Users</p>
           </div>
-          <div className="font-medium">
+          <div className="">
             <ButtonBordered className="bg-my-blue-300 text-white me-3 px-8">Search</ButtonBordered>
             <ButtonBordered className="bg-white text-my-blue-3 px-8">Reset</ButtonBordered>
           </div>
         </div>
 
-        <div className="w-full mt-2 text-center text-sm">
+        <div className="w-full mt-3 text-center text-sm">
           <table className="w-full rounded-t-2xl overflow-hidden ">
             <thead className="bg-my-gray-105 ">
-              <tr className="w-full border-2 text-my-gray-200">
-                <th className="rounded-tl-2xl px-4 py-2 w-1/5">Name</th>
-                <th className="px-4 py-2 w-1/5">Username</th>
-                <th className="px-4 py-2 w-1/4">Email</th>
-                <th className="px-4 py-2 w-1/6">Role</th>
-                <th className="px-4 py-2 w-1/6">Status</th>
-                <th className="px-4 py-2 rounded-tr-2xl w-1/12">Action</th>
+              <tr className="w-full font-medium border-2 text-my-gray-200">
+                <td className="rounded-tl-2xl px-4 py-2 w-1/5">Name</td>
+                <td className="px-4 py-2 w-1/5">Username</td>
+                <td className="px-4 py-2 w-1/4">Email</td>
+                <td className="px-4 py-2 w-1/6">Role</td>
+                <td className="px-4 py-2 w-1/6">Status</td>
+                <td className="px-4 py-2 rounded-tr-2xl w-1/12">Action</td>
               </tr>
             </thead>
             <tbody>
