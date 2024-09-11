@@ -10,7 +10,7 @@ function layout({children} : LayoutProps) {
   return (
     <div>
         <Navbar/>
-        <div className="flex h-full w-full">
+        <div className="flex h-auto w-full overflow-y-auto">
             <Sidebar/>
             {children}
         </div>

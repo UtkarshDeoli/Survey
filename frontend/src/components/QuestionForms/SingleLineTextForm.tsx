@@ -13,19 +13,19 @@ interface Props {
     handleDelete:(id:string)=>void
   }
   
-  function EmailForm({ id, register, setValue, control ,handleDelete}: Props) {
+  function SingleLineTextForm({ id, register, setValue, control ,handleDelete}: Props) {
 
     useEffect(()=>{
-      setValue(`questions.${id}.type`,"email");
+      setValue(`questions.${id}.type`,"single_line_text");
       setValue(`questions.${id}.question_id`,id);
     },[])
 
     const media = useWatch({
       control,
-      name: `questions.${id}.parameters.question_media_type`,
+      name: "questions.0.parameters.question_media_type",
       defaultValue: "",
     })
-    console.log(media)
+   
     return (
       <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden">
         <FormHeader handleDelete={handleDelete} register={register} id={id} input={true}/>
@@ -35,7 +35,7 @@ interface Props {
               <label className="col-span-4 text-secondary-300">Description</label>
               <input
                 {...register(`questions.${id}.parameters.description`)}
-                type="text"
+                type="email"
                 className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                 placeholder="Type help information for question here..."
               />
@@ -56,6 +56,24 @@ interface Props {
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                 placeholder="Variable name"
+            />
+            </div>
+            <div className="grid grid-cols-12 w-3/4">
+              <label className="col-span-4 text-secondary-300">Formula</label>
+              <input
+                {...register(`questions.${id}.parameters.formula`)}
+                type="text"
+                className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
+                placeholder="Define formula"
+            />
+            </div>
+            <div className="grid grid-cols-12 w-3/4">
+              <label className="col-span-4 text-secondary-300">Default value</label>
+              <input
+                {...register(`questions.${id}.parameters.default_value`)}
+                type="text"
+                className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
+                placeholder="Set default value"
             />
             </div>
             <div className="grid grid-cols-12 w-3/4">
@@ -83,7 +101,7 @@ interface Props {
                         </p>
                       </div>
                       <input
-                        {...register(`questions.${id}.parameters.question_media_type`)}
+                        {...register(`questions.${id}.parameters.question_image`)}
                         type="file"
                         className="hidden"
                         accept={
@@ -103,6 +121,29 @@ interface Props {
               )
             }
             <div className="grid grid-cols-12 w-3/4">
+              <label className="col-span-4 text-secondary-300">Suffix</label>
+              <input
+                {...register(`questions.${id}.parameters.suffix`)}
+                type="text"
+                className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
+                />  
+            </div>
+            <div className="grid grid-cols-12 w-3/4">
+              <label className="col-span-4 text-secondary-300">Limit length</label>
+              <input
+                {...register(`questions.${id}.parameters.limit_length.from`)}
+                type="number"
+                className="border border-secondary-200 rounded-md p-2 col-span-3 focus:outline-none"
+                />  
+            
+              <label className="col-span-2 text-secondary-300 text-center">to</label>
+              <input
+                {...register(`questions.${id}.parameters.limit_length.to`)}
+                type="number"
+                className="border border-secondary-200 rounded-md p-2 col-span-3 focus:outline-none"
+                />  
+            </div>
+            <div className="grid grid-cols-12 w-3/4">
               <label className="col-span-4 text-secondary-300">Is question required</label>
               <input
                 {...register(`questions.${id}.parameters.question_required`)}
@@ -110,13 +151,46 @@ interface Props {
                 className="border border-secondary-200 rounded-md p-2 col-span-1 focus:outline-none"
             />
             </div>
-          </div>
+            <div className="grid grid-cols-12 w-3/4">
+              <label className="col-span-4 text-secondary-300">Display in survey</label>
+              <input
+                {...register(`questions.${id}.parameters.display_in_survey`)}
+                type="checkbox"
+                className="border border-secondary-200 rounded-md p-2 col-span-1 focus:outline-none"
+            />
+            </div>
+            <div className="grid grid-cols-12 w-3/4">
+              <label className="col-span-4 text-secondary-300">Validation pattern </label>
+              <input
+                {...register(`questions.${id}.parameters.validation_pattern`)}
+                type="text"
+                className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
+                placeholder="Define validation pattern"
+            />
+            </div>
+            <div className="grid grid-cols-12 w-3/4">
+              <label className="col-span-4 text-secondary-300">Validation message </label>
+              <div className="col-span-8 flex flex-col gap-2">
+                <input
+                  {...register(`questions.${id}.parameters.validation_message`)}
+                  type="text"
+                  className="border border-secondary-200 rounded-md p-2 focus:outline-none"
+                  placeholder="Define validation message"
+                />
+                <p className="text-secondary-300 text-sm">This field should contain the Regular Expression to validate the answer of this question.</p>
+                <div className="flex gap-1 items-center text-sm text-secondary-300">
+                  <p>For more details refer</p>
+                  <a className="text-primary-300" href=" https://en.wikipedia.org/wiki/Regular_expression" target="_blank"> https://en.wikipedia.org/wiki/Regular_expression</a>
+                </div>
+              </div>
+            </div>
+            
 
+          </div>
         </div>
-        
       </div>
     );
   }
   
-  export default EmailForm;
+  export default SingleLineTextForm;
   
