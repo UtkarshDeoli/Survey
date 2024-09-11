@@ -15,8 +15,8 @@ function AllQuestions() {
                 {level ==="Advance" ? <ButtonFilled onClick={()=>setLevel("Advance")} className="w-full py-[10px] text-[14px] font-semibold">Advance</ButtonFilled> : <button onClick={()=>setLevel("Advance")} className="py-[10px] px-4 border rounded-md  w-full border-secondary-200 text-my-blue-700 text-[14px] font-semibold">Advance</button>}
             </div>
             <div className="flex flex-col gap-2 h-[600px] overflow-y-auto">
-                {questions.map(question=>(
-                    <div draggable onDragStart={(e)=>{
+                {questions.map((question,ind)=>(
+                    <div key={ind} draggable onDragStart={(e)=>{
                         e.dataTransfer.setData("text/plain", question);
                     }} className="p-2 flex gap-3 rounded-md bg-white cursor-grab">
                         <div className="h-6 w-6 bg-secondary-400"></div>

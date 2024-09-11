@@ -26,6 +26,7 @@ const customStyles = {
 
 function SurveyHeader() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [name,setName] = useState <string> ("")
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
@@ -54,11 +55,11 @@ function SurveyHeader() {
             <form className="w-full h-full flex flex-col gap-10 justify-center items-center">
                 <div className="flex items-center gap-10">
                     <label>Name</label>
-                    <input className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-[185px] h-[35px]" type="text" placeholder="name"/>
+                    <input onChange={(e)=>setName(e.target.value)} value={name} className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-[185px] h-[35px]" type="text" placeholder="name"/>
                 </div>
                 <div className="flex items-center gap-10">
-                    <ButtonBordered className="border-secondary-200">Cancel</ButtonBordered>
-                    <button className="px-6 py-2 bg-primary-300 text-white rounded-md" type="button" onClick={()=>window.open("/admin/surveys/create","_self")}>Create survey</button>
+                    <ButtonBordered onClick={closeModal} type="button" className="border-secondary-200">Cancel</ButtonBordered>
+                    <button className="px-6 py-2 bg-primary-300 text-white rounded-md" type="button" onClick={()=>window.open(`/admin/surveys/create?name=${encodeURIComponent(name)}`,"_self")}>Create survey</button>
                 </div>
             </form>
         </div>

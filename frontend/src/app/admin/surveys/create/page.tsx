@@ -1,15 +1,20 @@
 "use client";
 
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 
 function page() {
+  const params = useSearchParams();
+  const name = params.get('name');
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
+
 
   function submitHandler(data: any) {
     console.log(data);
@@ -34,6 +39,8 @@ function page() {
           <div className="grid grid-cols-3">
             <label className="text-secondary-300 font-medium">Name</label>
             <input
+              value={name||""}
+              disabled
               {...register("name")}
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
