@@ -1,32 +1,27 @@
 "use client"
-import ButtonBordered from "@/components/ui/buttons/ButtonBordered"
+import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
+import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import Active from "@/components/ui/status/Active";
 import Inactive from "@/components/ui/status/Inactive";
+import { getUsers } from "@/networks/get_users";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
-import { MdBlock } from "react-icons/md";
-import { useRouter } from 'next/navigation'
-import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
+import { IUser } from "@/types/user_interfaces";
 
 
 function page() {
-  const users = [
-    {
-      name: 'Rohit Sharma',
-      username: 'Rohitsharma',
-      email: 'rohitsharma@gmail.com',
-      role: 'Manager',
-      status: true,
-      action: true,
-    },
-    {
-      name: 'Rohit Sharma',
-      username: 'Rohitsharma',
-      email: 'rohitsharma@gmail.com',
-      role: 'Manager',
-      status: false,
-      action: false,
-    },
-  ];
+
+  const [users,setUsers]=useState<IUser[]>([]);
+  
+  useEffect(()=>{
+    async function getData(){
+      const res:any=await getUsers();
+      if(res.error) return 
+      setUsers(res);
+    }
+    getData();
+  },[]);
 
   const router = useRouter();
   
@@ -40,7 +35,7 @@ function page() {
         <div className="flex justify-end space-x-3">
           <ButtonBordered className="bg-my-blue-600 border-0 text-white">Help</ButtonBordered>
           <ButtonFilled onClick={()=>{router.push('./users/add-multiple-users')}} className="bg-my-blue-400 text-white">Add Multiple Users</ButtonFilled>
-          <ButtonFilled onClick={()=>{router.push('./users/add-user')}} className="bg-my-blue-400 text-white">Add Users</ButtonFilled>
+          <ButtonFilled onClick={()=>{router.push('./users/add-user')}} className="bg-my-blue-400 text-white">Add User</ButtonFilled>
           <ButtonFilled className="bg-my-blue-400 text-white">Export Users</ButtonFilled>
         </div>
       </nav>
@@ -73,14 +68,14 @@ function page() {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
+              {users && users.length!==0 && users.map((user, index) => (
                 <tr key={index} className="bg-white border">
                   <td className="px-4 py-2 w-1/5">{user.name}</td>
                   <td className="px-4 py-2 w-1/5">{user.username}</td>
                   <td className="px-4 py-2 w-1/4">{user.email}</td>
                   <td className="px-4 py-2 w-1/6">{user.role}</td>
-                  <td className="px-4 py-2 w-1/6 text-white">{user.status ? <Active /> : <Inactive />}</td>
-                  <td className="px-4 py-2 w-1/12 ">{user.action ? <FaRegEdit className="block mx-auto" /> : <MdBlock className="block mx-auto" />}</td>
+                  <td className="px-4 py-2 w-1/6 text-white">{user.status==='active' ? <Active /> : <Inactive />}</td>
+                  <td className="px-4 py-2 w-1/12 "><FaRegEdit className="block mx-auto" /></td>
                 </tr>
               ))}
             </tbody>

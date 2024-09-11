@@ -1,12 +1,12 @@
 "use client";
 
-import TwoDatePicker from "@/components/data/TwoDatePicker";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
+import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
+import Image from "next/image";
 import { useState } from "react";
 import eye from "../../../../../public/icons/survey_data/eye.png";
 import file_plus from "../../../../../public/icons/survey_data/file_plus.png";
-import Image from "next/image";
 
 
 interface SurveyResponse {
