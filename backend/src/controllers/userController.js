@@ -2,7 +2,8 @@ const User = require('../models/user')
 
 exports.addUsers = async(req, res) => {
     try {
-        const dbRes=await User.insertMany(req.body);
+        const users = req.body
+        const dbRes=await User.insertMany(users);
         return res.status(201).json({success: true, message: "user created successfully"})
     } catch (error) {
         return res.status(400).json({success: false, message: 'something went wrong'})
