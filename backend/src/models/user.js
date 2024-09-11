@@ -11,7 +11,7 @@ const userSchema = new Schema({
         required: true
     },
     email: {
-        type: Email,
+        type: String,
         required: true
     },
     password: {
@@ -51,8 +51,12 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    assignedSurvey: [String]
-
+    assignedSurvey: [String],
+    status:{
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'active'
+    }
 })
 
 const User = Mongoose.model('User99', userSchema);
