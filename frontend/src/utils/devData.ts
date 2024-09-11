@@ -1,6 +1,6 @@
 export const questions = [
-    "Test Block",
-    "Singleline Text Input",
+    "Text Block",
+    "Single line Text Input",
     "Multiline Text Input",
     "Number Input",
     "Number With Auto Code",
@@ -9,8 +9,8 @@ export const questions = [
     "Phone Number",
     "Radio Button",
     "Radio Button With Other",
-    "Drop Down",
-    "Drop Down With Other",
+    "DropDown",
+    "DropDown With Other",
     "Checkbox List",
     "Checkbox List With Other"
   ];
