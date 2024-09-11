@@ -24,6 +24,7 @@ function SurveyForm() {
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     const formMapping = FormMappings();
     const data = e.dataTransfer.getData("text/plain") as keyof typeof formMapping;
+    console.log("Datataaa: ", data)
     setForms([...forms, formMapping[data]]);
   }
   return (
