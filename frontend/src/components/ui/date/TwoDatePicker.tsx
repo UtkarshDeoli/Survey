@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import survey_analytics_calender from "../../../public/icons/survey_data/survey_analytics_calender.png";
+import survey_analytics_calender from "../../../../public/icons/survey_data/survey_analytics_calender.png";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { twMerge } from "tailwind-merge";
 
