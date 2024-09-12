@@ -2,35 +2,19 @@
 import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { FaQuestionCircle } from 'react-icons/fa';
-
-interface Permissions {
-  autoAssignSurvey: boolean;
-  viewCollectedData: boolean;
-  preventDataDownload: boolean;
-  preventDataAnalytics: boolean;
-  preventSpatialReport: boolean;
-  removeAudioAccess: boolean;
-  viewPendingData: boolean;
-}
-
-interface FormData {
-  username: string;
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  userStatus: 'active' | 'inactive';
-  role : "surveyManager" | "boothKaryakarta" | "surveyCollector" | "supportExecutive" | "dataHandler";
-  permissions: Permissions;
-  selectAllUsers: boolean;
-  users:any
-}
+import { IUser } from '@/types/user_interfaces';
+import { addUsers } from '@/networks/add_users';
 
 function Page() {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors } } = useForm<IUser>();
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<IUser> = async (data:IUser) => {
+    const params=[data]
+    console.log(params)
+    const res=await addUsers(params);
+    if(res){
+      window.location.replace('/admin/users')
+    }
   };
 
   return (
@@ -71,10 +55,10 @@ function Page() {
                           <input
                             type={field.type}
                             placeholder={field.placeholder}
-                            {...register(field.name as keyof FormData, { required: true })}
+                            {...register(field.name as keyof IUser, { required: true })}
                             className="border border-gray-300 rounded-md p-2 w-full"
                           />
-                          {errors[field.name as keyof FormData] && <p className="text-red-500">This field is required</p>}
+                          {errors[field.name as keyof IUser] && <p className="text-red-500">This field is required</p>}
                         </div>
                       </div>
                     ))
@@ -86,13 +70,13 @@ function Page() {
                   <div className=" w-1/2 font-medium">User Status</div>
                   <div className="w-1/2">
                     <select
-                      {...register('userStatus', { required: true })}
+                      {...register('status', { required: true })}
                       className="border border-gray-300 w-full text-center rounded-md p-2"
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
                     </select>
-                    {errors.userStatus && <p className="text-red-500">User status is required</p>}
+                    {errors.status && <p className="text-red-500">User status is required</p>}
                   </div>
                 </div>
 
@@ -150,7 +134,7 @@ function Page() {
                       </div>
                       <input
                         type="checkbox"
-                        {...register(`permissions.${permission.name as keyof Permissions}`, { required: false })}
+                        {...register(`${permission.name as keyof IUser}`, { required: false })}
                         className="rounded text-blue-500 float-end"
                       />
                     </div>
@@ -159,7 +143,7 @@ function Page() {
               </div>
 
               {/* Right Section -> Assign Surveys */}
-              <div className="w-1/2  ">
+              {/* <div className="w-1/2  ">
                 <div className="space-y-4 p-2 rounded-lg border-2 border-[#939393] max-h-fit">
                   <p className=" font-medium">Assign Survey</p>
                   <div className="">
@@ -193,7 +177,7 @@ function Page() {
                     ))}
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* save, cancel button */}

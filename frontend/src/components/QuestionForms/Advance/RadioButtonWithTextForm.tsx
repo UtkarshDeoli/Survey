@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import FormHeader from "./FormHeader";
+import FormHeader from "../FormHeader";
 
 interface Props {
   id: string;
@@ -11,9 +11,9 @@ interface Props {
   handleDelete: (id: string) => void;
 }
 
-function RadioButton({ id, register, setValue, handleDelete }: Props) {
+function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "radio_button");
+    setValue(`questions.${id}.type`, "radio_button_with_text");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
@@ -27,15 +27,6 @@ function RadioButton({ id, register, setValue, handleDelete }: Props) {
       <div className="bg-blue-100 p-5 w-full">
         <div className="flex flex-col justify-center items-center p-5 gap-3 bg-white w-full">
           <div className="grid grid-cols-12 w-3/4">
-            <label className="col-span-4 text-secondary-300">Description</label>
-            <input
-              {...register(`question.${id}.parameters.description`)}
-              type="email"
-              className="border border-secondary-200 rounded-md p-2 col-span-8"
-              placeholder="Type help information for question here..."
-            />
-          </div>
-          <div className="grid grid-cols-12 w-3/4">
             <label className="col-span-4 text-secondary-300">
               Display title
             </label>
@@ -46,6 +37,19 @@ function RadioButton({ id, register, setValue, handleDelete }: Props) {
               placeholder="Display title"
             />
           </div>
+
+          <div className="grid grid-cols-12 w-3/4">
+            <label className="col-span-4 text-secondary-300">
+              Variable name
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.variable_name`)}
+              type="text"
+              className="border border-secondary-200 rounded-md p-2 col-span-8"
+              placeholder="Define Variable Name"
+            />
+          </div>
+
           <div className="grid grid-cols-12 w-3/4">
             <label className="col-span-4 text-secondary-300">
               Question Media Type
@@ -100,6 +104,19 @@ function RadioButton({ id, register, setValue, handleDelete }: Props) {
           </div>
           <div className="grid grid-cols-12 w-3/4">
             <label className="col-span-4 text-secondary-300">
+              Number of Columns
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.number_of_columns`)}
+              type="text"
+              className="border border-secondary-200 rounded-md p-2 col-span-2"
+            />
+            <span className="inline-flex items-center col-span-4 text-secondary-300 pl-5">
+              (Web Survey Only)
+            </span>
+          </div>
+          <div className="grid grid-cols-12 w-3/4">
+            <label className="col-span-4 text-secondary-300">
               Is Question Required?
             </label>
             <input
@@ -108,63 +125,7 @@ function RadioButton({ id, register, setValue, handleDelete }: Props) {
               className="border border-secondary-200 rounded-md p-2"
             />
           </div>
-          <div className="grid grid-cols-12 w-3/4">
-            <label className="col-span-4 text-secondary-300">
-              Minimum Options Required
-            </label>
-            <input
-              {...register(`question.${id}.parameters.minimumOptionsReq`)}
-              type="text"
-              className="border border-secondary-200 rounded-md p-2 col-span-8"
-              placeholder="Set default value"
-            />
-          </div>
-          <div className="grid grid-cols-12 w-3/4">
-            <label className="col-span-4 text-secondary-300">
-              Maximum Options Required
-            </label>
-            <input
-              {...register(`question.${id}.parameters.maximumOptionsReq`)}
-              type="text"
-              className="border border-secondary-200 rounded-md p-2 col-span-8"
-              placeholder="Set default value"
-            />
-          </div>
-          <div className="grid grid-cols-12 w-3/4">
-            <label className="col-span-4 text-secondary-300">
-              Unique Options
-            </label>
-            <div className="col-span-8">
-              <textarea
-                className="border border-secondary-200 rounded-md p-2 w-full"
-                id="uniqueOptions"
-                {...register(`question.${id}.parameters.uniqueOptions`)}
-                placeholder=""
-              />
-              <p className="text-secondary-300">One option per line</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-12 w-3/4">
-            <label className="col-span-4 text-secondary-300">
-              Check All Options
-            </label>
-            <input
-              {...register(`question.${id}.parameters.checkAllOptions`)}
-              type="text"
-              className="border border-secondary-200 rounded-md p-2 col-span-8"
-              placeholder=""
-            />
-          </div>
-          <div className="grid grid-cols-12 w-3/4">
-            <label className="col-span-4 text-secondary-300">
-              Enable Text Search
-            </label>
-            <input
-              {...register(`question.${id}.parameters.enable_text_search`)}
-              type="Checkbox"
-              className="border border-secondary-200 rounded-md p-2"
-            />
-          </div>
+
           <div className="grid grid-cols-12 w-3/4">
             <label className="col-span-4 text-secondary-300">
               Randomize Options
@@ -181,4 +142,4 @@ function RadioButton({ id, register, setValue, handleDelete }: Props) {
   );
 }
 
-export default RadioButton;
+export default RadioButtonWithText;
