@@ -28,13 +28,40 @@ function page() {
   },[])
 
   async function submitHandler(data: any) {
-    const params = {...data,created_by:"rohitchand490@gmail.com"}
-    setLoading(true)
-    const res = await createSurvey(params)
-    if(res.success) toast.success("created")
-    else toast.error("failed")
-    setLoading(false)
-    // window.open("/admin/surveys/questions","_self")
+    console.log(data);
+    const formData = new FormData();
+    for (const key in data) {
+      if ( key !== 'welcome_image' && key !== 'thankyou_image') {
+        formData.append(key, data[key]);
+      }
+    }
+    if (data.welcome_image && data.welcome_image[0]) {
+      formData.append('welcome_image', data.welcome_image[0]);
+    }
+    if (data.thankyou_image && data.thankyou_image[0]) {
+      formData.append('thankyou_image', data.thankyou_image[0]);
+    }
+
+    formData.append('created_by', 'rohitchand490@gmail.com');
+  
+    setLoading(true);
+
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
+    try {
+      const res = await createSurvey(formData);
+      if (res.success) {
+        toast.success('Survey created successfully!');
+      } else {
+        toast.error('Failed to create survey.');
+      }
+    } catch (error) {
+      toast.error('Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -86,7 +113,7 @@ function page() {
                 <input
                   {...register("welcome_image")}
                   type="file"
-                  className="hidden" // Hide the actual file input
+                  className="hidden"
                 />
               </label>
             </div>
@@ -106,7 +133,7 @@ function page() {
                 <input
                   {...register("thankyou_image")}
                   type="file"
-                  className="hidden" // Hide the actual file input
+                  className="hidden"
                 />
               </label>
             </div>

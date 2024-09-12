@@ -4,18 +4,17 @@ const Survey = require('../models/survey');
 exports.saveSurvey = async (req, res) => {
     try {
         const {created_by, name, header_text, access_pin, background_location_capture } = req.body;
-        console.log("body-->",req.body)
-
-        let welcomeImage, thanksImage;
-        if (req.files && req.files.welcomeImage) {
-            welcomeImage = req.files.welcomeImage.data;
+        console.log(req.files)
+        let welcome_image, thankyou_image;
+        if (req.files && req.files.welcome_image) {
+            welcome_image = req.files.welcome_image.data;
         }
 
-        if (req.files && req.files.thanksImage) {
-            thanksImage = req.files.thanksImage.data;
+        if (req.files && req.files.thankyou_image) {
+            thankyou_image = req.files.thankyou_image.data;
         }
 
-        const survey = new Survey({ created_by, name, header_text, access_pin, background_location_capture, welcomeImage, thanksImage });
+        const survey = new Survey({ created_by, name, header_text, access_pin, background_location_capture, welcome_image, thankyou_image });
         await survey.save();
 
         return res.status(201).json({ success: true, message: 'Survey created successfully' });

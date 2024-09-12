@@ -30,10 +30,14 @@ const surveySchema = new Schema({
         type: Number,
         required: false,
     },
+    published:{
+        type: Boolean,
+        default: false
+    },
     questions: {
         type: Schema.Types.Mixed
     }
-});
+},{timestamps:true});
 
 const Survey = Mongoose.model('Survey99', surveySchema);
 
