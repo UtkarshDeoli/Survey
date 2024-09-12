@@ -16,7 +16,7 @@ function SurveyForm() {
 
   // Handle form submission
   function handleSubmitForm(data: any) {
-    console.log(data);
+    console.log(data.questions);
   }
 
   // Handle form deletion

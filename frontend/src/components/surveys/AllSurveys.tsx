@@ -1,8 +1,22 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { BsThreeDotsVertical } from "react-icons/bs"
-
+import { getAllSurveys } from "@/networks/survey_networks";
 function AllSurveys() {
+  const [allSurveys,setAllSurveys] = useState<any>([]);
+  const [loading,setLoading] = useState<boolean>(false);
+
+  useEffect(()=>{
+    handleGetAllSurveys()
+  },[])
+
+  async function handleGetAllSurveys(){
+    const params={} //to be dynamic
+    // setLoading(true)
+    const response = await getAllSurveys(params);
+    console.log(response);
+  }
   return (
     <div className="w-full px-8 py-3" >
     {/* surveys */}

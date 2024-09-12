@@ -1,24 +1,40 @@
 "use client";
 
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
+import { createSurvey } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 function page() {
+  const [loading,setLoading] = useState <boolean> (false)
+
   const params = useSearchParams();
   const name = params.get('name');
+  
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm();
 
+  useEffect(()=>{
+    if(name){
+      setValue("name",name)
+    }
+  },[])
 
-  function submitHandler(data: any) {
-    console.log(data);
-    window.open("/admin/surveys/questions","_self")
+  async function submitHandler(data: any) {
+    const params = {...data,created_by:"rohitchand490@gmail.com"}
+    setLoading(true)
+    const res = await createSurvey(params)
+    if(res.success) toast.success("created")
+    else toast.error("failed")
+    setLoading(false)
+    // window.open("/admin/surveys/questions","_self")
   }
 
   return (
@@ -101,7 +117,7 @@ function page() {
               Time duration
             </label>
             <input
-              {...register("duration")}
+              {...register("thank_time_duration")}
               type="number"
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
@@ -122,6 +138,7 @@ function page() {
               Background location capture
             </label>
             <input
+            type="number"
               {...register("background_location_capture")}
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />

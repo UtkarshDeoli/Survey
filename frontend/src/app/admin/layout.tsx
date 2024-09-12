@@ -1,6 +1,7 @@
 import Footer from "@/components/ui/Footer";
 import Navbar from "@/components/ui/Navbar";
 import Sidebar from "@/components/ui/Sidebar";
+import { Toaster } from "react-hot-toast";
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -15,6 +16,7 @@ function layout({children} : LayoutProps) {
             {children}
         </div>
         <Footer/>
+        <Toaster/>
     </div>
     
   )
