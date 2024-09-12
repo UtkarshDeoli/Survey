@@ -71,7 +71,7 @@ function DateForm({ id, register, setValue, handleDelete }: Props) {
             <select
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               id="mediaType"
-              {...register(`question.${id}.parameters.mediaType`, {})}
+              {...register(`questions.${id}.parameters.mediaType`, {})}
             >
               <option value="">Include Media Type</option>
               <option value="image">Image</option>
@@ -106,7 +106,7 @@ function DateForm({ id, register, setValue, handleDelete }: Props) {
               Is Question Required?
             </label>
             <input
-              {...register(`question.${id}.parameters.is_question_required`)}
+              {...register(`questions.${id}.parameters.is_question_required`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />
@@ -116,7 +116,7 @@ function DateForm({ id, register, setValue, handleDelete }: Props) {
               Current Date as answer
             </label>
             <input
-              {...register(`question.${id}.parameters.current_date_as_answer`)}
+              {...register(`questions.${id}.parameters.current_date_as_answer`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />
