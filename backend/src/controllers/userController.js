@@ -1,33 +1,49 @@
 const User = require('../models/user')
 
-exports.addUsers = async(req, res) => {
+exports.addUsers = async (req, res) => {
     try {
         const users = req.body
-        const dbRes=await User.insertMany(users);
-        return res.status(201).json({success: true, message: "user created successfully"})
+        const dbRes = await User.insertMany(users);
+        return res.status(201).json({ success: true, message: "user created successfully" })
     } catch (error) {
-        return res.status(400).json({success: false, message: 'something went wrong'})
+        return res.status(400).json({ success: false, message: 'something went wrong' })
     }
 }
 
-exports.updateUser = async(req, res) => {
+
+exports.updateUser = async (req, res) => {
     try {
         const user = req.body
         if (!user || !user.username) {
             return res.status(400).json({ error: 'Username is required' });
         }
-        const dbRes = await User.findOneAndUpdate({username: user.username},{$set:user},{ new: true, runValidators: true });
-        return res.status(200).json({success: true, message: "User updated successfully"})
+        const dbRes = await User.findOneAndUpdate({ username: user.username }, { $set: user }, { new: true, runValidators: true });
+        return res.status(200).json({ success: true, message: "User updated successfully" })
     } catch (error) {
-        return res.status(400).json({success: false, message: 'something went wrong'})
+        return res.status(400).json({ success: false, message: 'something went wrong' })
     }
 }
 
-exports.getUsers = async(req, res) => {
+exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find()
-        return res.status(200).json({success: true, data: users})
+        let filter = req.query.filter || "";
+        let createdBy = req.query.createdBy;
+
+        const validRoles = ['admin', 'boothKaryakarta', 'surveyCollector', 'supportExecutive', 'surveyManager'];
+
+        const searchConditions = [];
+        searchConditions.push({ name: { $regex: filter, $options: 'i' } });
+        searchConditions.push({ username: { $regex: filter, $options: 'i' } });
+        if (validRoles.includes(filter)) {
+            searchConditions.push({ role: filter });
+        }
+
+        const users = await User.find({
+            $or: searchConditions,
+            createdBy: createdBy
+        });
+        return res.status(200).json({ success: true, data: users })
     } catch (error) {
-        return res.status(400).json({success: false, message: 'something went wrong'})
+        return res.status(400).json({ success: false, message: 'something went wrong' })
     }
 }
