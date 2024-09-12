@@ -12,7 +12,7 @@ export const updateUsers =async (params:IUser)=>{
       headers: { 
         Authorization: `Bearer ${bearerToken}`,
       },
-      body:params
+      data:params
     }
     const response = await axios.request(options);
     return response.data.success;

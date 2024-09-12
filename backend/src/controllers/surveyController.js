@@ -3,23 +3,24 @@ const Survey = require('../models/survey');
 
 exports.saveSurvey = async (req, res) => {
     try {
-        const {createdBy, name, headerText, accessPin, backgroundLocationCapture } = req.body;
-
-        let welcomeImage, thanksImage;
-        if (req.files && req.files.welcomeImage) {
-            welcomeImage = req.files.welcomeImage.data;
+        const {created_by, name, header_text, access_pin, background_location_capture } = req.body;
+        console.log(req.files)
+        let welcome_image, thankyou_image;
+        if (req.files && req.files.welcome_image) {
+            welcome_image = req.files.welcome_image.data;
         }
 
-        if (req.files && req.files.thanksImage) {
-            thanksImage = req.files.thanksImage.data;
+        if (req.files && req.files.thankyou_image) {
+            thankyou_image = req.files.thankyou_image.data;
         }
 
-        const survey = new Survey({ createdBy, name, headerText, accessPin, backgroundLocationCapture, welcomeImage, thanksImage });
+        const survey = new Survey({ created_by, name, header_text, access_pin, background_location_capture, welcome_image, thankyou_image });
         await survey.save();
 
         return res.status(201).json({ success: true, message: 'Survey created successfully' });
 
     } catch (error) {
+        console.log(error);
         return res.status(400).json({ success: false, message: error.message });
     }
 };
@@ -42,8 +43,9 @@ exports.getSurvey = async (req, res) => {
 
 exports.getAllSurvey = async (req, res) => {
     try {
-        const createdBy = req.query.createdBy;
-        const survey = await Survey.find({createdBy});
+        console.log("route hitting")
+        const created_by = req.query.created_by;
+        const survey = await Survey.find({created_by});
         if(!survey) {
             return res.status(404).json({ success: "false", message: 'Survey not found' });
         }

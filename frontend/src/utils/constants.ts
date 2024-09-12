@@ -7,3 +7,5 @@ export const update_user='api/user/updateUser';
 
 
 // surveys
+export const create_survey = 'api/survey/saveSurvey'
+export const get_all_surveys = 'api/survey/getAllSurveys'
