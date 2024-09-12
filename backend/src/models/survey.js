@@ -2,7 +2,7 @@ const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 
 const surveySchema = new Schema({
-    createdBy: {
+    created_by: {
         type: String,
         required: true
     },
@@ -10,23 +10,23 @@ const surveySchema = new Schema({
         type: String,
         required: true
     },
-    headerText: {
+    header_text: {
         type: String,
     },
-    welcomeImage: {
+    welcome_image: {
         type: Buffer,
     }, 
-    thankYouImage: {
+    thankyou_image: {
         type: Buffer,
     },
-    thankTimeDuration: {
+    thank_time_duration: {
         type: Number,
         required: false,
     },
-    accessPin: {
+    access_pin: {
         type: String,
     },
-    backgroundLocationCapture: {
+    background_location_capture: {
         type: Number,
         required: false,
     },
