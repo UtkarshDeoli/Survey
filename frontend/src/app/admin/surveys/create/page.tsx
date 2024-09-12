@@ -3,11 +3,11 @@
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import { createSurvey } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-function page() {
+function Page() {
   const [loading,setLoading] = useState <boolean> (false)
 
   const params = useSearchParams();
@@ -186,4 +186,12 @@ function page() {
   );
 }
 
-export default page;
+
+
+const SuspendedCreateSurveyPage= () =>(
+  <Suspense>
+      <Page/>    
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;
