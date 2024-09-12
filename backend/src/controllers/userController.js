@@ -10,6 +10,7 @@ exports.addUsers = async(req, res) => {
     }
 }
 
+
 exports.updateUser = async(req, res) => {
     try {
         const user = req.body
@@ -23,9 +24,10 @@ exports.updateUser = async(req, res) => {
     }
 }
 
-exports.getUsers = async(req, res) => {
+exports.getAllUsers = async(req, res) => {
     try {
-        const users = await User.find()
+        const createdBy = req.params.createdBy;
+        const users = await User.find({createdBy: req.params.createdBy});
         return res.status(200).json({success: true, data: users})
     } catch (error) {
         return res.status(400).json({success: false, message: 'something went wrong'})
