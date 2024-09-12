@@ -2,9 +2,12 @@ const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 
 const surveySchema = new Schema({
+    createdBy: {
+        type: String,
+        required: true
+    },
     name: {
         type: String,
-        unique: true,
         required: true
     },
     headerText: {

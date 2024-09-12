@@ -3,7 +3,7 @@ const Survey = require('../models/survey');
 
 exports.saveSurvey = async (req, res) => {
     try {
-        const { name, headerText, accessPin, backgroundLocationCapture } = req.body;
+        const {createdBy, name, headerText, accessPin, backgroundLocationCapture } = req.body;
 
         let welcomeImage, thanksImage;
         if (req.files && req.files.welcomeImage) {
@@ -14,7 +14,7 @@ exports.saveSurvey = async (req, res) => {
             thanksImage = req.files.thanksImage.data;
         }
 
-        const survey = new Survey({ name, headerText, accessPin, backgroundLocationCapture, welcomeImage, thanksImage });
+        const survey = new Survey({ createdBy, name, headerText, accessPin, backgroundLocationCapture, welcomeImage, thanksImage });
         await survey.save();
 
         return res.status(201).json({ success: true, message: 'Survey created successfully' });
@@ -27,8 +27,8 @@ exports.saveSurvey = async (req, res) => {
 
 exports.getSurvey = async (req, res) => {
     try {
-        const surveyName = req.params.name;
-        const survey = await Survey.find({name: surveyName});
+        const id = req.params._id;
+        const survey = await Survey.find({_id: id});
         if(!survey) {
             return res.status(404).json({ success: "false", message: 'Survey not found' });
         }
@@ -42,7 +42,8 @@ exports.getSurvey = async (req, res) => {
 
 exports.getAllSurvey = async (req, res) => {
     try {
-        const survey = await Survey.find();
+        const createdBy = req.params.createdBy;
+        const survey = await Survey.find({createdBy});
         if(!survey) {
             return res.status(404).json({ success: "false", message: 'Survey not found' });
         }
@@ -56,8 +57,8 @@ exports.getAllSurvey = async (req, res) => {
 
 exports.updateSurvey = async (req, res) => {
     try {
-        const oldName = req.params.name;
-        const { name, headerText, accessPin, backgroundLocationCapture } = req.body;
+        const id = req.params._id;
+        const {createdBy, name, headerText, accessPin, backgroundLocationCapture } = req.body;
 
         let updateFields = { name, headerText, accessPin, backgroundLocationCapture };
 
@@ -69,7 +70,7 @@ exports.updateSurvey = async (req, res) => {
             updateFields.thanksImage = req.files.thanksImage.data;
         }
 
-        const result = await Survey.findOneAndUpdate({ name: oldName }, updateFields, { new: true });
+        const result = await Survey.findOneAndUpdate({ _id: id, createdBy}, updateFields, { new: true });
 
         if (!result) {
             return res.status(404).json({ success: false, message: 'Survey not found' });
