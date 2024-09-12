@@ -26,8 +26,26 @@ exports.updateUser = async(req, res) => {
 
 exports.getAllUsers = async(req, res) => {
     try {
-        const createdBy = req.params.createdBy;
-        const users = await User.find({createdBy: req.params.createdBy});
+        let filter = req.query.filter || "";
+
+        let createdBy = req.query.createdBy;
+        const users = await User.find({$or: [
+            {
+              name: {
+                $regex: filter,
+              },
+            },
+            {
+              username: {
+                $regex: filter,
+              },
+            },
+            {
+              role: {
+                $regex: filter,
+              },
+            },
+          ],createdBy: createdBy});
         return res.status(200).json({success: true, data: users})
     } catch (error) {
         return res.status(400).json({success: false, message: 'something went wrong'})

@@ -27,7 +27,7 @@ exports.saveSurvey = async (req, res) => {
 
 exports.getSurvey = async (req, res) => {
     try {
-        const id = req.params._id;
+        const id = req.query._id;
         const survey = await Survey.find({_id: id});
         if(!survey) {
             return res.status(404).json({ success: "false", message: 'Survey not found' });
@@ -42,7 +42,7 @@ exports.getSurvey = async (req, res) => {
 
 exports.getAllSurvey = async (req, res) => {
     try {
-        const createdBy = req.params.createdBy;
+        const createdBy = req.query.createdBy;
         const survey = await Survey.find({createdBy});
         if(!survey) {
             return res.status(404).json({ success: "false", message: 'Survey not found' });
@@ -57,7 +57,7 @@ exports.getAllSurvey = async (req, res) => {
 
 exports.updateSurvey = async (req, res) => {
     try {
-        const id = req.params._id;
+        const id = req.query._id;
         const {createdBy, name, headerText, accessPin, backgroundLocationCapture } = req.body;
 
         let updateFields = { name, headerText, accessPin, backgroundLocationCapture };
