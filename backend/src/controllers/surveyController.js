@@ -3,7 +3,7 @@ const Survey = require('../models/survey');
 
 exports.saveSurvey = async (req, res) => {
     try {
-        const { name, headerText, accessPin, backgroundLocationCapture } = req.body;
+        const {createdBy, name, headerText, accessPin, backgroundLocationCapture } = req.body;
 
         let welcomeImage, thanksImage;
         if (req.files && req.files.welcomeImage) {
