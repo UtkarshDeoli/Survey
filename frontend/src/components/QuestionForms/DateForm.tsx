@@ -7,12 +7,15 @@ import CustomDatePicker from "../surveys/CustomDatePicker";
 
 interface Props {
   id: string;
+  endIndex:number;
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   handleDelete: (id: string) => void;
+  handleDragEnter:()=>void
+  handleDragStart:()=>void
 }
 
-function DateForm({ id, register, setValue, handleDelete }: Props) {
+function DateForm({ id, register, setValue, handleDelete, handleDragStart, handleDragEnter,endIndex }: Props) {
   const [selectedDateMin, setSelectedDateMin] = useState<Date | null>(null);
   const [selectedDateMax, setSelectedDateMax] = useState<Date | null>(null);
 
@@ -22,7 +25,12 @@ function DateForm({ id, register, setValue, handleDelete }: Props) {
   }, []);
 
   return (
-    <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md">
+    <div 
+    onDragStart={handleDragStart}
+    onDragEnter={handleDragEnter}
+    draggable 
+    className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
+    >
       <FormHeader
         id={id}
         register={register}

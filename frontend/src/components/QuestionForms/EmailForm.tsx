@@ -7,13 +7,16 @@ import { FaRegFolderOpen } from "react-icons/fa";
 
 interface Props {
     id: string;
+    endIndex:number;
     register: ReturnType<typeof useForm>["register"];
     setValue: ReturnType<typeof useForm>["setValue"];
     control: ReturnType<typeof useForm>["control"];
     handleDelete:(id:string)=>void
+    handleDragEnter:()=>void
+    handleDragStart:()=>void
   }
   
-  function EmailForm({ id, register, setValue, control ,handleDelete}: Props) {
+  function EmailForm({ id, register, setValue, control, handleDelete, handleDragStart, handleDragEnter,endIndex}: Props) {
 
     useEffect(()=>{
       setValue(`questions.${id}.type`,"email");
@@ -26,7 +29,11 @@ interface Props {
       defaultValue: "",
     })
     return (
-      <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden">
+      <div 
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      draggable 
+      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}>
         <FormHeader handleDelete={handleDelete} register={register} id={id} input={true}/>
         <div className="bg-blue-100 p-5 w-full">
           <div className="flex flex-col justify-center items-center p-5 gap-3 bg-white w-full">

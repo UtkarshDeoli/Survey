@@ -2,35 +2,42 @@ const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 
 const surveySchema = new Schema({
-    name: {
+    created_by: {
         type: String,
-        unique: true,
         required: true
     },
-    headerText: {
+    name: {
+        type: String,
+        required: true
+    },
+    header_text: {
         type: String,
     },
-    welcomeImage: {
+    welcome_image: {
         type: Buffer,
     }, 
-    thankYouImage: {
+    thankyou_image: {
         type: Buffer,
     },
-    thankTimeDuration: {
+    thank_time_duration: {
         type: Number,
         required: false,
     },
-    accessPin: {
+    access_pin: {
         type: String,
     },
-    backgroundLocationCapture: {
+    background_location_capture: {
         type: Number,
         required: false,
+    },
+    published:{
+        type: Boolean,
+        default: false
     },
     questions: {
         type: Schema.Types.Mixed
     }
-});
+},{timestamps:true});
 
 const Survey = Mongoose.model('Survey99', surveySchema);
 

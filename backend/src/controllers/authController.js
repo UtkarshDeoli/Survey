@@ -5,7 +5,8 @@ const User = require('../models/user');
 const bcrypt = require("bcrypt");   
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
-
+const {generateResetToken} = require('../utils/utils');
+const {sendPasswordResetEmail} = require('../services/emailService');
 
 
 exports.login = async (req, res) => {
@@ -76,3 +77,81 @@ exports.signup = async (req, res) => {
         res.status(500).json({ message: "Internal server error", error: error });
     }
 };
+
+
+exports.forgotPassword = async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User Email not found",
+        });
+      }
+  
+      // Generate a JWT token with user ID and email
+      const token = generateResetToken(user._id, user.email);
+      
+      // Create a password reset link containing the token
+      const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+      
+      // Send the reset link via email
+      await sendPasswordResetEmail(user.email, resetLink);
+  
+      return res.status(200).json({
+        success: true,
+        message: "Password reset link sent to your email",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        error: error.message,
+      });
+    }
+  };
+
+
+exports.resetPassword = async (req, res) => {
+    try {
+      const { token, new_password } = req.body;
+  
+      // Verify the token
+      const decoded = jwt.verify(token, JWT_SECRET);
+      console.log(decoded);
+      // Find the user by ID
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+  
+      // Update the password
+      const hashedPass = await bcrypt.hash(new_password, 10)
+      //console.log(hashedPass);
+      user.password = hashedPass;
+      await user.save();
+  
+      return res.status(200).json({
+        success: true,
+        message: "Password successfully reset",
+      });
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({
+          success: false,
+          message: "Token has expired",
+        });
+      }
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        error: error.message,
+      });
+    }
+  };
+
