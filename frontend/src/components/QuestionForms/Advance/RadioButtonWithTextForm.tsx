@@ -31,7 +31,7 @@ function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
               Display title
             </label>
             <input
-              {...register(`question.${id}.parameters.display_title`)}
+              {...register(`questions.${id}.parameters.display_title`)}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder="Display title"
@@ -57,7 +57,7 @@ function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
             <select
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               id="mediaType"
-              {...register(`question.${id}.parameters.mediaType`, {})}
+              {...register(`questions.${id}.parameters.mediaType`, {})}
             >
               <option value="">Include Media Type</option>
               <option value="image">Image</option>
@@ -71,7 +71,7 @@ function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="options"
-                {...register(`question.${id}.parameters.options`)}
+                {...register(`questions.${id}.parameters.options`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line</p>
@@ -82,7 +82,7 @@ function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
               Default Value
             </label>
             <input
-              {...register(`question.${id}.parameters.default_value`)}
+              {...register(`questions.${id}.parameters.default_value`)}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder="Set default value"
@@ -96,7 +96,7 @@ function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="hiddenOptions"
-                {...register(`question.${id}.parameters.hiddenOptions`)}
+                {...register(`questions.${id}.parameters.hiddenOptions`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line</p>
@@ -120,7 +120,7 @@ function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
               Is Question Required?
             </label>
             <input
-              {...register(`question.${id}.parameters.is_question_required`)}
+              {...register(`questions.${id}.parameters.is_question_required`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />
@@ -131,7 +131,7 @@ function RadioButtonWithText({ id, register, setValue, handleDelete }: Props) {
               Randomize Options
             </label>
             <input
-              {...register(`question.${id}.parameters.randomize_options`)}
+              {...register(`questions.${id}.parameters.randomize_options`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />

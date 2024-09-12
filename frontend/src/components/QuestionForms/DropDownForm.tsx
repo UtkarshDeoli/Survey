@@ -68,7 +68,7 @@ function DropDownForm({ id, register, setValue, handleDelete }: Props) {
             <select
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               id="mediaType"
-              {...register(`question.${id}.parameters.mediaType`, {})}
+              {...register(`questions.${id}.parameters.mediaType`, {})}
             >
               <option value="">Include Media Type</option>
               <option value="image">Image</option>
@@ -83,7 +83,7 @@ function DropDownForm({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="options"
-                {...register(`question.${id}.parameters.options`)}
+                {...register(`questions.${id}.parameters.options`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line</p>
@@ -110,7 +110,7 @@ function DropDownForm({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="hiddenOptions"
-                {...register(`question.${id}.parameters.hiddenOptions`)}
+                {...register(`questions.${id}.parameters.hiddenOptions`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line</p>
@@ -122,7 +122,7 @@ function DropDownForm({ id, register, setValue, handleDelete }: Props) {
               Is Question Required?
             </label>
             <input
-              {...register(`question.${id}.parameters.is_question_required`)}
+              {...register(`questions.${id}.parameters.is_question_required`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />
@@ -133,7 +133,7 @@ function DropDownForm({ id, register, setValue, handleDelete }: Props) {
               Enable Text Search
             </label>
             <input
-              {...register(`question.${id}.parameters.enable_text_search`)}
+              {...register(`questions.${id}.parameters.enable_text_search`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />
@@ -144,7 +144,7 @@ function DropDownForm({ id, register, setValue, handleDelete }: Props) {
               Randomize Options
             </label>
             <input
-              {...register(`question.${id}.parameters.randomize_options`)}
+              {...register(`questions.${id}.parameters.randomize_options`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />

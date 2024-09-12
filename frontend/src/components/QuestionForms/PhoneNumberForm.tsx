@@ -86,7 +86,7 @@ function PhoneNumberForm({ id, register, setValue, handleDelete }: Props) {
             <select
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               id="mediaType"
-              {...register(`question.${id}.parameters.mediaType`, {})}
+              {...register(`questions.${id}.parameters.mediaType`, {})}
             >
               <option value="">Include Media Type</option>
               <option value="image">Image</option>
@@ -100,7 +100,7 @@ function PhoneNumberForm({ id, register, setValue, handleDelete }: Props) {
               Is Question Required?
             </label>
             <input
-              {...register(`question.${id}.parameters.is_question_required`)}
+              {...register(`questions.${id}.parameters.is_question_required`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />

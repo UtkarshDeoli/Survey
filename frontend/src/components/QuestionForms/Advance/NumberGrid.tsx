@@ -32,7 +32,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="hiddenOptions"
-                {...register(`question.${id}.parameters.row_options`)}
+                {...register(`questions.${id}.parameters.row_options`)}
                 placeholder=""
               />
               <p className="text-secondary-300">
@@ -48,7 +48,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="hiddenOptions"
-                {...register(`question.${id}.parameters.row_options`)}
+                {...register(`questions.${id}.parameters.row_options`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line.</p>
@@ -94,7 +94,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
             </label>
             <input
               {...register(
-                `question.${id}.parameters.are_all_questions_required`,
+                `questions.${id}.parameters.are_all_questions_required`,
               )}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
@@ -121,7 +121,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
               className="border border-secondary-200 rounded-md p-2 col-span-5"
               id="mediaType"
               {...register(
-                `question.${id}.parameters.forward_row_options_type`,
+                `questions.${id}.parameters.forward_row_options_type`,
               )}
             >
               <option value=""></option>
@@ -150,7 +150,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
               className="border border-secondary-200 rounded-md p-2 col-span-5"
               id="mediaType"
               {...register(
-                `question.${id}.parameters.forward_column_options_type`,
+                `questions.${id}.parameters.forward_column_options_type`,
               )}
             >
               <option value=""></option>
@@ -165,7 +165,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
             </label>
             <input
               {...register(
-                `question.${id}.parameters.display_as_grid_in_tablet_ipad`,
+                `questions.${id}.parameters.display_as_grid_in_tablet_ipad`,
               )}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
