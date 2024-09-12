@@ -3,7 +3,7 @@ import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import Active from "@/components/ui/status/Active";
 import Inactive from "@/components/ui/status/Inactive";
-import { getUsers } from "@/networks/get_users";
+import { getUsers } from "@/networks/user_networks";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";

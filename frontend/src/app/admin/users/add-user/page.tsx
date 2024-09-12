@@ -3,7 +3,7 @@ import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { IUser } from '@/types/user_interfaces';
-import { addUsers } from '@/networks/add_users';
+import { addUsers } from '@/networks/user_networks';
 
 function Page() {
   const { register, handleSubmit, formState: { errors } } = useForm<IUser>();

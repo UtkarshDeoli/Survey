@@ -13,7 +13,7 @@ interface Props {
 
 function CheckboxList({ id, register, setValue, handleDelete }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "chekcbox_list");
+    setValue(`questions.${id}.type`, "checkbox_list");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
@@ -30,7 +30,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
           <div className="grid grid-cols-12 w-3/4">
             <label className="col-span-4 text-secondary-300">Description</label>
             <input
-              {...register(`question.${id}.parameters.description`)}
+              {...register(`questions.${id}.parameters.description`)}
               type="email"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder="Type help information for question here..."
@@ -41,7 +41,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Variable Name
             </label>
             <input
-              {...register(`question.${id}.parameters.variable_name`)}
+              {...register(`questions.${id}.parameters.variable_name`)}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder="Define variable name"
@@ -54,7 +54,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
             <select
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               id="mediaType"
-              {...register(`question.${id}.parameters.mediaType`, {})}
+              {...register(`questions.${id}.parameters.mediaType`, {})}
             >
               <option value="">Include Media Type</option>
               <option value="image">Image</option>
@@ -68,7 +68,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="options"
-                {...register(`question.${id}.parameters.options`)}
+                {...register(`questions.${id}.parameters.options`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line</p>
@@ -79,7 +79,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Default Value
             </label>
             <input
-              {...register(`question.${id}.parameters.default_value`)}
+              {...register(`questions.${id}.parameters.default_value`)}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder="Set default value"
@@ -93,7 +93,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="hiddenOptions"
-                {...register(`question.${id}.parameters.hiddenOptions`)}
+                {...register(`questions.${id}.parameters.hiddenOptions`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line</p>
@@ -104,7 +104,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Is Question Required?
             </label>
             <input
-              {...register(`question.${id}.parameters.is_question_required`)}
+              {...register(`questions.${id}.parameters.is_question_required`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />
@@ -114,7 +114,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Minimum Options Required
             </label>
             <input
-              {...register(`question.${id}.parameters.minimumOptionsReq`)}
+              {...register(`questions.${id}.parameters.minimumOptionsReq`)}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder=""
@@ -125,7 +125,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Maximum Options Selectable
             </label>
             <input
-              {...register(`question.${id}.parameters.maximumOptionsReq`)}
+              {...register(`questions.${id}.parameters.maximumOptionsReq`)}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder=""
@@ -139,7 +139,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
                 id="uniqueOptions"
-                {...register(`question.${id}.parameters.uniqueOptions`)}
+                {...register(`questions.${id}.parameters.uniqueOptions`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line</p>
@@ -150,7 +150,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Check All Options
             </label>
             <input
-              {...register(`question.${id}.parameters.checkAllOptions`)}
+              {...register(`questions.${id}.parameters.checkAllOptions`)}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8"
               placeholder=""
@@ -161,7 +161,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Enable Text Search
             </label>
             <input
-              {...register(`question.${id}.parameters.enable_text_search`)}
+              {...register(`questions.${id}.parameters.enable_text_search`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />
@@ -171,7 +171,7 @@ function CheckboxList({ id, register, setValue, handleDelete }: Props) {
               Randomize Options
             </label>
             <input
-              {...register(`question.${id}.parameters.randomize_options`)}
+              {...register(`questions.${id}.parameters.randomize_options`)}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
             />

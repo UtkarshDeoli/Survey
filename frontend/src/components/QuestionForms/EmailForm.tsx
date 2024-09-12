@@ -25,7 +25,6 @@ interface Props {
       name: `questions.${id}.parameters.question_media_type`,
       defaultValue: "",
     })
-    console.log(media)
     return (
       <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden">
         <FormHeader handleDelete={handleDelete} register={register} id={id} input={true}/>
