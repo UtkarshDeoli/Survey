@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+// const mongoose = require('mongoose');
+// const Schema = mongoose.Schema;
 
-const formSchema = new Schema({
-    questions: {
-        type: Schema.Types.Mixed
-    }
-});
+// const formSchema = new Schema({
+//     questions: {
+//         type: Schema.Types.Mixed
+//     }
+// });
 
 
 
