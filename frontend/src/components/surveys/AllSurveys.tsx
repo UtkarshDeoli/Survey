@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { getAllSurveys } from "@/networks/survey_networks";
 import { formatDate } from "@/utils/common_functions";
+import { useRouter } from "next/navigation";
 function AllSurveys() {
   const [allSurveys, setAllSurveys] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const router = useRouter()
 
   useEffect(() => {
     handleGetAllSurveys();
@@ -34,7 +37,7 @@ function AllSurveys() {
             key={index}
             className="grid grid-cols-10 px-8 py-[16px] border border-secondary-200 w-full"
           >
-            <p className="col-span-4">{el.name}</p>
+            <p onClick={()=>router.push(`/admin/surveys/${el._id}`)} className="col-span-4 cursor-pointer underline">{el.name}</p>
             <p className="col-span-2">0</p>
             <p className="col-span-2">{formatDate(el.createdAt)}</p>
             <div className="col-span-2 flex items-center justify-between w-full">

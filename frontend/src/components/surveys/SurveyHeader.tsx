@@ -37,7 +37,7 @@ function SurveyHeader() {
         <div className="bg-secondary-100 h-full w-full px-8 py-3 flex justify-between items-center">
            <h3 className="text-secondary-300">Surveys</h3>
            <div className=" flex gap-2">
-                <ButtonBordered className="bg-white font-semibold"> + Copy template</ButtonBordered>
+                {/* <ButtonBordered className="bg-white font-semibold"> + Copy template</ButtonBordered> */}
                 <ButtonBordered 
                 onClick={openModal} 
                 className="bg-white font-semibold"> + Create survey</ButtonBordered>

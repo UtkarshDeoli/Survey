@@ -1,79 +1,94 @@
-"use client";
+"use client"
 
+import EditSurveysHeader from "@/components/surveys/EditSurveysHeader"
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
-import { createSurvey } from "@/networks/survey_networks";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { Suspense, useEffect, useState } from "react";
+import { createSurvey, getSurvey } from "@/networks/survey_networks";
+import { useParams } from "next/navigation"
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-function Page() {
-  const [loading,setLoading] = useState <boolean> (false)
+function page() {
+    const [surveyData,setSurveyData] = useState <any> ([]);
+    const [loading,setLoading] = useState <boolean>(false)
+    const params = useParams()
+    const surveyId = Array.isArray(params.survey_id) ? params.survey_id[0] : params.survey_id;
 
-  const params = useSearchParams();
-  const name = params.get('name');
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors, isSubmitting },
+      } = useForm({
+        defaultValues:surveyData
+      });
 
-  const router = useRouter();
-  
+    useEffect(()=>{
+        getSurveyData()
+    },[])
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm();
+    useEffect(() => {
+        if (surveyData) {
+          Object.keys(surveyData).forEach((key) => {
+            setValue(key, surveyData[key]);
+          });
+        }
+      }, [surveyData, setValue]);
 
-  useEffect(()=>{
-    if(name){
-      setValue("name",name)
+    console.log("survey data--->",surveyData)
+    
+
+    async function getSurveyData(){
+        const params ={_id:surveyId}
+        const response = await getSurvey(params)
+        console.log(response)
+        if(response.success){
+            setSurveyData(response.data[0])
+        }else{
+            toast.error("something went wrong")
+        }
     }
-  },[])
 
-  async function submitHandler(data: any) {
-    const formData = new FormData();
-    for (const key in data) {
-      if ( key !== 'welcome_image' && key !== 'thankyou_image') {
-        formData.append(key, data[key]);
+    async function submitHandler(data: any) {
+        const formData = new FormData();
+        for (const key in data) {
+          if ( key !== 'welcome_image' && key !== 'thankyou_image') {
+            formData.append(key, data[key]);
+          }
+        }
+        if (data.welcome_image && data.welcome_image[0]) {
+          formData.append('welcome_image', data.welcome_image[0]);
+        }
+        if (data.thankyou_image && data.thankyou_image[0]) {
+          formData.append('thankyou_image', data.thankyou_image[0]);
+        }
+    
+        formData.append('created_by', 'rohitchand490@gmail.com');
+      
+        setLoading(true);
+    
+        try {
+          const res = await createSurvey(formData);
+          console.log(res);
+          if (res.success) {
+            toast.success('Survey created successfully!');
+    
+          } else {
+            toast.error('Failed to create survey.');
+          }
+        } catch (error) {
+          toast.error('Something went wrong.');
+        } finally {
+          setLoading(false);
+        }
       }
-    }
-    if (data.welcome_image && data.welcome_image[0]) {
-      formData.append('welcome_image', data.welcome_image[0]);
-    }
-    if (data.thankyou_image && data.thankyou_image[0]) {
-      formData.append('thankyou_image', data.thankyou_image[0]);
-    }
-
-    formData.append('created_by', 'rohitchand490@gmail.com');
-  
-    setLoading(true);
-
-    try {
-      const res = await createSurvey(formData);
-      console.log(res);
-      if (res.success) {
-        toast.success('Survey created successfully!');
-        router.push(`/admin/surveys/questions?id=${res.survey._id}&created_by=${encodeURIComponent(res.survey.created_by)}`);
-
-      } else {
-        toast.error('Failed to create survey.');
-      }
-    } catch (error) {
-      toast.error('Something went wrong.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
+    
   return (
-    <section className="w-full">
-      <header className="w-full h-16 border-2">
-        <div className="bg-secondary-100 h-full w-full px-8 py-3 flex justify-between items-center">
-          <h3 className="text-secondary-300">Create Surveys</h3>
-        </div>
-      </header>
+    <main className="w-full">
+        <div className="w-full flex flex-col gap-5">
+            <EditSurveysHeader id={surveyId} created_by={surveyData.created_by} name={surveyData.name}/>
 
-      {/* form */}
-      <form
+            <form
         className="grid grid-cols-2 m-10"
         onSubmit={handleSubmit(submitHandler)}
       >
@@ -82,7 +97,7 @@ function Page() {
           <div className="grid grid-cols-3">
             <label className="text-secondary-300 font-medium">Name</label>
             <input
-              value={name||""}
+              value={surveyData.name||""}
               disabled
               {...register("name")}
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
@@ -182,16 +197,9 @@ function Page() {
           </button>
         </div>
       </form>
-    </section>
-  );
+        </div>
+    </main>
+  )
 }
 
-
-
-const SuspendedCreateSurveyPage= () =>(
-  <Suspense>
-      <Page/>    
-  </Suspense>
-);
-
-export default SuspendedCreateSurveyPage;
+export default page

@@ -1,9 +1,14 @@
+"use client"
+
+import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import Navbar from "@/components/ui/Navbar";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter()
   return (
-    <main>
-      Home
+    <main className="flex w-screen h-screen justify-center items-center bg-black">
+      <ButtonFilled onClick={()=>router.push("/admin/surveys")}>Go to admin</ButtonFilled>
     </main>
   );
 }
