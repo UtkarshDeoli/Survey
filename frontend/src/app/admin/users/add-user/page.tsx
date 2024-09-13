@@ -14,15 +14,9 @@ function Page() {
     const params=[data]
     console.log("datatata::::",params)
     const res=await addUsers(params);
-<<<<<<< main
-    if(res){
-      router.replace('/admin/users')
-    }
-=======
     // if(res){
-    //   window.location.replace('/admin/users')
+    //   router.replace('/admin/users')
     // }
->>>>>>> backend
   };
 
   return (
