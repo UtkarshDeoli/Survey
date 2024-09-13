@@ -19,7 +19,7 @@ function AllSurveys() {
     const params = {}; //to be dynamic
     setLoading(true)
     const response = await getAllSurveys(params);
-    setAllSurveys(response.data)
+    setAllSurveys(response.survey)
   }
   return (
     <div className="w-full px-8 py-3">
