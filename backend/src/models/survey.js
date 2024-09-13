@@ -1,22 +1,44 @@
 const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 
-const userSchema = new Schema({
-    email: {
+const surveySchema = new Schema({
+    created_by: {
         type: String,
-        unique: true,
         required: true
     },
-    otp: {
+    name: {
         type: String,
-        required: false
+        required: true
     },
-    created_at: {
-        type: Date,
-        default: Date.now
+    header_text: {
+        type: String,
+    },
+    welcome_image: {
+        type: Buffer,
+    }, 
+    thankyou_image: {
+        type: Buffer,
+    },
+    thank_time_duration: {
+        type: Number,
+        required: false,
+    },
+    access_pin: {
+        type: String,
+    },
+    background_location_capture: {
+        type: Number,
+        required: false,
+    },
+    published:{
+        type: Boolean,
+        default: false
+    },
+    questions: {
+        type: Schema.Types.Mixed
     }
-});
+},{timestamps:true});
 
-const Users = Mongoose.model('Users', userSchema);
+const Survey = Mongoose.model('Survey99', surveySchema);
 
-module.exports = Users;
+module.exports = Survey;
