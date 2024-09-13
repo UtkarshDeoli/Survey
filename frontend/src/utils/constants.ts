@@ -1,4 +1,5 @@
-export const SERVER_URI = "http://localhost:6969";
+// export const SERVER_URI = "http://localhost:6969";
+export const SERVER_URI = "https://survey-3uf0.onrender.com";
 
 // users
 export const get_users = "api/user/getUsers";
