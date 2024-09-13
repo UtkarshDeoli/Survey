@@ -25,15 +25,34 @@ exports.saveSurvey = async (req, res) => {
     }
 };
 
+exports.deleteSurvey = async (req, res) => {
+    try {
+        console.log("delete route hitting")
+        const id = req.query._id;
+        const created_by = req.query.created_by;
+
+        const survey = await Survey.findOneAndDelete({ _id: id, created_by });
+
+        if (!survey) {
+            return res.status(404).json({ success: false, message: 'Survey not found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Survey deleted successfully' });
+
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
+    }   
+}
+
 
 exports.getSurvey = async (req, res) => {
     try {
         const id = req.query._id;
-        const survey = await Survey.find({_id: id});
-        if(!survey) {
+        const survey = await Survey.find({ _id: id });
+        if (!survey) {
             return res.status(404).json({ success: "false", message: 'Survey not found' });
         }
-        else{
+        else {
             return res.status(201).json({ success: "true", data: survey });
         }
     } catch (error) {
@@ -44,18 +63,52 @@ exports.getSurvey = async (req, res) => {
 exports.getAllSurvey = async (req, res) => {
     try {
         console.log("route hitting")
-        const created_by = req.query.created_by;
-        const survey = await Survey.find({created_by});
-        if(!survey) {
-            return res.status(404).json({ success: "false", message: 'Survey not found' });
+
+        const { page = 1, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
+
+        const order = sortOrder === 'asc' ? 1 : -1;
+
+        const skip = (page - 1) * limit;
+        const sortOptions = {};
+
+        if (sortBy === 'name') {
+            sortOptions.name = order;
+        } else if (sortBy === 'createdAt') {
+            sortOptions.createdAt = order;
         }
-        else{
-            return res.status(201).json({ success: "true", data: survey });
+
+        const created_by = req.query.created_by;
+
+        const findOptions = { created_by };
+
+        if(req.query.published){
+            findOptions.published = req.query.published;
+        }
+
+        const survey = await Survey.find(findOptions)
+            .skip(skip)
+            .limit(limit)
+            .sort(sortOptions)
+            .collation({ locale: 'en', strength: 2 }); // Case-insensitive sorting
+
+        const total = await Survey.countDocuments();
+
+        if (!survey) {
+            return res.status(404).json({ success: "false", message: 'Survey not found' });
+        } else {
+            return res.status(201).json({
+                success: "true", total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+                survey
+            });
         }
     } catch (error) {
         return res.status(400).json({ success: "false", message: error.message });
     }
-}
+};
+
 
 exports.updateSurvey = async (req, res) => {
     try {

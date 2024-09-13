@@ -27,9 +27,9 @@ exports.updateUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
     try {
         let filter = req.query.filter || "";
-        let createdBy = req.query.createdBy;
+        let created_by = req.query.created_by;
 
-        const validRoles = ['admin', 'boothKaryakarta', 'surveyCollector', 'supportExecutive', 'surveyManager'];
+        const validRoles = ['admin', 'booth_karyakarta', 'survey_collector', 'support_executive', 'survey_manager'];
 
         const searchConditions = [];
         searchConditions.push({ name: { $regex: filter, $options: 'i' } });
@@ -40,7 +40,7 @@ exports.getAllUsers = async (req, res) => {
 
         const users = await User.find({
             $or: searchConditions,
-            createdBy: createdBy
+            created_by: created_by
         });
         return res.status(200).json({ success: true, data: users })
     } catch (error) {
