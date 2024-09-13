@@ -4,14 +4,14 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 
 const userSchema = new Schema({
-    createdBy: {
+    created_by: {
         type: String,
     },
     username: {
         type: String,
         required: true
     },
-    addedBy: {
+    added_by: {
         type: String
     },
     name: {
@@ -26,40 +26,40 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    phoneNumber: {
+    phone_number: {
         type: Number,
         required: false
     },
     role: {
         type: String,
-        enum: ['admin', 'boothKaryakarta', 'surveyCollector', 'supportExecutive', 'surveyManager'],
+        enum: ['admin', 'booth_karyakarta', 'survey_collector', 'support_executive', 'survey_manager'],
         required: true
     },
-    autoAssignSurvey: {
+    auto_assign_survey: {
         type: Boolean,
         default: false
     },
-    veiwOwnCollectData: {
+    veiw_own_collected_data: {
         type: Boolean,
         default: false
     },
-    preventDataDownload: {
+    prevent_data_download: {
         type: Boolean,
         default: false
     },
-    preventDataAnalytics: {
+    prevent_data_analytics: {
         type: Boolean,
         default: false
     },
-    removeAudioRecordingAccess: {
+    remove_audio_recording_access: {
         type: Boolean,
         default: false
     },
-    viewPendingData: {
+    view_pending_data: {
         type: Boolean,
         default: false
     },
-    assignedSurvey: [String],
+    assigned_survey: [String],
     status:{
         type: String,
         enum: ['active', 'inactive'],
