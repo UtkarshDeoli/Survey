@@ -6,17 +6,23 @@ import FormHeader from "./FormHeader";
 
 interface Props {
   id: string;
+  endIndex: number;
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   handleDelete: (id: string) => void;
+  handleDragEnter: () => void;
+  handleDragStart: () => void;
   defaultQuestionTitle?: string;
 }
 
 function PhoneNumberForm({
   id,
+  endIndex,
   register,
   setValue,
   handleDelete,
+  handleDragEnter,
+  handleDragStart,
   defaultQuestionTitle,
 }: Props) {
   useEffect(() => {
@@ -24,7 +30,12 @@ function PhoneNumberForm({
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
-    <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md">
+    <div
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      draggable
+      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
+    >
       <FormHeader
         id={id}
         defaultQuestionTitle={defaultQuestionTitle}

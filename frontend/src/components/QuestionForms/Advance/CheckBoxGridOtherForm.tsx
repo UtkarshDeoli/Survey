@@ -9,6 +9,9 @@ interface Props {
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   handleDelete: (id: string) => void;
+  handleDragEnter: () => void;
+  handleDragStart: () => void;
+  endIndex: number;
 }
 
 function CheckBoxGridOtherForm({
@@ -16,13 +19,21 @@ function CheckBoxGridOtherForm({
   register,
   setValue,
   handleDelete,
+  handleDragEnter,
+  handleDragStart,
+  endIndex,
 }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "checkbox_grid_with_other");
+    setValue(`questions.${id}.type`, "Checkbox Grid With Other");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
-    <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md">
+    <div
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      draggable
+      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
+    >
       <FormHeader
         id={id}
         register={register}

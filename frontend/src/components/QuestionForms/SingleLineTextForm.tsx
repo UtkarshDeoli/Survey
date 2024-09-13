@@ -7,10 +7,13 @@ import { FaRegFolderOpen } from "react-icons/fa";
 
 interface Props {
   id: string;
+  endIndex: number;
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   control: ReturnType<typeof useForm>["control"];
   handleDelete: (id: string) => void;
+  handleDragEnter: () => void;
+  handleDragStart: () => void;
   defaultQuestionTitle?: string;
 }
 
@@ -20,6 +23,9 @@ function SingleLineTextForm({
   setValue,
   control,
   handleDelete,
+  handleDragEnter,
+  handleDragStart,
+  endIndex,
   defaultQuestionTitle: defaultQuestionTitle,
 }: Props) {
   useEffect(() => {
@@ -34,7 +40,12 @@ function SingleLineTextForm({
   });
 
   return (
-    <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden">
+    <div
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      draggable
+      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
+    >
       <FormHeader
         handleDelete={handleDelete}
         register={register}
@@ -232,4 +243,3 @@ function SingleLineTextForm({
 }
 
 export default SingleLineTextForm;
-
