@@ -62,12 +62,11 @@ exports.getSurvey = async (req, res) => {
 
 exports.getAllSurvey = async (req, res) => {
     try {
-        console.log("route hitting")
+        console.log("route hitting");
 
-        const { page = 1, limit = 10, sortBy = 'name', sortOrder = 'asc' } = req.query;
+        const { filter = '', page = 1, limit = 10, sortBy = 'name', sortOrder = 'asc', created_by, published } = req.query;
 
         const order = sortOrder === 'asc' ? 1 : -1;
-
         const skip = (page - 1) * limit;
         const sortOptions = {};
 
@@ -77,33 +76,36 @@ exports.getAllSurvey = async (req, res) => {
             sortOptions.createdAt = order;
         }
 
-        const created_by = req.query.created_by;
+        const searchConditions = [{ name: { $regex: filter, $options: 'i' } }];
+        const findOptions = { $and: searchConditions };
 
-        const findOptions = { created_by };
-
-        if(req.query.published){
-            findOptions.published = req.query.published;
+        if (created_by) {
+            findOptions.created_by = created_by;
         }
 
+        if (published) {
+            findOptions.published = published;
+        }
+
+        const total = await Survey.countDocuments(findOptions);
         const survey = await Survey.find(findOptions)
             .skip(skip)
-            .limit(limit)
+            .limit(Number(limit))
             .sort(sortOptions)
-            .collation({ locale: 'en', strength: 2 }); // Case-insensitive sorting
+            .collation({ locale: 'en', strength: 2 }); 
 
-        const total = await Survey.countDocuments();
-
-        if (!survey) {
-            return res.status(404).json({ success: "false", message: 'Survey not found' });
-        } else {
-            return res.status(201).json({
-                success: "true", total,
-                page,
-                limit,
-                totalPages: Math.ceil(total / limit),
-                survey
-            });
+        if (survey.length === 0) {
+            return res.status(404).json({ success: "false", message: 'No surveys found' });
         }
+
+        return res.status(200).json({
+            success: "true",
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+            survey
+        });
     } catch (error) {
         return res.status(400).json({ success: "false", message: error.message });
     }

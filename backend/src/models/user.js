@@ -6,13 +6,11 @@ const uniqueValidator = require('mongoose-unique-validator');
 const userSchema = new Schema({
     created_by: {
         type: String,
+        required: false
     },
     username: {
         type: String,
         required: true
-    },
-    added_by: {
-        type: String
     },
     name: {
         type: String,
@@ -48,6 +46,10 @@ const userSchema = new Schema({
         default: false
     },
     prevent_data_analytics: {
+        type: Boolean,
+        default: false
+    },
+    prevent_spatial_report: {
         type: Boolean,
         default: false
     },
