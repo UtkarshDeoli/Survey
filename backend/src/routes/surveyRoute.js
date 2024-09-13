@@ -7,6 +7,7 @@ router.post('/saveSurvey',  surveyController.saveSurvey);
 router.get('/getSurvey',  surveyController.getSurvey);
 router.get('/getAllSurveys',  surveyController.getAllSurvey);
 router.post('/updateSurvey', surveyController.updateSurvey);
+router.post('/deleteSurvey', surveyController.deleteSurvey);
 
 
 module.exports = router;
