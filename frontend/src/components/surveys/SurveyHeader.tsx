@@ -2,28 +2,9 @@
 
 import { useState } from "react";
 import ButtonBordered from "../ui/buttons/ButtonBordered"
-import Modal from "react-modal"
-import ButtonFilled from "../ui/buttons/ButtonFilled";
 import { useRouter } from "next/navigation";
+import CustomModal from "../ui/Modal";
 
-const customStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      padding: '0', // Remove default padding
-      border: 'none', // Remove default border if needed
-      borderRadius: '16px', // Adjust border radius
-    },
-    overlay: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    },
-  };
-
-  Modal.setAppElement('body');
 
 function SurveyHeader() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -46,12 +27,7 @@ function SurveyHeader() {
 
 
        {/* modal */}
-        <Modal
-            isOpen={modalIsOpen}
-            onRequestClose={closeModal}
-            style={customStyles}
-            contentLabel="Example Modal"
-        >
+        <CustomModal open={modalIsOpen} closeModal={closeModal}>
         <div className="min-w-[662px] h-[337px] flex flex-col">
             <div className="relative z-10 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">Create surveys</div>
             <form className="w-full h-full flex flex-col gap-10 justify-center items-center">
@@ -65,7 +41,7 @@ function SurveyHeader() {
                 </div>
             </form>
         </div>
-      </Modal>
+      </CustomModal>
     </header>
   )
 }

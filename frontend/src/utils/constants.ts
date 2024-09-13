@@ -10,6 +10,7 @@ export const update_user = "api/user/updateUser";
 export const create_survey = "api/survey/saveSurvey";
 export const update_survey = "api/survey/updateSurvey";
 export const get_survey = "api/survey/getSurvey";
+export const delete_survey = "api/survey/deleteSurvey";
 export const get_all_surveys = "api/survey/getAllSurveys";
 
 // questions

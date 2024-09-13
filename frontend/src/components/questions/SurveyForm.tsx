@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormMappings from "@/utils/FormMappings";
 import { useForm } from "react-hook-form";
 import ButtonBordered from "../ui/buttons/ButtonBordered";
 import { useSearchParams } from "next/navigation";
-import { updateSurvey } from "@/networks/survey_networks";
+import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import toast from "react-hot-toast";
 
 function SurveyForm() {
@@ -19,14 +19,43 @@ function SurveyForm() {
   const [forms, setForms] = useState<React.ComponentType<any>[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [endDragIndex, setEndDragIndex] = useState<number | null>(null);
+  const [surveyData,setSurveyData] = useState<any>(null)
   
   // React hook form
   const { register, handleSubmit, setValue, control, unregister, getValues } = useForm();
 
+
+  // Effects
+  useEffect(()=>{
+    if(_id){
+      handlegetSurveyData()
+    }
+  },[])
+
+
+  // handle get survey
+  async function handlegetSurveyData(){
+    const params ={_id}
+    const response = await getSurvey(params)
+    if(response.success){
+        const formMappings = FormMappings()
+        setSurveyData(response.data[0])
+        const recievedForms = response.data[0].questions?.map((question:any)=>formMappings[question.type])
+        if(recievedForms) setForms(recievedForms)
+        response.data[0].questions?.forEach((question:any)=>{
+          const index = question.question_id;
+          Object.keys(question.parameters).forEach((parameter:string)=>setValue(`questions.${index}.parameters[${parameter}]`,question.parameters[parameter]))
+        })
+    }else{
+        toast.error("something went wrong")
+    }
+}
+
   // Handle form submission
   async function handleSubmitForm(data: any) {
     console.log(data.questions);
-    const params = {_id, created_by, questions : data.questions}
+    const formData = {created_by,questions:data.questions}
+    const params = {_id, created_by, formData}
     const response = await updateSurvey(params)
     if(response.success){
       toast.success("Questions updated in survey!")

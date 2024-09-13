@@ -28,8 +28,7 @@ exports.saveSurvey = async (req, res) => {
 exports.deleteSurvey = async (req, res) => {
     try {
         console.log("delete route hitting")
-        const id = req.query._id;
-        const created_by = req.query.created_by;
+        const {id,created_by} = req.body;
 
         const survey = await Survey.findOneAndDelete({ _id: id, created_by });
 
@@ -112,20 +111,29 @@ exports.getAllSurvey = async (req, res) => {
 
 exports.updateSurvey = async (req, res) => {
     try {
+        console.log("queryy--->",req.query)
         const id = req.query._id;
-        const {created_by, name, header_text, access_pin, background_location_capture, questions, thank_time_duration } = req.body;
+        console.log("id from controller-->",id)
+        const { created_by, name, header_text, access_pin, background_location_capture, questions, thank_time_duration, published } = req.body;
 
-        let updateFields = { name, header_text, access_pin, background_location_capture, questions, thank_time_duration };
+        let updateFields = {};
+        console.log(req.body);
+        if (name !== undefined && name !== null) updateFields.name = name;
+        if (header_text !== undefined && header_text !== null) updateFields.header_text = header_text;
+        if (access_pin !== undefined && access_pin !== null) updateFields.access_pin = access_pin;
+        if (background_location_capture !== undefined && background_location_capture !== null) updateFields.background_location_capture = background_location_capture;
+        if (questions !== undefined && questions !== null) updateFields.questions = questions;
+        if (thank_time_duration !== undefined && thank_time_duration !== null) updateFields.thank_time_duration = thank_time_duration;
+        if (published !== undefined && published !== null) updateFields.published = published;
 
         if (req.files && req.files.welcome_image) {
             updateFields.welcome_image = req.files.welcome_image.data;
         }
-
         if (req.files && req.files.thanks_image) {
             updateFields.thanks_image = req.files.thanks_image.data;
         }
 
-        const result = await Survey.findOneAndUpdate({ _id: id, created_by}, updateFields, { new: true });
+        const result = await Survey.findOneAndUpdate({ _id: id, created_by }, updateFields, { new: true });
 
         if (!result) {
             return res.status(404).json({ success: false, message: 'Survey not found' });
@@ -134,6 +142,7 @@ exports.updateSurvey = async (req, res) => {
         return res.status(200).json({ success: true, message: 'Survey updated successfully', survey: result });
 
     } catch (error) {
+        console.log(error);
         return res.status(400).json({ success: false, message: error.message });
     }
 };

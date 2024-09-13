@@ -13,7 +13,7 @@ interface Props {
 
 function NumberPointForm({ id, register, setValue, handleDelete }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "number_point");
+    setValue(`questions.${id}.type`, "Number Point");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (

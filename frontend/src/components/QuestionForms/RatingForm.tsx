@@ -13,7 +13,7 @@ interface Props {
 
 function RatingForm({ id, register, setValue, handleDelete }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "rating");
+    setValue(`questions.${id}.type`, "Rating");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (

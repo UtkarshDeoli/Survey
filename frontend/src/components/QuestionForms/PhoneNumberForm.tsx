@@ -20,7 +20,7 @@ function PhoneNumberForm({
   defaultQuestionTitle,
 }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "phone_number");
+    setValue(`questions.${id}.type`, "Phone Number");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (

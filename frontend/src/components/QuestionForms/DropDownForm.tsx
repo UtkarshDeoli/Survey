@@ -16,7 +16,7 @@ interface Props {
 
 function DropDownForm({ id, register, setValue, handleDelete, handleDragStart, handleDragEnter,endIndex }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "dropdown");
+    setValue(`questions.${id}.type`, "DropDown");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (

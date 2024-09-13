@@ -13,7 +13,7 @@ interface Props {
 
 function RadioButton({ id, register, setValue, handleDelete }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "radio_button");
+    setValue(`questions.${id}.type`, "Radio Button");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (

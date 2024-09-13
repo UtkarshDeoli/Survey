@@ -33,7 +33,8 @@ function Page() {
     const formData = new FormData();
     for (const key in data) {
       if ( key !== 'welcome_image' && key !== 'thankyou_image') {
-        formData.append(key, data[key]);
+        const value = data[key] ?? '';
+        formData.append(key, value);
       }
     }
     if (data.welcome_image && data.welcome_image[0]) {

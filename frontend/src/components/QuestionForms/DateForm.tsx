@@ -20,7 +20,7 @@ function DateForm({ id, register, setValue, handleDelete, handleDragStart, handl
   const [selectedDateMax, setSelectedDateMax] = useState<Date | null>(null);
 
   useEffect(() => {
-    setValue(`questions.${id}.type`, "date");
+    setValue(`questions.${id}.type`, "Date");
     setValue(`questions.${id}.question_id`, id);
   }, []);
 

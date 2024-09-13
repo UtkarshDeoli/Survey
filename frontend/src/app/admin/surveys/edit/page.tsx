@@ -2,8 +2,8 @@
 
 import EditSurveysHeader from "@/components/surveys/EditSurveysHeader"
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
-import { createSurvey, getSurvey } from "@/networks/survey_networks";
-import { useParams } from "next/navigation"
+import { createSurvey, getSurvey, updateSurvey } from "@/networks/survey_networks";
+import { useParams, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -11,8 +11,8 @@ import toast from "react-hot-toast";
 function page() {
     const [surveyData,setSurveyData] = useState <any> ([]);
     const [loading,setLoading] = useState <boolean>(false)
-    const params = useParams()
-    const surveyId = Array.isArray(params.survey_id) ? params.survey_id[0] : params.survey_id;
+    const params = useSearchParams()
+    const surveyId = params.get('survey_id')
 
     const {
         register,
@@ -33,7 +33,7 @@ function page() {
             setValue(key, surveyData[key]);
           });
         }
-      }, [surveyData, setValue]);
+    }, [surveyData, setValue]);
 
     console.log("survey data--->",surveyData)
     
@@ -53,7 +53,7 @@ function page() {
         const formData = new FormData();
         for (const key in data) {
           if ( key !== 'welcome_image' && key !== 'thankyou_image') {
-            formData.append(key, data[key]);
+            formData.append(key, data[key] == null ? '' : data[key]);
           }
         }
         if (data.welcome_image && data.welcome_image[0]) {
@@ -66,15 +66,18 @@ function page() {
         formData.append('created_by', 'rohitchand490@gmail.com');
       
         setLoading(true);
-    
+        const params = {
+            _id: surveyId,
+            formData
+        }
         try {
-          const res = await createSurvey(formData);
+          const res = await updateSurvey(params);
           console.log(res);
           if (res.success) {
-            toast.success('Survey created successfully!');
+            toast.success('Survey updated successfully!');
     
           } else {
-            toast.error('Failed to create survey.');
+            toast.error('Failed to update survey.');
           }
         } catch (error) {
           toast.error('Something went wrong.');
@@ -86,7 +89,7 @@ function page() {
   return (
     <main className="w-full">
         <div className="w-full flex flex-col gap-5">
-            <EditSurveysHeader id={surveyId} created_by={surveyData.created_by} name={surveyData.name}/>
+            <EditSurveysHeader id={surveyId||""} created_by={surveyData.created_by} name={surveyData.name}/>
 
             <form
         className="grid grid-cols-2 m-10"
@@ -188,7 +191,7 @@ function page() {
         </div>
 
         <div className="col-span-2 flex gap-4 justify-center mt-[10%]">
-          <ButtonFilled className="px-4 py-[10px] w-[95px]">Save</ButtonFilled>
+          <ButtonFilled className="px-4 py-[10px] w-[95px]">Update</ButtonFilled>
           <button
             type="button"
             className="px-4 py-[10px] w-[95px] border border-secondary-200 rounded-md text-secondary-300"

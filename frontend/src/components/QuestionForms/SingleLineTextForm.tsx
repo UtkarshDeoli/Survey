@@ -23,7 +23,7 @@ function SingleLineTextForm({
   defaultQuestionTitle: defaultQuestionTitle,
 }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "single_line_text");
+    setValue(`questions.${id}.type`, "Single line Text Input");
     setValue(`questions.${id}.question_id`, id);
   }, []);
 

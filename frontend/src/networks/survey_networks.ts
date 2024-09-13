@@ -1,4 +1,4 @@
-import { SERVER_URI, create_survey, get_all_surveys, get_survey, update_survey} from "@/utils/constants";
+import { SERVER_URI, create_survey, delete_survey, get_all_surveys, get_survey, update_survey} from "@/utils/constants";
 import axios from "axios";
 
 export const createSurvey =async (params:any)=>{
@@ -19,7 +19,7 @@ export const updateSurvey =async (params:any)=>{
       const options={
         method: 'POST',
         url: `${SERVER_URI}/${update_survey}?_id=${params._id}`,
-        data:params
+        data:params.formData
       }
       const response = await axios.request(options);
       return response.data;
@@ -54,4 +54,19 @@ export const getSurvey =async (params:any)=>{
     } catch (error) {
       return { success: false, message: 'Something Went Wrong' ,error};
     }
-  }
+}
+
+export const deleteSurvey =async (params:any)=>{
+    try {
+      const options={
+        method: 'POST',
+        url: `${SERVER_URI}/${delete_survey}`,
+        data:params
+      }
+      const response = await axios.request(options);
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      return { success: false, message: 'Something Went Wrong' ,error};
+    }
+}
