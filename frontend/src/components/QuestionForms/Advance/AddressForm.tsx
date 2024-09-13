@@ -14,6 +14,9 @@ interface Props {
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   handleDelete: (id: string) => void;
+  handleDragEnter: () => void;
+  handleDragStart: () => void;
+  endIndex: number;
 }
 const FormNames = [
   "Address Line 1",
@@ -28,7 +31,15 @@ interface FormItem {
   name: string;
 }
 
-function AddressForm({ id, register, setValue, handleDelete }: Props) {
+function AddressForm({
+  id,
+  register,
+  setValue,
+  handleDelete,
+  handleDragEnter,
+  handleDragStart,
+  endIndex,
+}: Props) {
   const [formItems, setFormItems] = useState<FormItem[]>([
     { component: SingleLineTextForm, name: "Address Line 1" },
     { component: SingleLineTextForm, name: "Address Line 2" },
@@ -41,7 +52,7 @@ function AddressForm({ id, register, setValue, handleDelete }: Props) {
   const { handleSubmit, control, unregister } = useForm();
 
   useEffect(() => {
-    setValue(`questions.${id}.type`, "address");
+    setValue(`questions.${id}.type`, "Address");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   function handleSubmitForm(data: any) {
@@ -81,7 +92,12 @@ function AddressForm({ id, register, setValue, handleDelete }: Props) {
   }
 
   return (
-    <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md">
+    <div
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      draggable
+      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
+    >
       <FormHeader
         id={id}
         register={register}

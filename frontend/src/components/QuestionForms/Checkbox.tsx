@@ -6,25 +6,42 @@ import FormHeader from "./FormHeader";
 
 interface Props {
   id: string;
+  endIndex: number;
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   handleDelete: (id: string) => void;
   control: ReturnType<typeof useForm>["control"];
+  handleDragEnter: () => void;
+  handleDragStart: () => void;
 }
 
-function CheckboxList({ id,control, register, setValue, handleDelete }: Props) {
+function CheckboxList({
+  id,
+  endIndex,
+  control,
+  register,
+  setValue,
+  handleDelete,
+  handleDragEnter,
+  handleDragStart,
+}: Props) {
   const [hide,setHide] = useState<boolean>(false)
   useEffect(() => {
     setValue(`questions.${id}.type`, "Checkbox List");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
-    <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md">
-       <FormHeader
-        handleDelete={handleDelete}
-        register={register}
+    <div
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      draggable
+      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
+    >
+      <FormHeader
         id={id}
+        register={register}
         input={true}
+        handleDelete={handleDelete}
         hide={hide}
         setHide={()=>setHide((prev:boolean)=>!prev)}
         control={control}

@@ -10,8 +10,9 @@ function Page() {
   const { register, handleSubmit, formState: { errors } } = useForm<IUser>();
   const router = useRouter()
   const onSubmit: SubmitHandler<IUser> = async (data:IUser) => {
+    delete data.confirm_password;
     const params=[data]
-    console.log(params)
+    console.log("datatata::::",params)
     const res=await addUsers(params);
     if(res){
       router.replace('/admin/users')
@@ -44,7 +45,7 @@ function Page() {
                       { label: "Name", name: "name", type: "text", placeholder: "Name" },
                       { label: "Email", name: "email", type: "email", placeholder: "Email" },
                       { label: "Password", name: "password", type: "password", placeholder: "Password" },
-                      { label: "Confirm Password", name: "confirmPassword", type: "password", placeholder: "Confirm password" },
+                      { label: "Confirm Password", name: "confirm_password", type: "password", placeholder: "Confirm password" },
                     ].map((field, index) => (
                       <div className="flex w-full space-y-2" key={index}>
                         <div className="w-1/2 py-2">
@@ -86,15 +87,15 @@ function Page() {
                   <div className=" w-1/2 font-medium">Role</div>
                   <div className="space-y-2 w-1/2">
                     {[
-                      { label: 'Survey Manager', name: 'surveyManager' },
-                      { label: 'Booth Karyakarta', name: 'boothKaryakarta' },
-                      { label: 'Survey Collector', name: 'surveyCollector' },
-                      { label: 'Support Executive', name: 'supportExecutive' },
-                      { label: 'Data Handler', name: 'dataHandler' },
+                      { label: 'Admin', name: 'admin' },
+                      { label: 'Survey Manager', name: 'survey_manager' },
+                      { label: 'Booth Karyakarta', name: 'booth_karyakarta' },
+                      { label: 'Survey Collector', name: 'survey_collector' },
+                      { label: 'Support Executive', name: 'support_executive' },
                     ].map((role) => (
                       <div key={role.name} className="flex items-center space-x-2">
                         <input
-                          type="radio"
+                          type="Checkbox"
                           value={role.name}
                           {...register("role", { required: true })}
                           className=" text-blue-500"
@@ -115,13 +116,13 @@ function Page() {
                 {/* Permissions */}
                 <div className="space-y-2 mt-3 w-full">
                   {[
-                    { label: 'Auto Assign Survey', name: 'autoAssignSurvey' },
-                    { label: 'View Own Collected Data', name: 'viewCollectedData' },
-                    { label: 'Prevent Data Download', name: 'preventDataDownload' },
-                    { label: 'Prevent Data Analytics', name: 'preventDataAnalytics' },
-                    { label: 'Prevent Spatial Report', name: 'preventSpatialReport' },
-                    { label: 'Remove Audio Recording Access', name: 'removeAudioAccess' },
-                    { label: 'View Pending Data', name: 'viewPendingData' },
+                    { label: 'Auto Assign Survey', name: 'auto_assign_survey' },
+                    { label: 'View Own Collected Data', name: 'view_own_collected_data' },
+                    { label: 'Prevent Data Download', name: 'prevent_data_download' },
+                    { label: 'Prevent Data Analytics', name: 'prevent_data_analytics' },
+                    { label: 'Prevent Spatial Report', name: 'prevent_spatial_report' },
+                    { label: 'Remove Audio Recording Access', name: 'remove_audio_recording_access' },
+                    { label: 'View Pending Data', name: 'view_pending_data' },
                   ].map((permission) => (
                     <div key={permission.name} className="flex items-center w-full">
                       <div className="flex space-x-2 items-center w-1/2">
