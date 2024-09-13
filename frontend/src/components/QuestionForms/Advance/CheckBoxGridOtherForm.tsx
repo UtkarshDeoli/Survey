@@ -11,14 +11,14 @@ interface Props {
   handleDelete: (id: string) => void;
 }
 
-function DropDownWithOtherGridForm({
+function CheckBoxGridOtherForm({
   id,
   register,
   setValue,
   handleDelete,
 }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "dropdown_with_other");
+    setValue(`questions.${id}.type`, "checkbox_grid_with_other");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
@@ -62,13 +62,30 @@ function DropDownWithOtherGridForm({
 
           <div className="grid grid-cols-12 w-[85%]">
             <label className="col-span-5 text-secondary-300">
-              Question Options
+              Unique Options
             </label>
             <div className="col-span-7">
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
-                id="questionOptions"
-                {...register(`questions.${id}.parameters.question_options`)}
+                id="uniqueOptions"
+                {...register(`questions.${id}.parameters.unique_options`)}
+                placeholder=""
+              />
+              <p className="text-secondary-300">One option per line.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-12 w-[85%]">
+            <label className="col-span-5 text-secondary-300">
+              Hidden Column Options
+            </label>
+            <div className="col-span-7">
+              <textarea
+                className="border border-secondary-200 rounded-md p-2 w-full"
+                id="hiddenColumOptions"
+                {...register(
+                  `questions.${id}.parameters.hidden_column_options`,
+                )}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line.</p>
@@ -94,6 +111,44 @@ function DropDownWithOtherGridForm({
             <input
               {...register(
                 `questions.${id}.parameters.are_all_questions_required`,
+              )}
+              type="Checkbox"
+              className="border border-secondary-200 rounded-md p-2"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-[85%]">
+            <label className="col-span-5 text-secondary-300">
+              Minimum Questions Required
+            </label>
+            <div className="flex flex-col col-span-7">
+              <input
+                {...register(`questions.${id}.parameters.minimum_questions`)}
+                type="text"
+                className="border border-secondary-200 rounded-md p-2 col-span-7"
+              />
+              <div className="w-[85%] text-red-500 text-sm">
+                If "Minimum Questions Required" is specified, "Are All Questions
+                Required" will be ignored.
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-12 w-[85%]">
+            <label className="col-span-5 text-secondary-300">
+              Radomize Row Options
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.randomize_row_options`)}
+              type="Checkbox"
+              className="border border-secondary-200 rounded-md p-2"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-[85%]">
+            <label className="col-span-5 text-secondary-300">
+              Randomize Column Options
+            </label>
+            <input
+              {...register(
+                `questions.${id}.parameters.randomize_column_options`,
               )}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
@@ -128,48 +183,7 @@ function DropDownWithOtherGridForm({
               <option value="unselected">UnSelected</option>
             </select>
           </div>
-          <div className="grid grid-cols-12 w-[85%]">
-            <label className="col-span-5 text-secondary-300">
-              Forward Column Options From
-            </label>
-            <input
-              {...register(
-                `questions.${id}.parameters.forward_column_options_from`,
-              )}
-              type="text"
-              className="border border-secondary-200 rounded-md p-2 col-span-7"
-              placeholder="Variable Name"
-            />
-          </div>
-          <div className="grid grid-cols-12 w-[85%]">
-            <label className="col-span-5 text-secondary-300">
-              Forward Column Options Type
-            </label>
-            <select
-              className="border border-secondary-200 rounded-md p-2 col-span-5"
-              id="mediaType"
-              {...register(
-                `questions.${id}.parameters.forward_column_options_type`,
-              )}
-            >
-              <option value=""></option>
-              <option value="selected">Selected</option>
-              <option value="unselected">UnSelected</option>
-            </select>
-          </div>
 
-          <div className="grid grid-cols-12 w-[85%]">
-            <label className="col-span-5 text-secondary-300">
-              Display As Grid in Tablet/iPad
-            </label>
-            <input
-              {...register(
-                `questions.${id}.parameters.display_as_grid_in_tablet_ipad`,
-              )}
-              type="Checkbox"
-              className="border border-secondary-200 rounded-md p-2"
-            />
-          </div>
           <div className="w-[85%] text-red-500 text-sm">
             If number of rows or columns are more, it might not fit in single
             view of the mobile device. This depends on the screen size of the
@@ -183,4 +197,4 @@ function DropDownWithOtherGridForm({
   );
 }
 
-export default DropDownWithOtherGridForm;
+export default CheckBoxGridOtherForm;

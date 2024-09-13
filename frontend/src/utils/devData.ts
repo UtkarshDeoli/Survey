@@ -24,4 +24,13 @@ export const advanceQuestions = [
   "DropDown With Other Grid",
   "Single line Text Grid",
   "Number Grid",
+  "Decimal Grid",
+  "Radio Grid",
+  "Radio Grid With Other",
+  "Checkbox With Text",
+  "Checkbox Grid",
+  "Checkbox Grid With Other",
+  "Number Point Grid",
+  "Contact Form",
+  "Address",
 ];
