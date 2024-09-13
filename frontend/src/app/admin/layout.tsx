@@ -4,22 +4,21 @@ import Sidebar from "@/components/ui/Sidebar";
 import { Toaster } from "react-hot-toast";
 
 interface LayoutProps {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-function layout({children} : LayoutProps) {
+function Layout({ children }: LayoutProps) {
   return (
-    <div>
-        <Navbar/>
-        <div className="flex h-auto w-full overflow-y-auto">
-            <Sidebar/>
-            {children}
-        </div>
-        <Footer/>
-        <Toaster/>
+    <div className="flex flex-col h-screen">
+      <Navbar />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto">{children}</main>
+      </div>
+      <Footer />
+      <Toaster />
     </div>
-    
-  )
+  );
 }
 
-export default layout
+export default Layout;
