@@ -2,17 +2,12 @@
 
 import {
   BsBookFill,
-  BsBox,
-  BsChevronLeft,
-  BsChevronRight,
   BsClipboardDataFill,
   BsGearFill,
   BsSpeedometer,
   BsTable,
 } from "react-icons/bs";
 import { ImUser } from "react-icons/im";
-import Image from "next/image";
-import menu from "../../../public/icons/menu.png";
 import { usePathname, useRouter } from "next/navigation";
 import { Router } from "next/router";
 import { useState } from "react";
@@ -62,4 +57,3 @@ function Sidebar() {
 }
 
 export default Sidebar;
-
