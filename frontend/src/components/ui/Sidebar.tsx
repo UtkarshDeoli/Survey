@@ -22,12 +22,12 @@ function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(flag);
 
   const SidebarScreens: any = [
-    { icon: <BsSpeedometer size={24} />, name: "Dashboard" },
-    { icon: <BsBookFill size={24} />, name: "Surveys" },
-    { icon: <BsTable size={24} />, name: "Data" },
-    { icon: <ImUser size={24} />, name: "Users" },
-    { icon: <BsClipboardDataFill size={24} />, name: "Reports" },
-    { icon: <BsGearFill size={24} />, name: "Settings" },
+    { icon: <BsSpeedometer size={24} />, name: "Dashboard", path: "/admin" },
+    { icon: <BsBookFill size={24} />, name: "Surveys", path: "/admin/surveys" },
+    { icon: <BsTable size={24} />, name: "Data", path: "/admin/data" },
+    { icon: <ImUser size={24} />, name: "Users", path: "/admin/users" },
+    { icon: <BsClipboardDataFill size={24} />, name: "Reports", path: "/admin/reports" },
+    { icon: <BsGearFill size={24} />, name: "Settings", path: "/admin/settings" },
   ];
 
   return (
@@ -40,14 +40,17 @@ function Sidebar() {
         {SidebarScreens.map((el: any, ind: number) => (
           <button
             onClick={() => {
-              if (el.name === "Dashboard") router.push("/admin");
-              else router.push(`/admin/${el.name.toLowerCase()}`);
+              router.push(el.path);
             }}
             key={ind}
-            className={`rounded-md px-8 py-4 flex gap-2 items-center text-[16px] text-secondary-300 font-semibold w-full ${
-              path === `/admin/${el.name.toLowerCase()}`
-                ? "border-2 bg-primary-300 bg-opacity-10 border-primary-300"
-                : ""
+            className={`rounded-md px-8 py-4 flex gap-2 items-center text-[16px] font-semibold w-full ${
+              el.path === "/admin" // Exact match for Dashboard
+                ? path === el.path
+                  ? "border-2 bg-primary-300 bg-opacity-10 border-primary-300 text-primary-300"
+                  : "text-secondary-300"
+                : path.includes(el.path) // For all other paths
+                ? "border-2 bg-primary-300 bg-opacity-10 border-primary-300 text-primary-300"
+                : "text-secondary-300"
             }`}
           >
             {el.icon}

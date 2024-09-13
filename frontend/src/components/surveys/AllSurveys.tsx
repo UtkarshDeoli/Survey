@@ -14,6 +14,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import CustomModal from "../ui/Modal";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import toast from "react-hot-toast";
+import Loader from "../ui/Loader";
 
 interface AllSurveysProps {
   queryParams: Params;
@@ -95,6 +96,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
     setLoading(true);
     const response = await getAllSurveys(params);
     setAllSurveys(response.survey);
+    setLoading(false);
   }
 
   // Toggle dropdown
@@ -111,8 +113,8 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
         <p className="col-span-2">Date created</p>
         <p className="col-span-2">Status</p>
       </div>
-
-      {allSurveys && allSurveys.length > 0 ? (
+      {loading && <Loader className="h-[40vh] w-full flex justify-center items-center text-primary-300"/>}
+      {!loading && allSurveys && allSurveys.length > 0 ? (
         allSurveys.map((el: any, index: number) => (
           <div
             key={index}
@@ -154,7 +156,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
                 </button>
                 {activeDropdown === el._id && (
                   <div className="absolute right-0 top-8 h-auto w-48 bg-white shadow-lg border rounded-md py-2 z-10">
-                    <button className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
+                    <button onClick={()=>router.push(`/admin/surveys/edit?survey_id=${el._id}`)} className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
                       <FaRegEdit /> Edit
                     </button>
                     <button className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
@@ -175,8 +177,8 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
             </div>
           </div>
         ))
-      ) : (
-        <p>No surveys</p>
+      ) : !loading && !allSurveys && (
+        <p className="w-full h-20 flex justify-center items-center font-semibold text-secondary-300">No surveys</p>
       )}
       {/* modals */}
 
