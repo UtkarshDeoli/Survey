@@ -7,29 +7,23 @@ import { FaRegFolderOpen } from "react-icons/fa";
 
 interface Props {
   id: string;
-  endIndex: number;
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   control: ReturnType<typeof useForm>["control"];
   handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
   defaultQuestionTitle?: string;
 }
 
-function EmailForm({
+function MultiLineTextForm({
   id,
   register,
   setValue,
   control,
   handleDelete,
-  handleDragStart,
-  handleDragEnter,
-  endIndex,
   defaultQuestionTitle,
 }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "email");
+    setValue(`questions.${id}.type`, "multi_line_text");
     setValue(`questions.${id}.question_id`, id);
   }, []);
 
@@ -38,13 +32,9 @@ function EmailForm({
     name: `questions.${id}.parameters.question_media_type`,
     defaultValue: "",
   });
+
   return (
-    <div
-      onDragStart={handleDragStart}
-      onDragEnter={handleDragEnter}
-      draggable
-      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
-    >
+    <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden">
       <FormHeader
         handleDelete={handleDelete}
         register={register}
@@ -58,7 +48,7 @@ function EmailForm({
             <label className="col-span-4 text-secondary-300">Description</label>
             <input
               {...register(`questions.${id}.parameters.description`)}
-              type="text"
+              type="email"
               className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
               placeholder="Type help information for question here..."
             />
@@ -83,6 +73,26 @@ function EmailForm({
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
               placeholder="Variable name"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-3/4">
+            <label className="col-span-4 text-secondary-300">Formula</label>
+            <input
+              {...register(`questions.${id}.parameters.formula`)}
+              type="text"
+              className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
+              placeholder="Define formula"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-3/4">
+            <label className="col-span-4 text-secondary-300">
+              Default value
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.default_value`)}
+              type="text"
+              className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
+              placeholder="Set default value"
             />
           </div>
           <div className="grid grid-cols-12 w-3/4">
@@ -111,9 +121,7 @@ function EmailForm({
                   </p>
                 </div>
                 <input
-                  {...register(
-                    `questions.${id}.parameters.question_media_type`,
-                  )}
+                  {...register(`questions.${id}.parameters.question_image`)}
                   type="file"
                   className="hidden"
                   accept={
@@ -132,11 +140,48 @@ function EmailForm({
             </div>
           )}
           <div className="grid grid-cols-12 w-3/4">
+            <label className="col-span-4 text-secondary-300">Suffix</label>
+            <input
+              {...register(`questions.${id}.parameters.suffix`)}
+              type="text"
+              className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-3/4">
+            <label className="col-span-4 text-secondary-300">
+              Limit length
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.limit_length.from`)}
+              type="number"
+              className="border border-secondary-200 rounded-md p-2 col-span-3 focus:outline-none"
+            />
+
+            <label className="col-span-2 text-secondary-300 text-center">
+              to
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.limit_length.to`)}
+              type="number"
+              className="border border-secondary-200 rounded-md p-2 col-span-3 focus:outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-3/4">
             <label className="col-span-4 text-secondary-300">
               Is question required
             </label>
             <input
               {...register(`questions.${id}.parameters.question_required`)}
+              type="checkbox"
+              className="border border-secondary-200 rounded-md p-2 col-span-1 focus:outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-3/4">
+            <label className="col-span-4 text-secondary-300">
+              Display in survey
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.display_in_survey`)}
               type="checkbox"
               className="border border-secondary-200 rounded-md p-2 col-span-1 focus:outline-none"
             />
@@ -147,4 +192,4 @@ function EmailForm({
   );
 }
 
-export default EmailForm;
+export default MultiLineTextForm;
