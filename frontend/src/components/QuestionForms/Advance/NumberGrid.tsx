@@ -31,7 +31,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
             <div className="col-span-7">
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
-                id="hiddenOptions"
+                id="rowOptions"
                 {...register(`questions.${id}.parameters.row_options`)}
                 placeholder=""
               />
@@ -47,8 +47,8 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
             <div className="col-span-7">
               <textarea
                 className="border border-secondary-200 rounded-md p-2 w-full"
-                id="hiddenOptions"
-                {...register(`questions.${id}.parameters.row_options`)}
+                id="columnOptions"
+                {...register(`questions.${id}.parameters.column_options`)}
                 placeholder=""
               />
               <p className="text-secondary-300">One option per line.</p>
@@ -106,7 +106,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
             </label>
             <input
               {...register(
-                `questions.${id}.parameters.forward_row_options_from_variable_name`,
+                `questions.${id}.parameters.forward_row_options_from`,
               )}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -135,7 +135,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
             </label>
             <input
               {...register(
-                `questions.${id}.parameters.forward_column_options_from_variable_name`,
+                `questions.${id}.parameters.forward_column_options_from`,
               )}
               type="text"
               className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -171,7 +171,7 @@ function NumberGridForm({ id, register, setValue, handleDelete }: Props) {
               className="border border-secondary-200 rounded-md p-2"
             />
           </div>
-          <div className="w-[85%] text-red-500 ">
+          <div className="w-[85%] text-red-500 text-sm">
             If number of rows or columns are more, it might not fit in single
             view of the mobile device. This depends on the screen size of the
             mobile device also. In this scenario, please scroll to right in

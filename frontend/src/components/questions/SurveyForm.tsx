@@ -12,7 +12,7 @@ function SurveyForm() {
   const [endDragIndex, setEndDragIndex] = useState<number | null>(null);
   
   // React hook form
-  const { register, handleSubmit, setValue, control, unregister } = useForm();
+  const { register, handleSubmit, setValue, control, unregister, getValues } = useForm();
 
   // Handle form submission
   function handleSubmitForm(data: any) {
@@ -30,6 +30,7 @@ function SurveyForm() {
     e.stopPropagation();
     e.dataTransfer.setData("text/plain","form_reorder")
     setDraggedIndex(index)
+    console.log("starting Ind----",index)
   }
 
   // Handle form drop event
@@ -48,6 +49,22 @@ function SurveyForm() {
     const reorderedForms = [...forms];
     const [draggedItem] = reorderedForms.splice(draggedIndex, 1);
     reorderedForms.splice(endDragIndex || 0, 0, draggedItem);
+
+    const formValues = getValues("questions");
+    const reorderedValues = [...formValues];
+
+    const [draggedValue] = reorderedValues.splice(draggedIndex, 1);
+    reorderedValues.splice(endDragIndex || 0, 0, draggedValue);
+
+    // Set the new form and form data states
+    setForms(reorderedForms);
+
+    // Update the reordered form data in React Hook Form
+    reorderedValues.forEach((value, index) => {
+      setValue(`questions.${index}`, value);
+    });
+
+
     setForms(reorderedForms);
     setDraggedIndex(null);
     setEndDragIndex(null); 
@@ -57,7 +74,7 @@ function SurveyForm() {
    function handleDragEnter(index: number) {
     if (draggedIndex !== null && index !== draggedIndex) {
       setEndDragIndex(index);
-      
+      console.log("Entering Ind----",index)
     }
   }
 

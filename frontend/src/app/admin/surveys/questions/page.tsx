@@ -1,17 +1,20 @@
-import AllQuestions from "@/components/questions/AllQuestions"
-import QuestionHeader from "@/components/questions/QuestionHeader"
-import SurveyForm from "@/components/questions/SurveyForm"
+import AllQuestions from "@/components/questions/AllQuestions";
+import QuestionHeader from "@/components/questions/QuestionHeader";
+import SurveyForm from "@/components/questions/SurveyForm";
+import { Toaster } from "react-hot-toast";
 
 function page() {
   return (
     <main className="w-full">
-      <QuestionHeader/>
+      <QuestionHeader />
       <div className="flex bg-secondary-600">
-        <AllQuestions/>
-        <SurveyForm/>
+        <AllQuestions />
+        <SurveyForm />
+        <Toaster />
       </div>
     </main>
-  )
+  );
 }
 
-export default page
+export default page;
+
