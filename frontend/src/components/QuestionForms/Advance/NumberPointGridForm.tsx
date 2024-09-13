@@ -11,14 +11,9 @@ interface Props {
   handleDelete: (id: string) => void;
 }
 
-function DropDownWithOtherGridForm({
-  id,
-  register,
-  setValue,
-  handleDelete,
-}: Props) {
+function NumberPointGridForm({ id, register, setValue, handleDelete }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "dropdown_with_other");
+    setValue(`questions.${id}.type`, "number_point_grid");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
@@ -62,21 +57,6 @@ function DropDownWithOtherGridForm({
 
           <div className="grid grid-cols-12 w-[85%]">
             <label className="col-span-5 text-secondary-300">
-              Question Options
-            </label>
-            <div className="col-span-7">
-              <textarea
-                className="border border-secondary-200 rounded-md p-2 w-full"
-                id="questionOptions"
-                {...register(`questions.${id}.parameters.question_options`)}
-                placeholder=""
-              />
-              <p className="text-secondary-300">One option per line.</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-12 w-[85%]">
-            <label className="col-span-5 text-secondary-300">
               Variable name
             </label>
             <input
@@ -89,11 +69,43 @@ function DropDownWithOtherGridForm({
 
           <div className="grid grid-cols-12 w-[85%]">
             <label className="col-span-5 text-secondary-300">
+              Limit length
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.limit_length.from`)}
+              type="number"
+              className="border border-secondary-200 rounded-md p-2 col-span-2 focus:outline-none"
+            />
+
+            <label className="col-span-1 text-secondary-300 text-center">
+              to
+            </label>
+            <input
+              {...register(`questions.${id}.parameters.limit_length.to`)}
+              type="number"
+              className="border border-secondary-200 rounded-md p-2 col-span-2 focus:outline-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-12 w-[85%]">
+            <label className="col-span-5 text-secondary-300">
               Are All Questions Required?
             </label>
             <input
               {...register(
                 `questions.${id}.parameters.are_all_questions_required`,
+              )}
+              type="Checkbox"
+              className="border border-secondary-200 rounded-md p-2"
+            />
+          </div>
+          <div className="grid grid-cols-12 w-[85%]">
+            <label className="col-span-5 text-secondary-300">
+              Display As Grid in Tablet/iPad
+            </label>
+            <input
+              {...register(
+                `questions.${id}.parameters.display_as_grid_in_tablet_ipad`,
               )}
               type="Checkbox"
               className="border border-secondary-200 rounded-md p-2"
@@ -158,18 +170,6 @@ function DropDownWithOtherGridForm({
             </select>
           </div>
 
-          <div className="grid grid-cols-12 w-[85%]">
-            <label className="col-span-5 text-secondary-300">
-              Display As Grid in Tablet/iPad
-            </label>
-            <input
-              {...register(
-                `questions.${id}.parameters.display_as_grid_in_tablet_ipad`,
-              )}
-              type="Checkbox"
-              className="border border-secondary-200 rounded-md p-2"
-            />
-          </div>
           <div className="w-[85%] text-red-500 text-sm">
             If number of rows or columns are more, it might not fit in single
             view of the mobile device. This depends on the screen size of the
@@ -183,4 +183,4 @@ function DropDownWithOtherGridForm({
   );
 }
 
-export default DropDownWithOtherGridForm;
+export default NumberPointGridForm;

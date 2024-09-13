@@ -11,14 +11,9 @@ interface Props {
   handleDelete: (id: string) => void;
 }
 
-function DropDownWithOtherGridForm({
-  id,
-  register,
-  setValue,
-  handleDelete,
-}: Props) {
+function DecimalGridForm({ id, register, setValue, handleDelete }: Props) {
   useEffect(() => {
-    setValue(`questions.${id}.type`, "dropdown_with_other");
+    setValue(`questions.${id}.type`, "decimal_grid");
     setValue(`questions.${id}.question_id`, id);
   }, []);
   return (
@@ -61,18 +56,13 @@ function DropDownWithOtherGridForm({
           </div>
 
           <div className="grid grid-cols-12 w-[85%]">
-            <label className="col-span-5 text-secondary-300">
-              Question Options
-            </label>
-            <div className="col-span-7">
-              <textarea
-                className="border border-secondary-200 rounded-md p-2 w-full"
-                id="questionOptions"
-                {...register(`questions.${id}.parameters.question_options`)}
-                placeholder=""
-              />
-              <p className="text-secondary-300">One option per line.</p>
-            </div>
+            <label className="col-span-5 text-secondary-300">Precision</label>
+            <input
+              {...register(`questions.${id}.parameters.precision`)}
+              type="text"
+              value="2"
+              className="border border-secondary-200 rounded-md p-2 col-span-7"
+            />
           </div>
 
           <div className="grid grid-cols-12 w-[85%]">
@@ -86,7 +76,28 @@ function DropDownWithOtherGridForm({
               placeholder="Define Variable Name"
             />
           </div>
-
+          <div className="grid grid-cols-12 w-[85%]">
+            <label className="col-span-5 text-secondary-300">
+              Limit Value Between
+            </label>
+            <span className="col-span-7">
+              <input
+                {...register(
+                  `questions.${id}.parameters.limit_value_between_start`,
+                )}
+                type="number"
+                className="[appearance:textfield] border border-secondary-200 rounded-md p-2 mr-5 w-1/3"
+              />
+              <span>-</span>
+              <input
+                {...register(
+                  `questions.${id}.parameters.limit_value_between_end`,
+                )}
+                type="number"
+                className="[appearance:textfield] border border-secondary-200 rounded-md p-2 ml-5 w-1/3"
+              />
+            </span>
+          </div>
           <div className="grid grid-cols-12 w-[85%]">
             <label className="col-span-5 text-secondary-300">
               Are All Questions Required?
@@ -170,7 +181,7 @@ function DropDownWithOtherGridForm({
               className="border border-secondary-200 rounded-md p-2"
             />
           </div>
-          <div className="w-[85%] text-red-500 text-sm">
+          <div className="w-[85%] text-red-500 text-sm ">
             If number of rows or columns are more, it might not fit in single
             view of the mobile device. This depends on the screen size of the
             mobile device also. In this scenario, please scroll to right in
@@ -183,4 +194,4 @@ function DropDownWithOtherGridForm({
   );
 }
 
-export default DropDownWithOtherGridForm;
+export default DecimalGridForm;

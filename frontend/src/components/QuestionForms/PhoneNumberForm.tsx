@@ -9,9 +9,16 @@ interface Props {
   register: ReturnType<typeof useForm>["register"];
   setValue: ReturnType<typeof useForm>["setValue"];
   handleDelete: (id: string) => void;
+  defaultQuestionTitle?: string;
 }
 
-function PhoneNumberForm({ id, register, setValue, handleDelete }: Props) {
+function PhoneNumberForm({
+  id,
+  register,
+  setValue,
+  handleDelete,
+  defaultQuestionTitle,
+}: Props) {
   useEffect(() => {
     setValue(`questions.${id}.type`, "phone_number");
     setValue(`questions.${id}.question_id`, id);
@@ -20,6 +27,7 @@ function PhoneNumberForm({ id, register, setValue, handleDelete }: Props) {
     <div className="flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md">
       <FormHeader
         id={id}
+        defaultQuestionTitle={defaultQuestionTitle}
         register={register}
         input={true}
         handleDelete={handleDelete}
