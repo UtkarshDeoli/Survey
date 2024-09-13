@@ -1,9 +1,10 @@
 import AllQuestions from "@/components/questions/AllQuestions";
 import QuestionHeader from "@/components/questions/QuestionHeader";
 import SurveyForm from "@/components/questions/SurveyForm";
+import { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 
-function page() {
+function Page() {
   return (
     <main className="w-full">
       <QuestionHeader />
@@ -16,5 +17,12 @@ function page() {
   );
 }
 
-export default page;
+const SuspendedQuestionPage = () =>(
+  <Suspense>
+      <Page/>    
+  </Suspense>
+);
+
+export default SuspendedQuestionPage;
+
 
