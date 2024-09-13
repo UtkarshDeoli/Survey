@@ -4,6 +4,7 @@ import { useState } from "react";
 import ButtonBordered from "../ui/buttons/ButtonBordered"
 import Modal from "react-modal"
 import ButtonFilled from "../ui/buttons/ButtonFilled";
+import { useRouter } from "next/navigation";
 
 const customStyles = {
     content: {
@@ -27,6 +28,7 @@ const customStyles = {
 function SurveyHeader() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [name,setName] = useState <string> ("")
+    const router = useRouter()
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
@@ -35,7 +37,7 @@ function SurveyHeader() {
         <div className="bg-secondary-100 h-full w-full px-8 py-3 flex justify-between items-center">
            <h3 className="text-secondary-300">Surveys</h3>
            <div className=" flex gap-2">
-                <ButtonBordered className="bg-white font-semibold"> + Copy template</ButtonBordered>
+                {/* <ButtonBordered className="bg-white font-semibold"> + Copy template</ButtonBordered> */}
                 <ButtonBordered 
                 onClick={openModal} 
                 className="bg-white font-semibold"> + Create survey</ButtonBordered>
@@ -59,7 +61,7 @@ function SurveyHeader() {
                 </div>
                 <div className="flex items-center gap-10">
                     <ButtonBordered onClick={closeModal} type="button" className="border-secondary-200">Cancel</ButtonBordered>
-                    <button className="px-6 py-2 bg-primary-300 text-white rounded-md" type="button" onClick={()=>window.open(`/admin/surveys/create?name=${encodeURIComponent(name)}`,"_self")}>Create survey</button>
+                    <button className="px-6 py-2 bg-primary-300 text-white rounded-md" type="button" onClick={()=>router.push(`/admin/surveys/create?name=${encodeURIComponent(name)}`)}>Create survey</button>
                 </div>
             </form>
         </div>

@@ -3,7 +3,7 @@ const Survey = require('../models/survey');
 
 exports.saveSurvey = async (req, res) => {
     try {
-        const { created_by, name, header_text, access_pin, background_location_capture } = req.body;
+        const {created_by, name, header_text, access_pin, background_location_capture,thank_time_duration } = req.body;
         console.log(req.files)
         let welcome_image, thankyou_image;
         if (req.files && req.files.welcome_image) {
@@ -14,10 +14,10 @@ exports.saveSurvey = async (req, res) => {
             thankyou_image = req.files.thankyou_image.data;
         }
 
-        const survey = new Survey({ created_by, name, header_text, access_pin, background_location_capture, welcome_image, thankyou_image });
+        const survey = new Survey({ created_by, name, header_text, access_pin, background_location_capture, welcome_image, thankyou_image,thank_time_duration });
         await survey.save();
 
-        return res.status(201).json({ success: true, message: 'Survey created successfully' });
+        return res.status(201).json({ success: true, message: 'Survey created successfully', survey});
 
     } catch (error) {
         console.log(error);
@@ -115,19 +115,19 @@ exports.getAllSurvey = async (req, res) => {
 exports.updateSurvey = async (req, res) => {
     try {
         const id = req.query._id;
-        const { created_by, name, headerText, accessPin, backgroundLocationCapture } = req.body;
+        const {created_by, name, header_text, access_pin, background_location_capture, questions, thank_time_duration } = req.body;
 
-        let updateFields = { name, headerText, accessPin, backgroundLocationCapture };
+        let updateFields = { name, header_text, access_pin, background_location_capture, questions, thank_time_duration };
 
-        if (req.files && req.files.welcomeImage) {
-            updateFields.welcomeImage = req.files.welcomeImage.data;
+        if (req.files && req.files.welcome_image) {
+            updateFields.welcome_image = req.files.welcome_image.data;
         }
 
-        if (req.files && req.files.thanksImage) {
-            updateFields.thanksImage = req.files.thanksImage.data;
+        if (req.files && req.files.thanks_image) {
+            updateFields.thanks_image = req.files.thanks_image.data;
         }
 
-        const result = await Survey.findOneAndUpdate({ _id: id, created_by }, updateFields, { new: true });
+        const result = await Survey.findOneAndUpdate({ _id: id, created_by}, updateFields, { new: true });
 
         if (!result) {
             return res.status(404).json({ success: false, message: 'Survey not found' });

@@ -4,18 +4,25 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { IUser } from '@/types/user_interfaces';
 import { addUsers } from '@/networks/user_networks';
+import { useRouter } from 'next/navigation';
 
 function Page() {
   const { register, handleSubmit, formState: { errors } } = useForm<IUser>();
-
+  const router = useRouter()
   const onSubmit: SubmitHandler<IUser> = async (data:IUser) => {
     delete data.confirm_password;
     const params=[data]
     console.log("datatata::::",params)
     const res=await addUsers(params);
+<<<<<<< main
+    if(res){
+      router.replace('/admin/users')
+    }
+=======
     // if(res){
     //   window.location.replace('/admin/users')
     // }
+>>>>>>> backend
   };
 
   return (
