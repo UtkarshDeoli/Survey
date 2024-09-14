@@ -3,63 +3,59 @@
 import React, { useEffect, useState } from "react";
 import FormMappings from "@/utils/FormMappings";
 import { useForm } from "react-hook-form";
-import ButtonBordered from "../ui/buttons/ButtonBordered";
 import { useSearchParams } from "next/navigation";
 import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import toast from "react-hot-toast";
 
 function SurveyForm() {
-
-  //search params
-  const searchParams = useSearchParams()
-  const _id = searchParams.get("id")
+  // search params
+  const searchParams = useSearchParams();
+  const _id = searchParams.get("id");
   const created_by = searchParams.get("created_by");
 
   // states
   const [forms, setForms] = useState<React.ComponentType<any>[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [endDragIndex, setEndDragIndex] = useState<number | null>(null);
-  const [surveyData,setSurveyData] = useState<any>(null)
-  
+  const [surveyData, setSurveyData] = useState<any>(null);
+
   // React hook form
   const { register, handleSubmit, setValue, control, unregister, getValues } = useForm();
 
-
   // Effects
-  useEffect(()=>{
-    if(_id){
-      handlegetSurveyData()
+  useEffect(() => {
+    if (_id) {
+      handlegetSurveyData();
     }
-  },[])
-
+  }, [_id]);
 
   // handle get survey
-  async function handlegetSurveyData(){
-    const params ={_id}
-    const response = await getSurvey(params)
-    if(response.success){
-        const formMappings = FormMappings()
-        setSurveyData(response.data[0])
-        const recievedForms = response.data[0].questions?.map((question:any)=>formMappings[question.type])
-        if(recievedForms) setForms(recievedForms)
-        response.data[0].questions?.forEach((question:any)=>{
-          const index = question.question_id;
-          Object.keys(question.parameters).forEach((parameter:string)=>setValue(`questions.${index}.parameters[${parameter}]`,question.parameters[parameter]))
-        })
-    }else{
-        toast.error("something went wrong")
+  async function handlegetSurveyData() {
+    const params = { _id };
+    const response = await getSurvey(params);
+    if (response.success) {
+      const formMappings = FormMappings();
+      setSurveyData(response.data[0]);
+      const receivedForms = response.data[0].questions?.map((question: any) => formMappings[question.type]);
+      if (receivedForms) setForms(receivedForms);
+      response.data[0].questions?.forEach((question: any) => {
+        const index = question.question_id;
+        Object.keys(question.parameters).forEach((parameter: string) => setValue(`questions.${index}.parameters[${parameter}]`, question.parameters[parameter]));
+      });
+    } else {
+      toast.error("Something went wrong");
     }
-}
+  }
 
   // Handle form submission
   async function handleSubmitForm(data: any) {
     console.log(data.questions);
-    const formData = {created_by,questions:data.questions}
-    const params = {_id, created_by, formData}
-    const response = await updateSurvey(params)
-    if(response.success){
-      toast.success("Questions updated in survey!")
-    }else{
+    const formData = { created_by, questions: data.questions };
+    const params = { _id, created_by, formData };
+    const response = await updateSurvey(params);
+    if (response.success) {
+      toast.success("Questions updated in survey!");
+    } else {
       toast.error("Something went wrong");
     }
   }
@@ -70,25 +66,25 @@ function SurveyForm() {
     unregister(`questions.${id}`);
   }
 
-  //Handle start of drag
-  function handleDragStart(e:React.DragEvent<HTMLDivElement>,index:number){
+  // Handle start of drag
+  function handleDragStart(e: React.DragEvent<HTMLDivElement>, index: number) {
     e.stopPropagation();
-    e.dataTransfer.setData("text/plain","form_reorder")
-    setDraggedIndex(index)
-    console.log("starting Ind----",index)
+    e.dataTransfer.setData("text/plain", "form_reorder");
+    setDraggedIndex(index);
+    console.log("starting Ind----", index);
   }
 
   // Handle form drop event
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     const formMapping = FormMappings();
     const data = e.dataTransfer.getData("text/plain") as keyof typeof formMapping;
-    if(data !== "form_reorder"){
+    if (data !== "form_reorder") {
       setForms([...forms, formMapping[data]]);
     }
   }
 
   // Handle drop event (rearrange forms based on the dragged and dropped indices)
-  function handleDropForm(e:React.DragEvent<HTMLDivElement>) {
+  function handleDropForm(e: React.DragEvent<HTMLDivElement>) {
     if (draggedIndex === null) return;
 
     const reorderedForms = [...forms];
@@ -109,48 +105,53 @@ function SurveyForm() {
       setValue(`questions.${index}`, value);
     });
 
-
     setForms(reorderedForms);
     setDraggedIndex(null);
-    setEndDragIndex(null); 
+    setEndDragIndex(null);
   }
 
-   // Handle drag enter event (update the end drag index)
-   function handleDragEnter(index: number) {
+  // Handle drag enter event (update the end drag index)
+  function handleDragEnter(index: number) {
     if (draggedIndex !== null && index !== draggedIndex) {
       setEndDragIndex(index);
-      console.log("Entering Ind----",index)
+      console.log("Entering Ind----", index);
     }
   }
 
   return (
-    <main className="w-full flex justify-center items-center">
+    <main className="flex flex-col h-screen w-full p-4">
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="relative w-[1062px] h-[682px] bg-white flex flex-col gap-2 p-2 overflow-y-auto"
+        className="relative flex-1 bg-white flex flex-col gap-2 p-2 overflow-y-auto"
       >
-       
-        <form onSubmit={handleSubmit(handleSubmitForm)}>
-          <div onDragOver={(e)=>e.preventDefault()} onDrop={handleDropForm} className="flex flex-col gap-2">
-            {forms.map((Form, index) => (
-                  <Form
-                    handleDragEnter={() => handleDragEnter(index)}
-                    handleDragStart={(e:React.DragEvent<HTMLDivElement>)=>handleDragStart(e,index)}
-                    key={index}
-                    handleDelete={handleDelete}
-                    control={control}
-                    setValue={setValue}
-                    register={register}
-                    id={index.toString()}
-                    endIndex={endDragIndex}
-                  />
-                ))}
+        <form className="flex flex-col flex-1 pb-20">
+          <div onDragOver={(e) => e.preventDefault()} onDrop={handleDropForm} className="flex flex-col gap-2 flex-1">
+            {forms.length > 0 ? forms.map((Form, index) => (
+              <Form
+                handleDragEnter={() => handleDragEnter(index)}
+                handleDragStart={(e: React.DragEvent<HTMLDivElement>) => handleDragStart(e, index)}
+                key={index}
+                handleDelete={handleDelete}
+                control={control}
+                setValue={setValue}
+                register={register}
+                id={index.toString()}
+                endIndex={endDragIndex}
+              />
+            )):(
+              <p className="w-full h-[20vh] flex justify-center items-center text-secondary-300">Drag and drop the questions from left to add question to survey</p>
+            )}
           </div>
-          {forms.length > 0 && (
-            <ButtonBordered className="mt-10 w-fit ml-auto">Save</ButtonBordered>
-          )}
         </form>
+      </div>
+      <div className="sticky bottom-0 left-0 w-full bg-white border-t border-gray-200 py-2 px-4 flex justify-end z-10">
+        <button
+          onClick={handleSubmit(handleSubmitForm)} // Trigger form submission
+          className="px-6 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
+        >
+          Save Changes
+        </button>
       </div>
     </main>
   );

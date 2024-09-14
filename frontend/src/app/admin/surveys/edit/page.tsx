@@ -34,8 +34,6 @@ function page() {
           });
         }
     }, [surveyData, setValue]);
-
-    console.log("survey data--->",surveyData)
     
 
     async function getSurveyData(){

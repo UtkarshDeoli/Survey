@@ -1,6 +1,7 @@
 "use client";
 
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
+import Loader from "@/components/ui/Loader";
 import { createSurvey } from "@/networks/survey_networks";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useState } from "react";
@@ -63,6 +64,12 @@ function Page() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if(loading){
+    return <div className="fixed h-screen w-screen flex justify-center items-center bg-black bg-opacity-35 z-50">
+      <Loader/>
+    </div>
   }
 
   return (
