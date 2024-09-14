@@ -14,7 +14,7 @@ interface Params {
   sortOrder: string;
   published?: string;
   created_by: string;
-  search: string;
+  filter: string;
 }
 
 function Page() {
@@ -25,10 +25,10 @@ function Page() {
     sortOrder: "asc",
     published: "all",
     created_by: "rohitchand490@gmail.com",
-    search: "",
+    filter: "",
   });
 
-  const [searchInput, setSearchInput] = useState("");
+  const [searchBarInput, setSearchBarInput] = useState("");
   const [published, setPublished] = useState("all");
   const [sortSelect, setSortSelect] = useState("nameAsc");
 
@@ -37,7 +37,7 @@ function Page() {
   const handleApplyFilters = () => {
     setQueryParams((prev) => ({
       ...prev,
-      search: searchInput,
+      filter: searchBarInput,
       published: published,
       sortBy: sortSelect.includes("name") ? "name" : "createdAt",
       sortOrder: sortSelect.includes("Asc") ? "asc" : "desc",
@@ -49,13 +49,13 @@ function Page() {
     <section className="w-full">
       <SurveyHeader />
 
-      <div className="sticky top-16 bg-white border-b border-gray-200 z-10">
+      <div className="bg-white border-b border-gray-200 z-10">
         <div className="flex justify-between px-8 py-3">
           <input
             className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
             placeholder="Search surveys here"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            value={searchBarInput}
+            onChange={(e) => setSearchBarInput(e.target.value)}
           />
           <div className="flex gap-2">
             <div className="flex h-10 items-center space-x-5 text-secondary-300 font-semibold">
@@ -95,7 +95,12 @@ function Page() {
               className="text-[14px] font-semibold flex gap-2 items-center justify-center"
               onClick={handleApplyFilters}
             >
-              <Image src={filter.src} alt="filter icon" height={24} width={24} />
+              <Image
+                src={filter.src}
+                alt="filter icon"
+                height={24}
+                width={24}
+              />
               <p>Apply filters</p>
             </ButtonFilled>
           </div>
