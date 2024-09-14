@@ -14,7 +14,7 @@ function SurveyHeader() {
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
   return (
-    <header className="w-full h-16 border-2">
+    <header className="sticky top-0 left-0 z-20 w-full h-16 border-2">
         <div className="bg-secondary-100 h-full w-full px-8 py-3 flex justify-between items-center">
            <h3 className="text-secondary-300">Surveys</h3>
            <div className=" flex gap-2">

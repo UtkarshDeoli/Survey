@@ -7,7 +7,7 @@ import { questions, advanceQuestions } from "@/utils/devData";
 function AllQuestions() {
   const [level, setLevel] = useState("Standard");
   return (
-    <aside className="min-w-[283px] min-h-screen pt-4 pl-2 overflow-hidden">
+    <aside className="sticky top-0 left-0 h-full min-w-[283px] min-h-screen pt-4 pl-2 overflow-hidden">
       <div className="flex flex-col gap-2 w-full">
         <button className="bg-my-blue-700 w-full text-[14px] font-semibold border text-white px-4 py-[10px] rounded-md text-left ">
           Questionnaire
