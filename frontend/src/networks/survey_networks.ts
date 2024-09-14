@@ -56,7 +56,7 @@ export const getAllSurveys = async (params: any) => {
 
     const options = {
       method: "GET",
-      url: `${SERVER_URI}/${get_all_surveys}?search=${search}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&published=${published}&created_by=${created_by}`,
+      url: `${SERVER_URI}/${get_all_surveys}?filter=${search}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&published=${published}&created_by=${created_by}`,
     };
     const response = await axios.request(options);
     console.log(response);

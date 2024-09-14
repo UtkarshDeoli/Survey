@@ -2,7 +2,8 @@ export const SERVER_URI = "http://localhost:6969";
 // export const SERVER_URI = "https://survey-3uf0.onrender.com";
 
 // users
-export const get_users = "api/user/getUsers";
+export const get_user = "api/user/getUser";
+export const get_all_users = "api/user/getAllUsers";
 export const add_users = "api/user/addUsers";
 export const update_user = "api/user/updateUser";
 
