@@ -26,7 +26,7 @@ interface Params {
   sortOrder: string;
   published?: string;
   created_by: string;
-  search: string;
+  filter: string;
 }
 
 function AllSurveys({ queryParams }: AllSurveysProps) {
@@ -113,73 +113,83 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
         <p className="col-span-2">Date created</p>
         <p className="col-span-2">Status</p>
       </div>
-      {loading && <Loader className="h-[40vh] w-full flex justify-center items-center text-primary-300"/>}
-      {!loading && allSurveys && allSurveys.length > 0 ? (
-        allSurveys.map((el: any, index: number) => (
-          <div
-            key={index}
-            className="grid grid-cols-10 px-8 py-[16px] border border-secondary-200 w-full"
-          >
-            <p
-              onClick={() =>
-                router.push(`/admin/surveys/edit?survey_id=${el._id}`)
-              }
-              className="col-span-4 cursor-pointer underline"
+      {loading && (
+        <Loader className="h-[40vh] w-full flex justify-center items-center text-primary-300" />
+      )}
+      {!loading && allSurveys && allSurveys.length > 0
+        ? allSurveys.map((el: any, index: number) => (
+            <div
+              key={index}
+              className="grid grid-cols-10 px-8 py-[16px] border border-secondary-200 w-full"
             >
-              {el.name}
-            </p>
-            <p className="col-span-2">0</p>
-            <p className="col-span-2">{formatDate(el.createdAt)}</p>
-            <div className="col-span-2 flex items-center justify-between w-full relative">
-              <button
-                onClick={() => {
-                  setisSurveyPublished(el.published);
-                  setSurveyToPublish(el._id);
-                  setPublishModal(true);
-                }}
-                className={`border rounded-md px-2 py-1 text-[14px] font-medium ${
-                  el.published
-                    ? "border-custom-green-300 text-custom-green-300"
-                    : "border-red-500 text-red-500"
-                }`}
+              <p
+                onClick={() =>
+                  router.push(`/admin/surveys/edit?survey_id=${el._id}`)
+                }
+                className="col-span-4 cursor-pointer underline"
               >
-                {el.published ? "Published" : "Unpublished"}
-              </button>
-              <div className="relative">
+                {el.name}
+              </p>
+              <p className="col-span-2">0</p>
+              <p className="col-span-2">{formatDate(el.createdAt)}</p>
+              <div className="col-span-2 flex items-center justify-between w-full relative">
                 <button
                   onClick={() => {
-                    setSurveyToDelete(el._id);
-                    toggleDropdown(el._id);
+                    setisSurveyPublished(el.published);
+                    setSurveyToPublish(el._id);
+                    setPublishModal(true);
                   }}
+                  className={`border rounded-md px-2 py-1 text-[14px] font-medium ${
+                    el.published
+                      ? "border-custom-green-300 text-custom-green-300"
+                      : "border-red-500 text-red-500"
+                  }`}
                 >
-                  <BsThreeDotsVertical />
+                  {el.published ? "Published" : "Unpublished"}
                 </button>
-                {activeDropdown === el._id && (
-                  <div className="absolute right-0 top-8 h-auto w-48 bg-white shadow-lg border rounded-md py-2 z-10">
-                    <button onClick={()=>router.push(`/admin/surveys/edit?survey_id=${el._id}`)} className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
-                      <FaRegEdit /> Edit
-                    </button>
-                    <button className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
-                      <FaRegUser /> Assign to user
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveDropdown(null);
-                        setDeleteModal(true);
-                      }}
-                      className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full"
-                    >
-                      <MdDeleteOutline /> Delete
-                    </button>
-                  </div>
-                )}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setSurveyToDelete(el._id);
+                      toggleDropdown(el._id);
+                    }}
+                  >
+                    <BsThreeDotsVertical />
+                  </button>
+                  {activeDropdown === el._id && (
+                    <div className="absolute right-0 top-8 h-auto w-48 bg-white shadow-lg border rounded-md py-2 z-10">
+                      <button
+                        onClick={() =>
+                          router.push(`/admin/surveys/edit?survey_id=${el._id}`)
+                        }
+                        className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full"
+                      >
+                        <FaRegEdit /> Edit
+                      </button>
+                      <button className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
+                        <FaRegUser /> Assign to user
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveDropdown(null);
+                          setDeleteModal(true);
+                        }}
+                        className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full"
+                      >
+                        <MdDeleteOutline /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))
-      ) : !loading && !allSurveys && (
-        <p className="w-full h-20 flex justify-center items-center font-semibold text-secondary-300">No surveys</p>
-      )}
+          ))
+        : !loading &&
+          !allSurveys && (
+            <p className="w-full h-20 flex justify-center items-center font-semibold text-secondary-300">
+              No surveys
+            </p>
+          )}
       {/* modals */}
 
       <CustomModal
