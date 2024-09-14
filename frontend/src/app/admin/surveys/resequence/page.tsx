@@ -3,11 +3,11 @@
 import QuestionHeader from "@/components/questions/QuestionHeader";
 import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { VscThreeBars } from "react-icons/vsc";
 
-export default function Page() {
+function Page() {
   const [surveyQuestions, setSurveyQuestions] = useState<any[]>([]);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const params = useSearchParams();
@@ -112,3 +112,11 @@ export default function Page() {
     </main>
   );
 }
+
+const SuspendedCreateSurveyPage= () =>(
+  <Suspense>
+      <Page/>    
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;
