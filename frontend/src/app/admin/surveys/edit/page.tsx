@@ -4,11 +4,11 @@ import EditSurveysHeader from "@/components/surveys/EditSurveysHeader"
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import { createSurvey, getSurvey, updateSurvey } from "@/networks/survey_networks";
 import { useParams, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-function page() {
+function Page() {
     const [surveyData,setSurveyData] = useState <any> ([]);
     const [loading,setLoading] = useState <boolean>(false)
     const params = useSearchParams()
@@ -203,4 +203,10 @@ function page() {
   )
 }
 
-export default page
+const SuspendedCreateSurveyPage= () =>(
+  <Suspense>
+      <Page/>    
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;

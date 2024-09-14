@@ -98,13 +98,13 @@ function AddressForm({
       draggable
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
-      <FormHeader
+      {/* <FormHeader
         id={id}
         register={register}
         input={true}
         handleDelete={handleDelete}
         defaultQuestionTitle="Address Form"
-      />
+      /> */}
       <div className="bg-blue-100 p-5 w-full ">
         <div
           onDrop={handleDrop}

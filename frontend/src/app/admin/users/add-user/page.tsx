@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { IUser } from '@/types/user_interfaces';
@@ -291,4 +291,10 @@ function Page() {
   );
 }
 
-export default Page;
+const SuspendedCreateSurveyPage= () =>(
+  <Suspense>
+      <Page/>    
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;

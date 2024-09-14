@@ -34,12 +34,12 @@ function DecimalGridForm({
       draggable
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
-      <FormHeader
+      {/*<FormHeader
         id={id}
         register={register}
         input={true}
         handleDelete={handleDelete}
-      />
+      />*/}
       <div className="bg-blue-100 p-5 w-full">
         <div className="flex flex-col justify-center items-center p-5 gap-3 bg-white w-full">
           <div className="grid grid-cols-12 w-[85%]">
