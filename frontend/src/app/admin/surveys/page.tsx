@@ -49,7 +49,7 @@ function Page() {
     <section className="w-full">
       <SurveyHeader />
 
-      <div className="sticky top-16 bg-white border-b border-gray-200 z-10">
+      <div className="bg-white border-b border-gray-200 z-10">
         <div className="flex justify-between px-8 py-3">
           <input
             className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"

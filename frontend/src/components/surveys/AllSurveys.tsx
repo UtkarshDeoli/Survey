@@ -15,6 +15,7 @@ import CustomModal from "../ui/Modal";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import toast from "react-hot-toast";
 import Loader from "../ui/Loader";
+import Switch from "react-switch"; // Using a third-party switch component for toggle
 
 interface AllSurveysProps {
   queryParams: Params;
@@ -34,18 +35,16 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
-  const [publishModal, setPublishModal] = useState<boolean>(false);
   const [surveyToDelete, setSurveyToDelete] = useState<string | null>(null);
+
   const [surveyToPublish, setSurveyToPublish] = useState<string | null>(null);
   const [isSurveyPublished, setisSurveyPublished] = useState<boolean | null>(
-    null,
+    null
   );
-
-  console.log(isSurveyPublished);
+  const [publishModal, setPublishModal] = useState<boolean>(false);
 
   const router = useRouter();
 
-  // useEffects
   useEffect(() => {
     handleGetAllSurveys();
   }, [queryParams]);
@@ -67,7 +66,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
     }
   }
 
-  // Publish a survey
+  // Toggle publish/unpublish survey
   async function handlePublishSurvey() {
     const formData = {
       published: !isSurveyPublished,
@@ -82,7 +81,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
       setSurveyToPublish(null);
       setisSurveyPublished(null);
       toast.success(
-        `Survey ${isSurveyPublished ? "Unpublished" : "Published"} successfully`,
+        `Survey ${isSurveyPublished ? "Unpublished" : "Published"} successfully`
       );
     } else {
       toast.error("Failed to Publish survey");
@@ -90,9 +89,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
   }
 
   async function handleGetAllSurveys() {
-    console.log("CALLED");
-    console.log(queryParams);
-    const params = queryParams; //to be dynamic
+    const params = queryParams;
     setLoading(true);
     const response = await getAllSurveys(params);
     setAllSurveys(response.survey);
@@ -104,11 +101,18 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
     setActiveDropdown((prev) => (prev === index ? null : index));
   };
 
+  // Handle publish/unpublish toggle click
+  const handleToggleClick = (survey: any) => {
+    setisSurveyPublished(survey.published);
+    setSurveyToPublish(survey._id);
+    setPublishModal(true); // Show modal for confirmation
+  };
+
   return (
     <div className="w-full px-8 py-3">
       {/* surveys */}
-      <div className="grid grid-cols-10 text-secondary-300 font-semibold bg-secondary-100 px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
-        <p className="col-span-4">All surveys</p>
+      <div className="grid grid-cols-8 text-secondary-300 font-semibold bg-secondary-100 px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+        <p className="col-span-2">All surveys</p>
         <p className="col-span-2">Total responses</p>
         <p className="col-span-2">Date created</p>
         <p className="col-span-2">Status</p>
@@ -120,33 +124,29 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
         ? allSurveys.map((el: any, index: number) => (
             <div
               key={index}
-              className="grid grid-cols-10 px-8 py-[16px] border border-secondary-200 w-full"
+              className="grid grid-cols-8 px-8 py-[16px] border border-secondary-200 w-full"
             >
               <p
                 onClick={() =>
                   router.push(`/admin/surveys/edit?survey_id=${el._id}`)
                 }
-                className="col-span-4 cursor-pointer underline"
+                className="col-span-2 cursor-pointer underline"
               >
                 {el.name}
               </p>
-              <p className="col-span-2">0</p>
+              <p className="col-span-2 pl-8">0</p>
               <p className="col-span-2">{formatDate(el.createdAt)}</p>
               <div className="col-span-2 flex items-center justify-between w-full relative">
-                <button
-                  onClick={() => {
-                    setisSurveyPublished(el.published);
-                    setSurveyToPublish(el._id);
-                    setPublishModal(true);
-                  }}
-                  className={`border rounded-md px-2 py-1 text-[14px] font-medium ${
-                    el.published
-                      ? "border-custom-green-300 text-custom-green-300"
-                      : "border-red-500 text-red-500"
-                  }`}
-                >
-                  {el.published ? "Published" : "Unpublished"}
-                </button>
+                <Switch
+                  onChange={() => handleToggleClick(el)}
+                  checked={el.published}
+                  onColor="#4CAF50"
+                  offColor="#DDDDDD"
+                  uncheckedIcon={false}
+                  checkedIcon={false}
+                  className="transition-switch duration-300 ease-in-out"
+                />
+
                 <div className="relative">
                   <button
                     onClick={() => {
@@ -190,8 +190,8 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
               No surveys
             </p>
           )}
-      {/* modals */}
 
+      {/* modals */}
       <CustomModal
         open={publishModal}
         closeModal={() => {
@@ -202,7 +202,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
       >
         <div className="flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
           <h1 className="text-xl">
-            Do want to {isSurveyPublished ? "Unpublish" : "Publish"} this
+            Do you want to {isSurveyPublished ? "Unpublish" : "Publish"} this
             survey?
           </h1>
           <div className="flex gap-2">

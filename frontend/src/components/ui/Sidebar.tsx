@@ -5,6 +5,7 @@ import { BsBookFill, BsSpeedometer, BsTable, BsClipboardDataFill, BsGearFill, Bs
 import { ImUser } from "react-icons/im";
 import { usePathname, useRouter } from "next/navigation";
 import { Tooltip } from "react-tooltip";
+import { VscThreeBars } from "react-icons/vsc";
 
 // Paths that should have a small sidebar
 const SMALL_PATHS = ["/admin/data/analytics", "/admin/surveys/questions"];
@@ -33,9 +34,9 @@ function Sidebar() {
     >
       <button
         onClick={toggleSidebar}
-        className={`p-2 rounded-full bg-primary-300 text-white mt-2 mx-auto ${sidebarOpen ? "self-end" : "self-start"}`}
+        className={`mt-2 text-secondary-300 mx-auto ${sidebarOpen ? "self-end" : "self-start"}`}
       >
-        {sidebarOpen ? <BsChevronLeft size={22} /> : <BsChevronRight size={22} />}
+        <VscThreeBars size={22} />
       </button>
       <div className={`flex flex-col items-start pt-6 ${sidebarOpen ? "px-2" : ""}`}>
         {SidebarScreens.map((el: any, ind: number) => (
