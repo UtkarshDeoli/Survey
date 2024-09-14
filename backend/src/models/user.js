@@ -29,8 +29,8 @@ const userSchema = new Schema({
         required: false
     },
     role: {
-        type: String,
-        enum: ['admin', 'booth_karyakarta', 'survey_collector', 'support_executive', 'survey_manager'],
+        type: [String],
+        enum: ['Admin', 'Booth Karyakarta', 'Survey Collector', 'Support Executive', 'Survey Manager'],
         required: true
     },
     auto_assign_survey: {

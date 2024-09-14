@@ -2,14 +2,16 @@ const User = require('../models/user')
 
 exports.addUsers = async (req, res) => {
     try {
-        console.log("add user REq")
+        console.log("add user Request")
         console.log(req.body)
-        
-        const result = await User.insertMany(req.body);
 
-        return res.status(201).json({ success: true, message: "user created successfully" })
+        const user = new User(req.body);
+        const result = await user.save();
+
+        return res.status(201).json({ success: true, message: "Users created successfully", data: result });
     } catch (error) {
-        return res.status(400).json({ success: false, message: 'something went wrong' })
+        console.error("Error adding users:", error);
+        return res.status(400).json({ success: false, message: "Something went wrong" });
     }
 }
 
@@ -27,12 +29,26 @@ exports.updateUser = async (req, res) => {
     }
 }
 
+exports.getUser = async (req, res) => {
+    try {
+        console.log("get single user hitting")
+        const _id = req.query.userId;
+        console.log(_id)
+        const user = await User.findOne({ _id:_id });
+        console.log(user)
+        return res.status(200).json({ success: true, data: user })
+    }
+    catch (error) {
+        return res.status(400).json({ success: false, message: 'something went wrong' })
+    }
+}
+
 exports.getAllUsers = async (req, res) => {
     try {
         let filter = req.query.filter || "";
         let created_by = req.query.created_by;
 
-        const validRoles = ['admin', 'booth_karyakarta', 'survey_collector', 'support_executive', 'survey_manager'];
+        const validRoles = ['Admin', 'Booth Karyakarta', 'Survey Collector', 'Support Executive', 'Survey Manager'];
 
         const searchConditions = [];
         searchConditions.push({ name: { $regex: filter, $options: 'i' } });

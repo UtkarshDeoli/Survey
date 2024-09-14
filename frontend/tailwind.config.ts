@@ -8,6 +8,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      transitionProperty: {
+        'switch': 'transform, background-color', 
+      },
+      transitionTimingFunction: {
+        'ease-in-out': 'ease-in-out',
+      },
+      transitionDuration: {
+        '300': '300ms',
+      },
       colors: {
         "primary-300":"#477BFF",
 

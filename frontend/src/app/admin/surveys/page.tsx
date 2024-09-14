@@ -17,20 +17,22 @@ interface Params {
   filter: string;
 }
 
+const defaultParams: Params = {
+  page: 1,
+  limit: 10,
+  sortBy: "createdAt",
+  sortOrder: "desc",
+  published: "all",
+  created_by: "rohitchand490@gmail.com",
+  filter: "",
+};
+
 function Page() {
-  const [queryParams, setQueryParams] = useState<Params>({
-    page: 1,
-    limit: 10,
-    sortBy: "name",
-    sortOrder: "asc",
-    published: "all",
-    created_by: "rohitchand490@gmail.com",
-    filter: "",
-  });
+  const [queryParams, setQueryParams] = useState<Params>(defaultParams);
 
   const [searchBarInput, setSearchBarInput] = useState("");
   const [published, setPublished] = useState("all");
-  const [sortSelect, setSortSelect] = useState("nameAsc");
+  const [sortSelect, setSortSelect] = useState("dateDesc");
 
   useEffect(() => {}, [queryParams]);
 
@@ -45,11 +47,18 @@ function Page() {
     }));
   };
 
+  const handleClearFilters = () => {
+    setSearchBarInput("");
+    setPublished("all");
+    setSortSelect("dateDesc");
+    setQueryParams(() => defaultParams);
+  };
+
   return (
     <section className="w-full">
       <SurveyHeader />
 
-      <div className="sticky top-16 bg-white border-b border-gray-200 z-10">
+      <div className="bg-white border-b border-gray-200 z-10">
         <div className="flex justify-between px-8 py-3">
           <input
             className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
@@ -102,6 +111,12 @@ function Page() {
                 width={24}
               />
               <p>Apply filters</p>
+            </ButtonFilled>
+            <ButtonFilled
+              className="text-[14px] font-semibold flex gap-2 items-center justify-center"
+              onClick={handleClearFilters}
+            >
+              <p>Clear Filters</p>
             </ButtonFilled>
           </div>
         </div>
