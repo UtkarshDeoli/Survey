@@ -12,7 +12,7 @@ function QuestionHeader({id, created_by, name}:props) {
   const path = usePathname();
   const router = useRouter();
   return (
-    <header className="sticky top-0 left-0 w-full h-16 border-2 z-20">
+    <header className=" top-0 left-0 w-full h-16 border-2 z-20">
         <div className="bg-secondary-100 h-full w-full px-8 py-3 flex justify-between items-center">
            <h3 className="text-secondary-300 text-[14px] font-semibold">{name}</h3>
            <div className=" flex gap-2">
