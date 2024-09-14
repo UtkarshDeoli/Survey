@@ -29,12 +29,26 @@ exports.updateUser = async (req, res) => {
     }
 }
 
+exports.getUser = async (req, res) => {
+    try {
+        console.log("get single user hitting")
+        const _id = req.query.userId;
+        console.log(_id)
+        const user = await User.findOne({ _id:_id });
+        console.log(user)
+        return res.status(200).json({ success: true, data: user })
+    }
+    catch (error) {
+        return res.status(400).json({ success: false, message: 'something went wrong' })
+    }
+}
+
 exports.getAllUsers = async (req, res) => {
     try {
         let filter = req.query.filter || "";
         let created_by = req.query.created_by;
 
-        const validRoles = ['admin', 'booth_karyakarta', 'survey_collector', 'support_executive', 'survey_manager'];
+        const validRoles = ['Admin', 'Booth Karyakarta', 'Survey Collector', 'Support Executive', 'Survey Manager'];
 
         const searchConditions = [];
         searchConditions.push({ name: { $regex: filter, $options: 'i' } });
