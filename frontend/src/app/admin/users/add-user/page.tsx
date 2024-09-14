@@ -11,12 +11,12 @@ function Page() {
   const router = useRouter()
   const onSubmit: SubmitHandler<IUser> = async (data:IUser) => {
     delete data.confirm_password;
-    const params=[data]
+    const params=data
     console.log("datatata::::",params)
     const res=await addUsers(params);
-    if(res){
-      router.replace('/admin/users')
-    }
+    // if(res){
+    //   router.replace('/admin/users')
+    // }
   };
 
   return (

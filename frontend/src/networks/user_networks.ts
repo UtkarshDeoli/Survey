@@ -40,16 +40,16 @@ export const getUsers =async ()=>{
   }
 }
 
-export const addUsers =async (params:IUser[])=>{
+export const addUsers =async (params: any)=>{
     try {
-      const bearerToken =localStorage.getItem('token');
+      // const bearerToken =localStorage.getItem('token');
       const options={
         method: 'POST',
         url: `${SERVER_URI}/${add_users}`,
-        headers: { 
-          Authorization: `Bearer ${bearerToken}`,
-          'Content-Type': 'application/json'
-        },
+        // headers: { 
+        //   Authorization: `Bearer ${bearerToken}`,
+        //   'Content-Type': 'application/json'
+        // },
         data:params
       }
       console.log(options)

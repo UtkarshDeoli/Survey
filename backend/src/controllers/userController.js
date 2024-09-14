@@ -2,14 +2,16 @@ const User = require('../models/user')
 
 exports.addUsers = async (req, res) => {
     try {
-        console.log("add user REq")
+        console.log("add user Request")
         console.log(req.body)
-        
-        const result = await User.insertMany(req.body);
 
-        return res.status(201).json({ success: true, message: "user created successfully" })
+        const user = new User(req.body);
+        const result = await user.save();
+
+        return res.status(201).json({ success: true, message: "Users created successfully", data: result });
     } catch (error) {
-        return res.status(400).json({ success: false, message: 'something went wrong' })
+        console.error("Error adding users:", error);
+        return res.status(400).json({ success: false, message: "Something went wrong" });
     }
 }
 
