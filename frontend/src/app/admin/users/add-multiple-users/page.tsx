@@ -19,7 +19,7 @@ interface FormData {
   role: "surveyManager" | "boothKaryakarta" | "surveyCollector" | "supportExecutive" | "dataHandler";
   permissions: Permissions;
   selectAllUsers: boolean;
-  users:any
+  users: any
 }
 
 function AddMultipleUsersPage() {
@@ -162,8 +162,8 @@ function AddMultipleUsersPage() {
                     ))}
                   </div>
                 </div>
-                </div>
               </div>
+            </div>
 
             {/* Save, Cancel buttons */}
             <div className="flex justify-center space-x-5 mt-3">

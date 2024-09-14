@@ -1,23 +1,86 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { IUser } from '@/types/user_interfaces';
 import { addUsers } from '@/networks/user_networks';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { getAllSurveys } from '@/networks/survey_networks';
+import { getUser } from '@/networks/user_networks';
+
 
 function Page() {
-  const { register, handleSubmit, formState: { errors } } = useForm<IUser>();
+  const [surveys, setSurveys] = useState<{ name: string }[]>([]);
+  const [userData, setUserData] = useState<any>();
+  const [filter, setFilter] = useState<string>('');
+  const [userId, setUserId] = useState<string | null>(null);
+  const { register, watch, handleSubmit, setValue, formState: { errors } } = useForm<IUser>({ defaultValues: userData});
+  const searchParams = useSearchParams();
+  const assignedSurveys = watch('assigned_survey') || [];
+
+  const isAllSelected = assignedSurveys.length === surveys?.length;
+
+  useEffect(() => {
+    setValue('selectAll', isAllSelected);
+  }, [assignedSurveys, setValue, isAllSelected]);
+
+
+  useEffect(() => {
+    const user_Id = searchParams.get('_id');
+    setUserId(user_Id);
+    
+  }, [])
+
   const router = useRouter()
-  const onSubmit: SubmitHandler<IUser> = async (data:IUser) => {
+  const onSubmit: SubmitHandler<IUser> = async (data: IUser) => {
     delete data.confirm_password;
-    const params=data
-    console.log("datatata::::",params)
-    const res=await addUsers(params);
-    // if(res){
-    //   router.replace('/admin/users')
-    // }
+    const params = data
+    // console.log("datatata::::", params)
+    const res = await addUsers(params);
+    if (res) {
+      router.replace('/admin/users')
+    }
   };
+
+  useEffect(() => {
+    async function getSurveys() {
+      const res = await getAllSurveys({ search: filter, created_by: "rohitchand490@gmail.com" });
+      // console.log(res.survey);
+      setSurveys(res.survey);
+    }
+    getSurveys();
+  }, [filter])
+
+  
+  useEffect(() => {
+  if (userId) {
+    console.log("user_id::", )
+    getUserData();
+  }} , [userId])
+
+  useEffect(() => {
+    if (userData) {
+      console.log("userData::", userData);
+      Object.keys(userData).forEach((key: any) => {
+        setValue(key, userData[key]);
+      });
+
+    }
+  }, [userData]);
+
+
+  async function getUserData() {
+    const response = await getUser(userId)
+    console.log("ressese:://",response)
+    if (response) {
+      setUserData(response)
+    } else {
+      // toast.error("something went wrong")
+    }
+  }
+
+
+
 
   return (
     <div className="w-full bg-my-gray-100">
@@ -87,11 +150,11 @@ function Page() {
                   <div className=" w-1/2 font-medium">Role</div>
                   <div className="space-y-2 w-1/2">
                     {[
-                      { label: 'Admin', name: 'admin' },
-                      { label: 'Survey Manager', name: 'survey_manager' },
-                      { label: 'Booth Karyakarta', name: 'booth_karyakarta' },
-                      { label: 'Survey Collector', name: 'survey_collector' },
-                      { label: 'Support Executive', name: 'support_executive' },
+                      { label: 'Admin', name: 'Admin' },
+                      { label: 'Survey Manager', name: 'Survey Manager' },
+                      { label: 'Booth Karyakarta', name: 'Booth Karyakarta' },
+                      { label: 'Survey Collector', name: 'Survey Collector' },
+                      { label: 'Support Executive', name: 'Support Executive' },
                     ].map((role) => (
                       <div key={role.name} className="flex items-center space-x-2">
                         <input
@@ -145,41 +208,65 @@ function Page() {
               </div>
 
               {/* Right Section -> Assign Surveys */}
-              {/* <div className="w-1/2  ">
-                <div className="space-y-4 p-2 rounded-lg border-2 border-[#939393] max-h-fit">
-                  <p className=" font-medium">Assign Survey</p>
-                  <div className="">
+              <div className="w-1/2">
+                <div className="space-y-4 p-2 rounded-lg border border-[#939393] max-h-fit">
+                  <p className="text-gray-700 font-medium">Assign Survey</p>
+
+                  <div>
                     <input
                       type="text"
+                      onChange={(e) => setFilter(e.target.value)}
                       placeholder="Search survey"
                       className="border border-gray-300 rounded-md px-2 py-1 w-4/5"
                     />
                   </div>
+
                   <div className="space-y-2">
+                    {/* Select All functionality */}
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        {...register('selectAllUsers')}
+                        id="selectAllUsers"
+                        checked={isAllSelected}
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          setValue('assigned_survey', isChecked ? surveys.map((s: any) => s._id) : []);
+                        }}
                         className="rounded text-blue-500"
                       />
-                      <label htmlFor="selectAllUsers" className="">
+                      <label htmlFor="selectAllUsers" className="text-gray-700">
                         Select All
                       </label>
                     </div>
-                    {['Test 1', 'Test 2'].map((survey) => (
-                      <div key={survey} className="flex items-center space-x-2">
+
+                    {/* Loop through surveys */}
+                    {surveys?.map((survey: any) => (
+                      <div key={survey._id} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          {...register('users')}
-                          value={survey}
+                          {...register('assigned_survey')}
+                          value={survey._id}
+                          checked={assignedSurveys.includes(survey._id)} // Manage checked state
+                          onChange={(e) => {
+                            const selected = e.target.checked;
+                            if (selected) {
+                              setValue('assigned_survey', [...assignedSurveys, survey._id]);
+                            } else {
+                              setValue(
+                                'assigned_survey',
+                                assignedSurveys.filter(s => s !== survey._id)
+                              );
+                            }
+                          }}
                           className="rounded text-blue-500"
                         />
-                        <label className="">{survey}</label>
+                        <label className="text-gray-700">{survey.name}</label>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div> */}
+              </div>
+
             </div>
 
             {/* save, cancel button */}
@@ -188,7 +275,7 @@ function Page() {
                 type="submit"
                 className="bg-blue-500 text-white py-2 px-4 rounded-md "
               >
-                Save
+                {userId ? "Update" : "Save"}
               </button>
               <button
                 type="button"

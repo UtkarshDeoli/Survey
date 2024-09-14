@@ -1,5 +1,5 @@
 import { IUser } from "@/types/user_interfaces";
-import { SERVER_URI, update_user, get_users,add_users } from "@/utils/constants";
+import { SERVER_URI, update_user,get_user,  get_all_users,add_users } from "@/utils/constants";
 import axios from "axios";
 
 
@@ -21,14 +21,29 @@ export const updateUsers =async (params:IUser)=>{
   }
 }
 
-
-
-export const getUsers =async ()=>{
+export const getUser =async (params: any)=>{
   try {
     const bearerToken =localStorage.getItem('token');
     const options={
       method: 'GET',
-      url: `${SERVER_URI}/${get_users}`,
+      url: `${SERVER_URI}/${get_user}?userId=${params}`,
+      headers: { 
+        Authorization: `Bearer ${bearerToken}`,
+      }
+    }
+    const response = await axios.request(options);
+    return response.data.data;
+  } catch (error) {
+    return { success: false, message: 'Something Went Wrong' ,error};
+  }
+}
+
+export const getAllUsers =async (params: any)=>{
+  try {
+    const bearerToken =localStorage.getItem('token');
+    const options={
+      method: 'GET',
+      url: `${SERVER_URI}/${get_all_users}?filter=${params}`,
       headers: { 
         Authorization: `Bearer ${bearerToken}`,
       }

@@ -64,6 +64,7 @@ exports.deleteSurvey = async (req, res) => {
 
 exports.getSurvey = async (req, res) => {
   try {
+    console.log("get single user hitting");
     const id = req.query._id;
     const survey = await Survey.find({ _id: id });
     if (!survey) {
@@ -80,7 +81,8 @@ exports.getSurvey = async (req, res) => {
 
 exports.getAllSurvey = async (req, res) => {
   try {
-    console.log("route hitting");
+    // console.log("route getAll hitting");
+    // console.log("query--->", req.query);
 
     const {
       filter = "",
@@ -96,9 +98,9 @@ exports.getAllSurvey = async (req, res) => {
     const skip = (page - 1) * limit;
     const sortOptions = {};
 
-    if (sortBy === "name") {
+    if (sortBy && sortBy === "name") {
       sortOptions.name = order;
-    } else if (sortBy === "createdAt") {
+    } else if (sortBy && sortBy === "createdAt") {
       sortOptions.createdAt = order;
     }
 
@@ -113,6 +115,7 @@ exports.getAllSurvey = async (req, res) => {
       findOptions.published = published == "true" ? true : false;
     }
 
+    // console.log("findOptions--->", findOptions);
     const total = await Survey.countDocuments(findOptions);
     const survey = await Survey.find(findOptions)
       .skip(skip)
