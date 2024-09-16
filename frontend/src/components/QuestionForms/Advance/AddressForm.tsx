@@ -17,15 +17,9 @@ interface Props {
   handleDragEnter: () => void;
   handleDragStart: () => void;
   endIndex: number;
+  control: ReturnType<typeof useForm>["control"];
 }
-const FormNames = [
-  "Address Line 1",
-  "Address Line 2",
-  "City/Town",
-  "State/Province",
-  "ZIP/Postal Code",
-  "Country",
-];
+
 interface FormItem {
   component: React.ComponentType<any>;
   name: string;
@@ -39,7 +33,9 @@ function AddressForm({
   handleDragEnter,
   handleDragStart,
   endIndex,
+  control,
 }: Props) {
+  const [hide, setHide] = useState<boolean>(false);
   const [formItems, setFormItems] = useState<FormItem[]>([
     { component: SingleLineTextForm, name: "Address Line 1" },
     { component: SingleLineTextForm, name: "Address Line 2" },
@@ -49,7 +45,7 @@ function AddressForm({
     { component: SingleLineTextForm, name: "Country" },
   ]);
 
-  const { handleSubmit, control, unregister } = useForm();
+  const { handleSubmit, unregister } = useForm();
 
   useEffect(() => {
     setValue(`questions.${id}.type`, "Address");
@@ -98,43 +94,48 @@ function AddressForm({
       draggable
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
-      {/* <FormHeader
+      <FormHeader
         id={id}
         register={register}
         input={true}
         handleDelete={handleDelete}
+        hide={hide}
+        control={control}
+        setHide={() => setHide((prev: boolean) => !prev)}
         defaultQuestionTitle="Address Form"
-      /> */}
-      <div className="bg-blue-100 p-5 w-full ">
-        <div
-          onDrop={handleDrop}
-          onDragOver={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-          className="relative bg-white flex flex-col gap-2 p-2 overflow-y-auto h-auto "
-        >
-          <form
-            onSubmit={handleSubmit(handleSubmitForm)}
-            className="flex flex-col gap-2"
+      />
+      {!hide && (
+        <div className="bg-blue-100 p-5 w-full">
+          <div
+            onDrop={handleDrop}
+            onDragOver={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            className="relative bg-white flex flex-col gap-2 p-2 overflow-y-auto min-h-20 "
           >
-            {formItems.map((formItem, ind) => {
-              const Form = formItem.component;
-              return (
-                <Form
-                  handleDelete={handleChildDelete}
-                  control={control}
-                  setValue={setValue}
-                  register={register}
-                  defaultQuestionTitle={formItem.name}
-                  key={ind}
-                  id={`${id}_${ind}`}
-                />
-              );
-            })}
-          </form>
+            <form
+              onSubmit={handleSubmit(handleSubmitForm)}
+              className="flex flex-col gap-2"
+            >
+              {formItems.map((formItem, ind) => {
+                const Form = formItem.component;
+                return (
+                  <Form
+                    handleDelete={handleChildDelete}
+                    control={control}
+                    setValue={setValue}
+                    register={register}
+                    defaultQuestionTitle={formItem.name}
+                    key={ind}
+                    id={`${id}_${ind}`}
+                  />
+                );
+              })}
+            </form>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
