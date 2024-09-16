@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -78,4 +78,12 @@ const ResetPasswordPage: React.FC = () => {
   );
 };
 
-export default ResetPasswordPage;
+
+
+const SuspendedCreateSurveyPage= () =>(
+  <Suspense>
+      <ResetPasswordPage/>    
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;

@@ -23,7 +23,7 @@ function Navbar() {
     }
   }, [router]);
   return (
-    <nav className="sticky top-0 flex px-8 py-[18px] shadow-md justify-end">
+    <nav className="sticky top-0 flex px-8 py-[18px] shadow-md justify-end bg-white">
       <div className="flex gap-9 justify-center items-center">
         <ButtonBordered className="text-[14px] font-semibold">
           Notifications

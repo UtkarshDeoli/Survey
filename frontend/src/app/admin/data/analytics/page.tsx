@@ -5,10 +5,10 @@ import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
 import { getSurvey } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import QuestionChart from "@/components/data/QuestionChart";
 
-function page() {
+function Page() {
   const searchParams = useSearchParams();
   const surveyID = searchParams.get("survey_id");
 
@@ -91,4 +91,12 @@ function page() {
   );
 }
 
-export default page;
+
+
+const SuspendedCreateSurveyPage= () =>(
+  <Suspense>
+      <Page/>    
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;
