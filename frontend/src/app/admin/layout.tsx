@@ -9,13 +9,12 @@ interface LayoutProps {
 
 function Layout({ children }: LayoutProps) {
   return (
-    <div className="flex flex-col h-screen">
-      <Navbar />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+    <div className="flex">
+      <Sidebar />
+      <div className="w-full flex flex-col">
+        <Navbar />
+        <main className="w-full">{children}</main>
       </div>
-      {/* <Footer /> */}
       <Toaster />
     </div>
   );

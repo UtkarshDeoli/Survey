@@ -1,30 +1,28 @@
-"use client"
+"use client";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import Active from "@/components/ui/status/Active";
 import Inactive from "@/components/ui/status/Inactive";
 import { getAllUsers } from "@/networks/user_networks";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { IUser } from "@/types/user_interfaces";
 import CustomModal from "@/components/ui/Modal";
-import Switch  from "react-switch";
-
+import Switch from "react-switch";
 
 function page() {
-
   const [users, setUsers] = useState<IUser[]>([]);
-  const [search, setSearch] = useState<string>('');
+  const [searchBarInput, setSearchBarInput] = useState<string>("");
 
   useEffect(() => {
     getData();
   }, []);
 
   async function getData() {
-    const res: any = await getAllUsers(search);
+    const res: any = await getAllUsers(searchBarInput);
     console.log("res::::", res);
-    if (res.error) return
+    if (res.error) return;
     setUsers(res);
   }
   const router = useRouter();
@@ -32,47 +30,69 @@ function page() {
   function handleEditUser(_id: string) {
     router.push(`/admin/users/add-user?_id=${_id}`);
   }
-//   const handleToggleClick = (survey: any) => {
+  //   const handleToggleClick = (survey: any) => {
 
-//     setPublishModal(true); // Show modal for confirmation
-//   };
+  //     setPublishModal(true); // Show modal for confirmation
+  //   };
 
-function doNothing() {
-}
+  function doNothing() {}
 
   return (
-    <div className="w-full ">
-
-      <nav className="bg-my-gray-105 w-full py-3 px-8 flex justify-between shadow-md  ">
+    <div className="w-full">
+      <nav className="w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Users</h1>
         </div>
         <div className="flex justify-end space-x-3">
-          <ButtonBordered className="bg-my-blue-600 border-0 text-white">Help</ButtonBordered>
-          <ButtonFilled onClick={() => { router.push('./users/add-multiple-users') }} className="bg-my-blue-400 text-white">Add Multiple Users</ButtonFilled>
-          <ButtonFilled onClick={() => { router.push('./users/add-user') }} className="bg-my-blue-400 text-white">Add User</ButtonFilled>
-          <ButtonFilled className="bg-my-blue-400 text-white">Export Users</ButtonFilled>
+          <ButtonFilled className="bg-my-blue-600">Help</ButtonFilled>
+          <ButtonFilled
+            onClick={() => {
+              router.push("./users/add-multiple-users");
+            }}
+          >
+            Add Multiple Users
+          </ButtonFilled>
+          <ButtonFilled
+            onClick={() => {
+              router.push("./users/add-user");
+            }}
+          >
+            Add User
+          </ButtonFilled>
+          <ButtonFilled>Export Users</ButtonFilled>
         </div>
       </nav>
 
-      <div className="pt-10 px-5">
-        <div className="flex">
-          <div className="me-5">
-            <input className="px-2 py-2 rounded w-[320px] placeholder:text-black placeholder:font-medium" onChange={(e) => { setSearch(e.target.value) }} placeholder="Name / Username / Role" type="text" />
+      <div className="p-5 text-sm text-my-gray-200">
+        <div className="flex justify-between">
+          <div className="flex me-5 gap-8">
+            <input
+              className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
+              placeholder="Name / Username / Role"
+              value={searchBarInput}
+              onChange={(e) => setSearchBarInput(e.target.value)}
+            />
+            <div className="flex space-x-4 items-center me-20">
+              <div className="bg-[#2A4999] w-8 h-8  "></div>
+              <p className="text-sm font-medium">Hide Disabled Users</p>
+            </div>
           </div>
-          <div className="flex space-x-4 items-center me-20">
-            <div className="bg-[#2A4999] w-8 h-8  "></div>
-            <p className="text-sm font-medium">Hide Disabled Users</p>
-          </div>
-          <div className="">
-            <ButtonBordered onClick={() => { getData() }} className="bg-my-blue-300 text-white me-3 px-8">Search</ButtonBordered>
-            <ButtonBordered className="bg-white text-my-blue-3 px-8">Reset</ButtonBordered>
+
+          <div className="flex gap-4">
+            <ButtonFilled
+              onClick={() => {
+                getData();
+              }}
+            >
+              Search
+            </ButtonFilled>
+            <ButtonBordered>Reset</ButtonBordered>
           </div>
         </div>
 
         <div className="w-full mt-3 text-center text-sm">
-          <div className="w-full rounded-t-2xl border-t border-l border-r border-secondary-200 overflow-hidden ">
-            <div className="bg-my-gray-105 grid grid-cols-5 text-left">
+          <div className="w-full overflow-hidden border-2 rounded-t-2xl ">
+            <div className="bg-my-gray-105 grid grid-cols-5 text-left border-b">
               <p className="rounded-tl-2xl p-3">Name</p>
               <p className="p-3">Username</p>
               <p className="p-3">Email</p>
@@ -83,34 +103,46 @@ function doNothing() {
               </div>
             </div>
             <div>
-              {users && users.length !== 0 && users.map((user, index) => (
-                <div key={index} className="bg-white border grid grid-cols-5 text-left">
-                  <p className="p-3">{user.name}</p>
-                  <p className="p-3">{user.username}</p>
-                  <p className="p-3">{user.email}</p>
-                  <p className="p-3">{user.role.map((role: any) => (
-                    <span>{role},</span>
-                  ))
-                  }</p>
-                  <div className="flex justify-center gap-5 items-center">
-                    {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
-                    <Switch
-                      onChange={() => doNothing()}
-                      checked={user.status === 'active' ? true : false}
-                      onColor="#4CAF50"
-                      offColor="#DDDDDD"
-                      uncheckedIcon={false}
-                      checkedIcon={false}
-                      className="transition-switch duration-300 ease-in-out"
-                    />
-                    <p className="p-3" onClick={() => { handleEditUser(user._id) }}><FaRegEdit className="block mx-auto" /></p>
+              {users &&
+                users.length !== 0 &&
+                users.map((user, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border grid grid-cols-5 text-left"
+                  >
+                    <p className="p-3">{user.name}</p>
+                    <p className="p-3">{user.username}</p>
+                    <p className="p-3">{user.email}</p>
+                    <p className="p-3">
+                      {user.role.map((role: any) => (
+                        <span>{role},</span>
+                      ))}
+                    </p>
+                    <div className="flex justify-center gap-5 items-center">
+                      {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
+                      <Switch
+                        onChange={() => doNothing()}
+                        checked={user.status === "active" ? true : false}
+                        onColor="#4CAF50"
+                        offColor="#DDDDDD"
+                        uncheckedIcon={false}
+                        checkedIcon={false}
+                        className="transition-switch duration-300 ease-in-out"
+                      />
+                      <p
+                        className="p-3"
+                        onClick={() => {
+                          handleEditUser(user._id);
+                        }}
+                      >
+                        <FaRegEdit className="block mx-auto" />
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
-
       </div>
       {/* <CustomModal
         open={publishModal}
@@ -143,7 +175,7 @@ function doNothing() {
         </div>
       </CustomModal> */}
     </div>
-  )
+  );
 }
 
-export default page
+export default page;
