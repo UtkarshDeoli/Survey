@@ -37,6 +37,9 @@ function page() {
 //     setPublishModal(true); // Show modal for confirmation
 //   };
 
+function doNothing() {
+}
+
   return (
     <div className="w-full ">
 
@@ -92,7 +95,7 @@ function page() {
                   <div className="flex justify-center gap-5 items-center">
                     {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
                     <Switch
-                      onChange={() => handleToggleClick(user)}
+                      onChange={() => doNothing()}
                       checked={user.status === 'active' ? true : false}
                       onColor="#4CAF50"
                       offColor="#DDDDDD"
