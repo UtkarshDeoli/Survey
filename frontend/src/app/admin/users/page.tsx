@@ -38,7 +38,7 @@ function page() {
 //   };
 
   return (
-    <div className="w-full bg-my-gray-100">
+    <div className="w-full ">
 
       <nav className="bg-my-gray-105 w-full py-3 px-8 flex justify-between shadow-md  ">
         <div className="text-my-gray-200">
@@ -68,7 +68,7 @@ function page() {
         </div>
 
         <div className="w-full mt-3 text-center text-sm">
-          <div className="w-full rounded-t-2xl overflow-hidden ">
+          <div className="w-full rounded-t-2xl border-t border-l border-r border-secondary-200 overflow-hidden ">
             <div className="bg-my-gray-105 grid grid-cols-5 text-left">
               <p className="rounded-tl-2xl p-3">Name</p>
               <p className="p-3">Username</p>
@@ -91,7 +91,7 @@ function page() {
                   }</p>
                   <div className="flex justify-center gap-5 items-center">
                     {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
-                    {/* <Switch
+                    <Switch
                       onChange={() => handleToggleClick(user)}
                       checked={user.status === 'active' ? true : false}
                       onColor="#4CAF50"
@@ -99,7 +99,7 @@ function page() {
                       uncheckedIcon={false}
                       checkedIcon={false}
                       className="transition-switch duration-300 ease-in-out"
-                    /> */}
+                    />
                     <p className="p-3" onClick={() => { handleEditUser(user._id) }}><FaRegEdit className="block mx-auto" /></p>
                   </div>
                 </div>
