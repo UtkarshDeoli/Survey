@@ -96,7 +96,7 @@ function Page() {
         <div className='grid grid-cols-10 justify-center items-center'>
           <div className='col-span-6 px-10'>
             <div>
-              <Bar data={data} options={options} />
+              <Bar data={data} options={options}/>
             </div>
           </div>
           <div className='col-span-4'>
