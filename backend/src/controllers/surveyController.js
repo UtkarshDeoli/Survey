@@ -66,7 +66,7 @@ exports.getSurvey = async (req, res) => {
   try {
     console.log("get single user hitting");
     const id = req.query._id;
-    const survey = await Survey.find({ _id: id });
+    const survey = await Survey.findById(id);
     if (!survey) {
       return res
         .status(404)
@@ -196,13 +196,11 @@ exports.updateSurvey = async (req, res) => {
         .json({ success: false, message: "Survey not found" });
     }
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Survey updated successfully",
-        survey: result,
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Survey updated successfully",
+      survey: result,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success: false, message: error.message });

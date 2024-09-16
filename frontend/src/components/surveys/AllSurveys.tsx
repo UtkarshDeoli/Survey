@@ -39,7 +39,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
 
   const [surveyToPublish, setSurveyToPublish] = useState<string | null>(null);
   const [isSurveyPublished, setisSurveyPublished] = useState<boolean | null>(
-    null
+    null,
   );
   const [publishModal, setPublishModal] = useState<boolean>(false);
 
@@ -81,7 +81,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
       setSurveyToPublish(null);
       setisSurveyPublished(null);
       toast.success(
-        `Survey ${isSurveyPublished ? "Unpublished" : "Published"} successfully`
+        `Survey ${isSurveyPublished ? "Unpublished" : "Published"} successfully`,
       );
     } else {
       toast.error("Failed to Publish survey");
@@ -124,7 +124,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
         ? allSurveys.map((el: any, index: number) => (
             <div
               key={index}
-              className="grid grid-cols-8 px-8 py-[16px] border border-secondary-200 w-full"
+              className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full"
             >
               <p
                 onClick={() =>

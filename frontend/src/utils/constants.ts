@@ -1,5 +1,5 @@
-// export const SERVER_URI = "http://localhost:6969";
-export const SERVER_URI = "https://survey-3uf0.onrender.com";
+export const SERVER_URI = "http://localhost:6969";
+//export const SERVER_URI = "https://survey-3uf0.onrender.com";
 
 // users
 export const get_user = "api/user/getUser";
@@ -16,3 +16,9 @@ export const get_all_surveys = "api/survey/getAllSurveys";
 
 // questions
 export const ignore_nesting_forms = ["Contact Form", "Address"];
+
+//auth
+export const login = "api/auth/login";
+export const signup = "api/auth/signup";
+export const forgot_password = "api/auth/forgotPassword";
+export const reset_password = "api/auth/resetPassword";
