@@ -14,7 +14,7 @@ const data = {
     {
       label: 'Survey',
       data: [12, 19, 3, 5, 2, 3, 7],
-      backgroundColor: ['green','red','blue','yellow','orange','gray','indigo'],
+      backgroundColor: ['#EF9595','#EFB495','#EFD595','#EBEF95','#A5DD9B','#BB9AB1','#EECEB9'],
       borderColor: '',
       borderWidth: 0,
     },
@@ -77,7 +77,7 @@ function Page() {
             <p className='text-2xl font-semibold mt-10'>5,753</p>
             <p>last week survey</p>
           </div>
-          <div className='flex flex-col bg-gradient-to-r from-[#e9e961] via-[#e2e24c] to-[#f5f5bd] text-white w-[300px] h-[150px] rounded-lg p-3'>
+          <div className='flex flex-col bg-gradient-to-r from-[#B0C5A4] via-[#e2e24c] to-[#EBEF95] text-white w-[300px] h-[150px] rounded-lg p-3'>
             <p className='text-lg font-semibold'>Pending Survey</p>
             <p className='text-2xl font-semibold mt-10'>2,563</p>
             <p>last week survey</p>
