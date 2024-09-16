@@ -15,7 +15,7 @@ function Layout({ children }: LayoutProps) {
         <Sidebar />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
-      <Footer />
+      {/* <Footer /> */}
       <Toaster />
     </div>
   );
