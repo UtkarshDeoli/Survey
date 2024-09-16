@@ -12,7 +12,7 @@ const data = {
   labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
   datasets: [
     {
-      label: 'Monthly Sales',
+      label: 'Survey',
       data: [12, 19, 3, 5, 2, 3, 7],
       backgroundColor: ['green','red','blue','yellow','orange','gray','indigo'],
       borderColor: '',
@@ -101,7 +101,6 @@ function Page() {
           </div>
           <div className='col-span-4'>
             <IndiaMap />
-
           </div>
         </div>
       </div>
