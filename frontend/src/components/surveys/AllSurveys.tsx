@@ -109,9 +109,9 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
   };
 
   return (
-    <div className="w-full px-8 py-3">
+    <div className="w-full px-8 py-3 text-sm">
       {/* surveys */}
-      <div className="grid grid-cols-8 text-secondary-300 font-semibold bg-secondary-100 px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+      <div className="grid grid-cols-8 text-white font-semibold bg-blue-500 px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
         <p className="col-span-2">All surveys</p>
         <p className="col-span-2">Total responses</p>
         <p className="col-span-2">Date created</p>
@@ -124,7 +124,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
         ? allSurveys.map((el: any, index: number) => (
             <div
               key={index}
-              className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full"
+              className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-white"
             >
               <p
                 onClick={() =>

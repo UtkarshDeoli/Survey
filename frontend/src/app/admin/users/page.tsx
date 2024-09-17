@@ -38,12 +38,12 @@ function page() {
   function doNothing() {}
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-[#ECF0FA] text-sm">
       <nav className="w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Users</h1>
         </div>
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-end space-x-3 text-xs">
           <ButtonFilled className="bg-my-blue-600">Help</ButtonFilled>
           <ButtonFilled
             onClick={() => {
@@ -64,7 +64,7 @@ function page() {
       </nav>
 
       <div className="p-5 text-sm text-my-gray-200">
-        <div className="flex justify-between">
+        <div className="flex justify-between  bg-white p-3 rounded-xl">
           <div className="flex me-5 gap-8">
             <input
               className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
@@ -92,7 +92,7 @@ function page() {
 
         <div className="w-full mt-3 text-center text-sm">
           <div className="w-full overflow-hidden border-2 rounded-t-2xl ">
-            <div className="bg-my-gray-105 grid grid-cols-5 text-left border-b">
+            <div className="bg-blue-500 text-white grid grid-cols-5 text-center border-b">
               <p className="rounded-tl-2xl p-3">Name</p>
               <p className="p-3">Username</p>
               <p className="p-3">Email</p>
@@ -108,7 +108,7 @@ function page() {
                 users.map((user, index) => (
                   <div
                     key={index}
-                    className="bg-white border grid grid-cols-5 text-left"
+                    className="bg-white border grid grid-cols-5 text-center"
                   >
                     <p className="p-3">{user.name}</p>
                     <p className="p-3">{user.username}</p>

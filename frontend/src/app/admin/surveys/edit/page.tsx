@@ -39,9 +39,9 @@ function Page() {
     async function getSurveyData(){
         const params ={_id:surveyId}
         const response = await getSurvey(params)
-        console.log(response)
+        console.log("checkREs",response)
         if(response.success){
-            setSurveyData(response.data[0])
+            setSurveyData(response.data)
         }else{
             toast.error("something went wrong")
         }
@@ -87,7 +87,7 @@ function Page() {
   return (
     <main className="w-full">
         <div className="w-full flex flex-col gap-5">
-            <EditSurveysHeader id={surveyId||""} created_by={surveyData.created_by} name={surveyData.name}/>
+            <EditSurveysHeader id={surveyId||""} created_by={surveyData?.created_by} name={surveyData?.name}/>
 
             <form
         className="grid grid-cols-2 m-10"
@@ -98,7 +98,7 @@ function Page() {
           <div className="grid grid-cols-3">
             <label className="text-secondary-300 font-medium">Name</label>
             <input
-              value={surveyData.name||""}
+              value={surveyData?.name||""}
               disabled
               {...register("name")}
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
@@ -176,7 +176,7 @@ function Page() {
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
           </div>
-          <div className="grid grid-cols-3">
+          <div className="grid gap-5 grid-cols-3">
             <label className="text-secondary-300 font-medium">
               Background location capture
             </label>
