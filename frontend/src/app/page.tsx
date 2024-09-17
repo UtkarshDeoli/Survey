@@ -6,10 +6,13 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter()
+  function RedirectToLogin(){
+    router.push("/login")
+  }
   return (
     <main className="flex flex-col w-screen h-screen justify-center items-center bg-gradient-to-r from-black to-primary-300">
       {/* <ButtonFilled className="m-2" onClick={()=>router.push("/admin/surveys")}>Go to admin</ButtonFilled> */}
-      <ButtonFilled className="m-2 bg-yellow-500 text-black" onClick={()=>router.push("/login")}>Login Screen</ButtonFilled>
+      <ButtonFilled className="m-2 bg-yellow-500 text-black" onClick={RedirectToLogin}>Login Screen</ButtonFilled>
     </main>
   );
 }

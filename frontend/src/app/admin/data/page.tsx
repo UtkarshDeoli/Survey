@@ -39,8 +39,8 @@ function page() {
   ];
 
   return (
-    <div className="w-full font-medium ">
-      <nav className="h-16 w-full py-3 px-8 flex justify-between ">
+    <div className="w-full font-medium bg-[#ECF0FA] h-[100vh]">
+      <nav className="h-16 w-full py-3 px-8 flex justify-between text-sm">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Surveys Data</h1>
         </div>
@@ -48,7 +48,7 @@ function page() {
       </nav>
 
       <div className="p-5 text-sm text-my-gray-200">
-        <div className="flex justify-between">
+        <div className="flex justify-between bg-white p-3 rounded-lg">
           <div className="h-10 w-96">
             <input
               type="text"
@@ -65,7 +65,7 @@ function page() {
           <div className="flex h-10 items-center space-x-10 ">
             <p className="">Sort By:</p>
             <div className="rounded-md py-2 px-2 justify-between border-2 border-secondary-200">
-              <select name="sortby" className="w-40 bg-white" id="sortby">
+              <select name="sortby" className="w-40 bg-white focus:outline-none" id="sortby">
                 <option value="dateDesc">Date DESC</option>
                 <option value="dateAsc">Date ASC</option>
               </select>
@@ -75,8 +75,8 @@ function page() {
 
         <div className="w-full mt-3 text-center text-sm border-2 rounded-t-2xl overflow-hidden">
           <table className="w-full">
-            <thead className="bg-my-gray-105">
-              <tr className="w-full text-my-gray-200 border-b">
+            <thead className="bg-blue-500 text-white">
+              <tr className="w-full border-b">
                 <td className="px-8 text-left py-2 w-1/6">Names</td>
                 <td className="px-4 py-2">Responses</td>
                 <td className="px-4 py-2">Analytics</td>

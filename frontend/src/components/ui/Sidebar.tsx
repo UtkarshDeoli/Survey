@@ -28,37 +28,37 @@ function Sidebar() {
 
   const SidebarScreens: any = [
     {
-      icon: <BsSpeedometer size={24} />,
+      icon: <BsSpeedometer size={18} />,
       name: "Dashboard",
       path: "/admin",
       tooltip: "Dashboard",
     },
     {
-      icon: <BsBookFill size={24} />,
+      icon: <BsBookFill size={18} />,
       name: "Surveys",
       path: "/admin/surveys",
       tooltip: "Surveys",
     },
     {
-      icon: <BsTable size={24} />,
+      icon: <BsTable size={18} />,
       name: "Data",
       path: "/admin/data",
       tooltip: "Data",
     },
     {
-      icon: <ImUser size={24} />,
+      icon: <ImUser size={18} />,
       name: "Users",
       path: "/admin/users",
       tooltip: "Users",
     },
     {
-      icon: <BsClipboardDataFill size={24} />,
+      icon: <BsClipboardDataFill size={18} />,
       name: "Reports",
       path: "/admin/reports",
       tooltip: "Reports",
     },
     {
-      icon: <BsGearFill size={24} />,
+      icon: <BsGearFill size={18} />,
       name: "Settings",
       path: "/admin/settings",
       tooltip: "Settings",
@@ -69,7 +69,7 @@ function Sidebar() {
 
   return (
     <aside
-      className={`h-screen sticky top-0 left-0 border-2 flex flex-col transition-all duration-300 ease-in-out justify-between ${
+      className={`h-screen sticky top-0 left-0 border-2 border-secondary-100 flex flex-col transition-all duration-300 ease-in-out justify-between ${
         sidebarOpen ? "max-w-[250px]" : "max-w-[75px]"
       }`}
     >
@@ -85,18 +85,18 @@ function Sidebar() {
           )}
         </h1>
         <div
-          className={`flex flex-col items-start pt-6 ${sidebarOpen ? "px-2" : ""}`}
+          className={`flex flex-col items-start pt-16 ${sidebarOpen ? "px-2" : ""}`}
         >
           {SidebarScreens.map((el: any, ind: number) => (
             <div
               key={ind}
-              className={`relative flex justify-center w-full rounded-md ${
+              className={`relative flex justify-center  ${sidebarOpen ? "w-full mb-6" : "w-fit self-center mb-10"} rounded-md ${
                 el.path === "/admin" // Exact match for Dashboard
                   ? path === el.path
-                    ? "border-2 bg-primary-300 text-secondary-600 bg-gradient-to-r from-[#1f3ef1] via-[#3560fc] to-[#90b3ff]"
+                    ? "bg-primary-300 text-secondary-600"
                     : "text-secondary-300"
                   : path.includes(el.path) // For all other paths
-                    ? "border-2 bg-primary-300 text-secondary-600 bg-gradient-to-r from-[#1f3ef1] via-[#3560fc] to-[#90b3ff]"
+                    ? "bg-primary-300 text-secondary-600"
                     : "text-secondary-300"
               }`}
             >
@@ -104,7 +104,7 @@ function Sidebar() {
                 onClick={() => {
                   router.push(el.path);
                 }}
-                className={`rounded-md px-3 py-4 flex items-center gap-3 text-[16px] font-semibold ${!sidebarOpen ? "w-fit" : "w-[150px]"}`}
+                className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-semibold ${!sidebarOpen ? "w-fir" : "w-[150px]"}`}
               >
                 {!sidebarOpen && (
                   <div

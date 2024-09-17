@@ -68,38 +68,38 @@ function Page() {
   }
 
   return (
-    <div>
-      <div className='p-5 font-semibold'>Admin dashboard</div>
+    <div className='bg-[#ECF0FA]'>
+      <div className='p-5 font-medium'>Admin dashboard</div>
       <div className='flex flex-col gap-10'>
-        <div className='flex gap-5 justify-center'>
-          <div className='flex flex-col bg-gradient-to-r from-[#0086FF] via-[#62B4FE] to-[#a8d5ff] text-white w-[300px] h-[150px] rounded-lg p-3'>
-            <p className='text-lg font-semibold'>Total Survey</p>
-            <p className='text-2xl font-semibold mt-10'>5,753</p>
+        <div className='flex gap-5 justify-between bg-white mx-6 p-4 rounded-2xl'>
+          <div className='flex flex-col bg-gradient-to-r from-[#0086FF] via-[#62B4FE] to-[#a8d5ff] text-white w-full h-[150px] rounded-lg p-3'>
+            <p className='text-lg font-medium'>Total Survey</p>
+            <p className='text-2xl font-medium mt-10'>5,753</p>
             <p>last week survey</p>
           </div>
-          <div className='flex flex-col bg-gradient-to-r from-[#B0C5A4] via-[#e2e24c] to-[#EBEF95] text-white w-[300px] h-[150px] rounded-lg p-3'>
-            <p className='text-lg font-semibold'>Pending Survey</p>
-            <p className='text-2xl font-semibold mt-10'>2,563</p>
+          <div className='flex flex-col bg-gradient-to-r from-[#ffa959] via-[#e2ab4c] to-[#ffda7b] text-white w-full h-[150px] rounded-lg p-3'>
+            <p className='text-lg font-medium'>Pending Survey</p>
+            <p className='text-2xl font-medium mt-10'>2,563</p>
             <p>last week survey</p>
           </div>
-          <div className='flex flex-col bg-gradient-to-r from-[#396f33] via-[#38982d] to-[#8dc086] text-white w-[300px] h-[150px] rounded-lg p-3'>
-            <p className='text-lg font-semibold'>Approved Survey</p>
-            <p className='text-2xl font-semibold mt-10'>1,433</p>
+          <div className='flex flex-col bg-gradient-to-r from-[#396f33] via-[#38982d] to-[#8dc086] text-white w-full h-[150px] rounded-lg p-3'>
+            <p className='text-lg font-medium'>Approved Survey</p>
+            <p className='text-2xl font-medium mt-10'>1,433</p>
             <p>last week survey</p>
           </div>
-          <div className='flex flex-col bg-gradient-to-r from-[#d45050] via-[#f35f5f] to-[#ffb3b3] text-white w-[300px] h-[150px] rounded-lg p-3'>
-            <p className='text-lg font-semibold'>Rejected Survey</p>
-            <p className='text-2xl font-semibold mt-10'>3,563</p>
+          <div className='flex flex-col bg-gradient-to-r from-[#d45050] via-[#f35f5f] to-[#ffb3b3] text-white w-full h-[150px] rounded-lg p-3'>
+            <p className='text-lg font-medium'>Rejected Survey</p>
+            <p className='text-2xl font-medium mt-10'>3,563</p>
             <p>last week survey</p>
           </div>
         </div>
         <div className='grid grid-cols-10 justify-center items-center'>
-          <div className='col-span-6 px-10'>
+          <div className='self-start col-span-6 px-10 bg-white mx-6 py-4 rounded-2xl'>
             <div>
               <Bar data={data} />
             </div>
           </div>
-          <div className='col-span-4'>
+          <div className='col-span-4 bg-white mx-6 py-4 rounded-2xl'>
             <IndiaMap />
           </div>
         </div>
