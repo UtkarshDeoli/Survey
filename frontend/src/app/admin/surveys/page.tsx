@@ -55,10 +55,10 @@ function Page() {
   };
 
   return (
-    <section className="w-full  bg-[#ECF0FA]">
+    <section className="w-full  bg-[#ECF0FA] h-full">
       <SurveyHeader />
 
-      <div className="p-3 text-sm text-my-gray-200 bg-white mx-8 rounded-xl my-2">
+      <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
         <div className="flex justify-between">
           <input
             className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
@@ -68,7 +68,7 @@ function Page() {
           />
           <div className="flex gap-4">
             <div className="flex h-10 items-center space-x-2 text-secondary-300 font-semibold">
-              <p className="">Filter By:</p>
+              <p>Filter By:</p>
               <div className="rounded-md py-2 px-2 justify-between border border-secondary-200 bg-white">
                 <select
                   name="filterby"

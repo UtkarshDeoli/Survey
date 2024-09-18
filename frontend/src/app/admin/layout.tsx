@@ -13,7 +13,7 @@ function Layout({ children }: LayoutProps) {
       <Sidebar />
       <div className="w-full flex flex-col">
         <Navbar />
-        <main className="w-full">{children}</main>
+        <main className="w-full h-full">{children}</main>
       </div>
       <Toaster />
     </div>

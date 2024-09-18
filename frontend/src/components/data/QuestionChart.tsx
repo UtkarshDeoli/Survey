@@ -1,31 +1,61 @@
-import {
-  BarChart,
-  Bar,
-  ResponsiveContainer,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
+import { useState } from "react";
 import QuestionChartHeader from "./QuestionChartHeader";
+import ResponseChart from "./ResponseChart";
 
-function QuestionDataCard({ question }: any) {
-  const data = [
-    { name: "Male", value: 20 },
-    { name: "Female", value: 15 },
-  ];
+interface Props {
+  questionTitle: string;
+  responses: {
+    responseTitle: string;
+    count: number;
+  }[];
+  totalResponses: number;
+}
+
+function QuestionDataCard({ questionTitle, responses, totalResponses }: Props) {
+  const [chartType, setChartType] = useState<"column" | "line" | "bar" | "pie">(
+    "column",
+  );
   return (
-    <div className="bg-white p-5 items-center mb-5 rounded-lg h-80">
-      <QuestionChartHeader question={question} />
-      <ResponsiveContainer width="80%" height="70%" style={{ margin: "auto" }}>
-        <BarChart data={data}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <CartesianGrid />
-          <Tooltip />
-          <Bar dataKey="value" fill="#477bff" barSize={30} />
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col w-full h-full bg-white p-5 mb-5 rounded-lg gap-4">
+      <QuestionChartHeader
+        question={questionTitle}
+        onChartTypeChange={setChartType}
+      />
+      <div className="flex justify-center ">
+        <ResponseChart responses={responses} chartType={chartType} />
+      </div>
+
+      <table className="bg-white border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="py-2 px-4 border-b"></th>
+            <th className="py-2 px-4 border-b text-center">Responses</th>
+            <th className="py-2 px-4 border-b text-center">Percent</th>
+          </tr>
+        </thead>
+        <tbody>
+          {responses.map((row, index) => {
+            const percentage = ((row.count * 100) / totalResponses).toFixed(2);
+            return (
+              <tr
+                key={index}
+                className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+              >
+                <td className="py-2 px-4 border-b">{row.responseTitle}</td>
+                <td className="py-2 px-4 border-b text-center">{row.count}</td>
+                <td className="py-2 px-4 border-b text-center">
+                  {percentage}%
+                </td>
+              </tr>
+            );
+          })}
+          <tr className="font-bold">
+            <td className="py-2 px-4 border-b">Total</td>
+            <td className="py-2 px-4 border-b text-center">{totalResponses}</td>
+            <td className="py-2 px-4 border-b text-center">100.00%</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
   BsGearFill,
   BsChevronRight,
   BsChevronLeft,
+  BsLifePreserver,
 } from "react-icons/bs";
 import { ImUser } from "react-icons/im";
 import { usePathname, useRouter } from "next/navigation";
@@ -17,6 +18,7 @@ import { VscThreeBars } from "react-icons/vsc";
 import Image from "next/image";
 import logo from "../../../public/icons/logo.png";
 import logolg from "../../../public/icons/logo-large.png";
+import { BiTestTube } from "react-icons/bi";
 
 // Paths that should have a small sidebar
 const SMALL_PATHS = ["/admin/data/analytics", "/admin/surveys/questions"];
@@ -52,10 +54,10 @@ function Sidebar() {
       tooltip: "Users",
     },
     {
-      icon: <BsClipboardDataFill size={18} />,
-      name: "Reports",
-      path: "/admin/reports",
-      tooltip: "Reports",
+      icon: <BsLifePreserver size={18} />,
+      name: "Support",
+      path: "/admin/support",
+      tooltip: "Support",
     },
     {
       icon: <BsGearFill size={18} />,
@@ -138,3 +140,4 @@ function Sidebar() {
 }
 
 export default Sidebar;
+

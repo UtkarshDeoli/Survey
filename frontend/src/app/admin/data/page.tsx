@@ -9,6 +9,13 @@ import summary_report from "../../../../public/icons/survey_data/summary_report.
 import scoring_report from "../../../../public/icons/survey_data/scoring_report.png";
 import spatial_report from "../../../../public/icons/survey_data/spatial_report.png";
 import { useRouter } from "next/navigation";
+import {
+  BsClipboardData,
+  BsClipboardPlus,
+  BsLayersHalf,
+  BsListTask,
+  BsPieChart,
+} from "react-icons/bs";
 
 function page() {
   const router = useRouter();
@@ -65,7 +72,11 @@ function page() {
           <div className="flex h-10 items-center space-x-10 ">
             <p className="">Sort By:</p>
             <div className="rounded-md py-2 px-2 justify-between border-2 border-secondary-200">
-              <select name="sortby" className="w-40 bg-white focus:outline-none" id="sortby">
+              <select
+                name="sortby"
+                className="w-40 bg-white focus:outline-none"
+                id="sortby"
+              >
                 <option value="dateDesc">Date DESC</option>
                 <option value="dateAsc">Date ASC</option>
               </select>
@@ -97,50 +108,34 @@ function page() {
                   </td>
                   <td className="px-4 py-2">{row.responses}</td>
                   <td className="px-4 py-2">
-                    <Image
-                      className="mx-auto cursor-pointer"
-                      src={analytics.src}
-                      alt="filter icon"
-                      height={24}
-                      width={24}
-                      onClick={() => handleClick("analytics")}
-                    />
+                    <div className="flex items-center justify-center h-full cursor-pointer">
+                      <BsPieChart
+                        size={24}
+                        onClick={() => {
+                          handleClick("analytics");
+                        }}
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-2">
-                    <Image
-                      className="mx-auto"
-                      src={daily_report.src}
-                      alt="filter icon"
-                      height={24}
-                      width={24}
-                    />
+                    <div className="flex items-center justify-center h-full cursor-pointer">
+                      <BsClipboardData size={24} />
+                    </div>
                   </td>
                   <td className="px-4 py-2">
-                    <Image
-                      className="mx-auto"
-                      src={summary_report.src}
-                      alt="filter icon"
-                      height={24}
-                      width={24}
-                    />
+                    <div className="flex items-center justify-center h-full">
+                      <BsListTask size={24} />
+                    </div>
                   </td>
                   <td className="px-4 py-2">
-                    <Image
-                      className="mx-auto"
-                      src={spatial_report.src}
-                      alt="filter icon"
-                      height={24}
-                      width={24}
-                    />
+                    <div className="flex items-center justify-center h-full">
+                      <BsLayersHalf size={24} />
+                    </div>
                   </td>
                   <td className="px-4 py-2">
-                    <Image
-                      className="mx-auto"
-                      src={scoring_report.src}
-                      alt="filter icon"
-                      height={24}
-                      width={24}
-                    />
+                    <div className="flex items-center justify-center h-full">
+                      <BsClipboardPlus size={24} />
+                    </div>
                   </td>
                 </tr>
               ))}
