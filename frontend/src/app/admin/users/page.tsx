@@ -38,7 +38,7 @@ function page() {
   function doNothing() {}
 
   return (
-    <div className="w-full bg-[#ECF0FA] text-sm">
+    <div className="w-full bg-[#ECF0FA] text-sm h-full">
       <nav className="w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Users</h1>
@@ -108,7 +108,7 @@ function page() {
                 users.map((user, index) => (
                   <div
                     key={index}
-                    className="bg-white border grid grid-cols-5 text-center"
+                    className="bg-white border grid grid-cols-5 text-center text-black"
                   >
                     <p className="p-3">{user.name}</p>
                     <p className="p-3">{user.username}</p>
