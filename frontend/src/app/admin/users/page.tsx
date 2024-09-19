@@ -38,8 +38,8 @@ function page() {
   function doNothing() {}
 
   return (
-    <div className="w-full bg-[#ECF0FA] text-sm">
-      <nav className="w-full py-3 px-8 flex justify-between">
+    <div className="w-full bg-[#ECF0FA] text-sm h-full">
+      <nav className="h-16 w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Users</h1>
         </div>
@@ -63,33 +63,37 @@ function page() {
         </div>
       </nav>
 
-      <div className="p-5 text-sm text-my-gray-200">
-        <div className="flex justify-between  bg-white p-3 rounded-xl">
-          <div className="flex me-5 gap-8">
-            <input
-              className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
-              placeholder="Name / Username / Role"
-              value={searchBarInput}
-              onChange={(e) => setSearchBarInput(e.target.value)}
-            />
+      <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
+        <div className="flex justify-between">
+          <input
+            className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
+            placeholder="Name / Username / Role"
+            value={searchBarInput}
+            onChange={(e) => setSearchBarInput(e.target.value)}
+          />
+          {/*
             <div className="flex space-x-4 items-center me-20">
               <div className="bg-[#2A4999] w-8 h-8  "></div>
               <p className="text-sm font-medium">Hide Disabled Users</p>
             </div>
-          </div>
-
-          <div className="flex gap-4">
+            */}
+          <div className="flex space-x-3">
             <ButtonFilled
               onClick={() => {
                 getData();
               }}
+              className="text-[14px] font-semibold flex gap-2 items-center justify-center"
             >
               Search
             </ButtonFilled>
-            <ButtonBordered>Reset</ButtonBordered>
+            <div className="flex space-x-3">
+              <ButtonBordered>Reset</ButtonBordered>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="p-5 text-sm text-my-gray-200">
         <div className="w-full mt-3 text-center text-sm">
           <div className="w-full overflow-hidden border-2 rounded-t-2xl ">
             <div className="bg-blue-500 text-white grid grid-cols-5 text-center border-b">
@@ -108,7 +112,7 @@ function page() {
                 users.map((user, index) => (
                   <div
                     key={index}
-                    className="bg-white border grid grid-cols-5 text-center"
+                    className="bg-white border grid grid-cols-5 text-center text-black"
                   >
                     <p className="p-3">{user.name}</p>
                     <p className="p-3">{user.username}</p>

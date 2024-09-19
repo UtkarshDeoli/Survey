@@ -1,15 +1,20 @@
+import { FaRegEdit } from "react-icons/fa";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 
-function QuestionChartHeader({ question }: any) {
+function QuestionChartHeader({ question, onChartTypeChange }: any) {
   return (
     <div className="flex justify-between">
-      <div>{question}</div>
+      <div className="flex justify-center items-center gap-2">
+        <FaRegEdit className="cursor-pointer" />
+        {question}
+      </div>
       <div className="flex space-x-5">
         <div className="space-x-1">
           <label className="text-secondary-300">Chart Type:</label>
           <select
             className="border border-secondary-200 rounded-md p-2 col-span-8 bg-white"
             id="chartType"
+            onChange={(e) => onChartTypeChange(e.target.value)}
           >
             <option value="column">Column</option>
             <option value="bar">Bar</option>
