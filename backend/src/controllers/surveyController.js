@@ -81,11 +81,11 @@ exports.getSurvey = async (req, res) => {
 
 exports.getAllSurvey = async (req, res) => {
   try {
-    // console.log("route getAll hitting");
+    console.log("route getAll hitting");
     // console.log("query--->", req.query);
 
     const {
-      filter = "",
+      filter,
       page = 1,
       limit = 10,
       sortBy = "name",
@@ -103,7 +103,7 @@ exports.getAllSurvey = async (req, res) => {
     } else if (sortBy && sortBy === "createdAt") {
       sortOptions.createdAt = order;
     }
-
+    console.log("filter--->", req.query);
     const searchConditions = [{ name: { $regex: filter, $options: "i" } }];
     const findOptions = { $and: searchConditions };
 

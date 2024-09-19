@@ -1,5 +1,5 @@
 import { IUser } from "@/types/user_interfaces";
-import { SERVER_URI, update_user,get_user,  get_all_users,add_users } from "@/utils/constants";
+import { SERVER_URI, update_user,get_user, add_multiple_users,  get_all_users,add_users } from "@/utils/constants";
 import axios from "axios";
 
 
@@ -78,6 +78,22 @@ export const addUsers =async (params: any)=>{
     //   );
       console.log(response)
       return response.data.success;
+    } catch (error) {
+      return { success: false, message: 'Something Went Wrong' ,error};
+    }
+  }
+
+
+  export const addMultipleUsers =async (params: any)=>{
+    try {
+      const options={
+        method: 'POST',
+        url: `${SERVER_URI}/${add_multiple_users}`,
+        data:params
+      }
+      const response = await axios.request(options);
+      console.log(response)
+      return response.data;
     } catch (error) {
       return { success: false, message: 'Something Went Wrong' ,error};
     }

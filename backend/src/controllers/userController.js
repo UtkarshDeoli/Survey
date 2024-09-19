@@ -3,7 +3,6 @@ const User = require('../models/user')
 exports.addUsers = async (req, res) => {
     try {
         console.log("add user Request")
-        console.log(req.body)
 
         const user = new User(req.body);
         const result = await user.save();
@@ -14,6 +13,35 @@ exports.addUsers = async (req, res) => {
         return res.status(400).json({ success: false, message: "Something went wrong" });
     }
 }
+
+exports.addMultipleUsers = async (req, res) => {
+    try {
+        const { userDetails, ...restOfBody } = req.body;
+        // const createdUsers = [];
+
+        for (const user of userDetails) {
+            const newUser = new User({
+                name: user[0],
+                username: user[1],
+                email: user[2],
+                password: user[3],
+                ...restOfBody
+            });
+            const savedUser = await newUser.save();
+            // createdUsers.push(savedUser);
+        }
+
+        return res.status(201).json({ 
+            success: true, 
+            message: "Users created successfully", 
+            // data: createdUsers 
+        });
+    } catch (error) {
+        console.error("Error adding users:", error);
+        return res.status(400).json({ success: false, message: "Something went wrong" });
+    }
+}
+
 
 
 exports.updateUser = async (req, res) => {
