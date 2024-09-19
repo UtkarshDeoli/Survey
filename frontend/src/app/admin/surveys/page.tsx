@@ -67,12 +67,12 @@ function Page() {
             onChange={(e) => setSearchBarInput(e.target.value)}
           />
           <div className="flex gap-4">
-            <div className="flex h-10 items-center space-x-2 text-secondary-300 font-semibold">
+            <div className="flex  h-10 items-center space-x-1 text-secondary-300 font-semibold text-[14px] whitespace-nowrap">
               <p>Filter By:</p>
               <div className="rounded-md py-2 px-2 justify-between border border-secondary-200 bg-white">
                 <select
                   name="filterby"
-                  className="w-40 bg-white  focus:outline-none"
+                  className="w-fit bg-white  focus:outline-none px-2"
                   id="filterby"
                   value={published}
                   onChange={(e) => setPublished(e.target.value)}
@@ -83,12 +83,12 @@ function Page() {
                 </select>
               </div>
             </div>
-            <div className="flex h-10 items-center space-x-2 mr-8 text-secondary-300 font-semibold">
+            <div className="flex h-10 items-center space-x-1 mr-8 text-secondary-300 font-semibold text-[14px] whitespace-nowrap">
               <p className="">Sort By:</p>
               <div className="rounded-md py-2 px-2 justify-between border border-secondary-200 bg-white">
                 <select
                   name="sortby"
-                  className="w-40 bg-white focus:outline-none"
+                  className="w-fit bg-white focus:outline-none px-2"
                   id="sortby"
                   value={sortSelect}
                   onChange={(e) => setSortSelect(e.target.value)}
@@ -107,8 +107,8 @@ function Page() {
               <Image
                 src={filter.src}
                 alt="filter icon"
-                height={24}
-                width={24}
+                height={20}
+                width={20}
               />
               <p>Apply filters</p>
             </ButtonFilled>

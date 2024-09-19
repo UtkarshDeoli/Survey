@@ -109,7 +109,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
   };
 
   return (
-    <div className="w-full px-8 py-3 text-sm">
+    <div className="w-full px-5 py-5 text-sm">
       {/* surveys */}
       <div className="grid grid-cols-8 text-white font-semibold bg-blue-500 px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
         <p className="col-span-2">All surveys</p>

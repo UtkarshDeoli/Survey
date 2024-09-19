@@ -18,7 +18,7 @@ function page() {
     setSelectedRequest(request);
   };
   return (
-    <main className="w-full flex bg-[#ECF0FA] h-[92vh] overflow-clip">
+    <main className="w-full flex bg-[#ECF0FA] h-[93vh] overflow-clip">
       <SupportRequests onRequestClick={handleRequestClick} />
       <RequestMessages selectedRequest={selectedRequest} />
     </main>
