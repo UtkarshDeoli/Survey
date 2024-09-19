@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
 import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import toast from "react-hot-toast";
+import Loader from "../ui/Loader";
 
 function SurveyForm() {
   // search params
@@ -17,10 +18,10 @@ function SurveyForm() {
   const [forms, setForms] = useState<React.ComponentType<any>[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [endDragIndex, setEndDragIndex] = useState<number | null>(null);
-  const [surveyData, setSurveyData] = useState<any>(null);
+  const [loading,setLoading] = useState(false);
 
   // React hook form
-  const { register, handleSubmit, setValue, control, unregister, getValues } = useForm();
+  const { register, handleSubmit, setValue, control, unregister, getValues, formState:{isSubmitting} } = useForm();
 
   // Effects
   useEffect(() => {
@@ -32,13 +33,14 @@ function SurveyForm() {
   // handle get survey
   async function handlegetSurveyData() {
     const params = { _id };
+    setLoading(true);
     const response = await getSurvey(params);
+    setLoading(false);
     if (response.success) {
       const formMappings = FormMappings();
-      setSurveyData(response.data[0]);
-      const receivedForms = response.data[0].questions?.map((question: any) => formMappings[question.type]);
+      const receivedForms = response.data.questions?.map((question: any) => formMappings[question.type]);
       if (receivedForms) setForms(receivedForms);
-      response.data[0].questions?.forEach((question: any) => {
+      response.data.questions?.forEach((question: any) => {
         const index = question.question_id;
         Object.keys(question.parameters).forEach((parameter: string) => setValue(`questions.${index}.parameters[${parameter}]`, question.parameters[parameter]));
       });
@@ -49,8 +51,8 @@ function SurveyForm() {
 
   // Handle form submission
   async function handleSubmitForm(data: any) {
-    console.log(data.questions);
-    const formData = { created_by, questions: data.questions };
+    const questions = data.questions || [];
+    const formData = { created_by, questions };
     const params = { _id, created_by, formData };
     const response = await updateSurvey(params);
     if (response.success) {
@@ -127,7 +129,8 @@ function SurveyForm() {
       >
         <form className="flex flex-col flex-1 pb-20">
           <div onDragOver={(e) => e.preventDefault()} onDrop={handleDropForm} className="flex flex-col gap-2 flex-1">
-            {forms.length > 0 ? forms.map((Form, index) => (
+            {(loading || isSubmitting) && <Loader className="w-full h-[50vh] flex justify-center items-center"/>}
+            {!loading && !isSubmitting && forms.length > 0 ? forms.map((Form, index) => (
               <Form
                 handleDragEnter={() => handleDragEnter(index)}
                 handleDragStart={(e: React.DragEvent<HTMLDivElement>) => handleDragStart(e, index)}
@@ -139,7 +142,7 @@ function SurveyForm() {
                 id={index.toString()}
                 endIndex={endDragIndex}
               />
-            )):(
+            )): !loading && !isSubmitting && (
               <p className="w-full h-[20vh] flex justify-center items-center text-secondary-300">Drag and drop the questions from left to add question to survey</p>
             )}
           </div>

@@ -73,7 +73,6 @@ export const getSurvey = async (params: any) => {
       url: `${SERVER_URI}/${get_survey}?_id=${params._id}`,
     };
     const response = await axios.request(options);
-    console.log(response);
     return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };

@@ -144,9 +144,7 @@ exports.getAllSurvey = async (req, res) => {
 
 exports.updateSurvey = async (req, res) => {
   try {
-    console.log("queryy--->", req.query);
     const id = req.query._id;
-    console.log("id from controller-->", id);
     const {
       created_by,
       name,
@@ -159,29 +157,20 @@ exports.updateSurvey = async (req, res) => {
     } = req.body;
 
     let updateFields = {};
-    console.log(req.body);
+    
     if (name !== undefined && name !== null) updateFields.name = name;
-    if (header_text !== undefined && header_text !== null)
-      updateFields.header_text = header_text;
-    if (access_pin !== undefined && access_pin !== null)
-      updateFields.access_pin = access_pin;
-    if (
-      background_location_capture !== undefined &&
-      background_location_capture !== null
-    )
-      updateFields.background_location_capture = background_location_capture;
-    if (questions !== undefined && questions !== null)
-      updateFields.questions = questions;
-    if (thank_time_duration !== undefined && thank_time_duration !== null)
-      updateFields.thank_time_duration = thank_time_duration;
-    if (published !== undefined && published !== null)
-      updateFields.published = published;
+    if (header_text !== undefined && header_text !== null) updateFields.header_text = header_text;
+    if (access_pin !== undefined && access_pin !== null) updateFields.access_pin = access_pin;
+    if ( background_location_capture !== undefined && background_location_capture !== null ) updateFields.background_location_capture = background_location_capture;
+    if (questions !== undefined && questions !== null) updateFields.questions = questions;
+    if (thank_time_duration !== undefined && thank_time_duration !== null) updateFields.thank_time_duration = thank_time_duration;
+    if (published !== undefined && published !== null) updateFields.published = published;
 
     if (req.files && req.files.welcome_image) {
       updateFields.welcome_image = req.files.welcome_image.data;
     }
-    if (req.files && req.files.thanks_image) {
-      updateFields.thanks_image = req.files.thanks_image.data;
+    if (req.files && req.files.thankyou_image) {
+      updateFields.thankyou_image = req.files.thankyou_image.data;
     }
 
     const result = await Survey.findOneAndUpdate(

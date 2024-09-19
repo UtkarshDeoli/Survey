@@ -1,6 +1,7 @@
 "use client";
 
 import QuestionHeader from "@/components/questions/QuestionHeader";
+import Loader from "@/components/ui/Loader";
 import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -10,6 +11,8 @@ import { VscThreeBars } from "react-icons/vsc";
 function Page() {
   const [surveyQuestions, setSurveyQuestions] = useState<any[]>([]);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+  const [loading,setLoading] = useState <boolean>(false);
+
   const params = useSearchParams();
   const id = params.get("id");
   const created_by = params.get("created_by");
@@ -22,9 +25,11 @@ function Page() {
 
   async function handleGetSurveyData() {
     const queryParams = { _id: id };
+    setLoading(true);
     const response = await getSurvey(queryParams);
-    if (response.success) {
-      setSurveyQuestions(response.data[0].questions);
+    setLoading(false);
+    if (response.success && response.data.questions) {
+      setSurveyQuestions(response.data.questions);
     } else {
       toast.error("Something went wrong while fetching survey data");
     }
@@ -65,7 +70,9 @@ function Page() {
   const handleSave = async () => {
     const formData = { _id: id, created_by, questions: surveyQuestions };
     const params ={_id:id,formData}
+    setLoading(true);
     const response = await updateSurvey(params);
+    setLoading(false);
     if (response.success) {
       toast.success("Questions resequenced successfully!");
     } else {
@@ -80,7 +87,8 @@ function Page() {
 
       {/* Display Survey Questions with drag-and-drop reordering */}
       <div className="mt-4 flex-grow">
-        {surveyQuestions && surveyQuestions.length > 0 ? (
+      {loading && <Loader className="flex h-[50vh] justify-center items-center w-full"/>}
+        {!loading && surveyQuestions && surveyQuestions.length > 0 ? (
           <ul className=" p-5">
             {surveyQuestions.map((question: any, index: number) => (
               <li
@@ -96,7 +104,7 @@ function Page() {
               </li>
             ))}
           </ul>
-        ) : (
+        ) : !loading && (
           <p className="w-full h-[40vh] flex justify-center items-center">No questions available.</p>
         )}
       </div>

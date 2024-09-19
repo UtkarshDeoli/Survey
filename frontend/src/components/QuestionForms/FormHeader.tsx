@@ -7,6 +7,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { IoDuplicateOutline } from "react-icons/io5";
 import { MdOutlineDelete } from "react-icons/md";
 import { VscThreeBars } from "react-icons/vsc";
+import { Tooltip } from "react-tooltip";
 
 interface Props {
   id: string;
@@ -55,7 +56,11 @@ function FormHeader({
           />
         )}
       </div>
-      <button onClick={setHide} type="button">
+      <button 
+      data-tooltip-id={`tooltip-arrow`}
+      data-tooltip-content="Expand/Shrink survey"
+      data-tooltip-place="bottom"
+      onClick={setHide} type="button">
         {hide ? <IoIosArrowDown /> : <IoIosArrowUp/>}
       </button>
       <button type="button">
@@ -64,7 +69,11 @@ function FormHeader({
       <button type="button">
         <FaEye />
       </button>
-      <button type="button">
+      <button
+      data-tooltip-id={`tooltip-duplicate`}
+      data-tooltip-content="Duplicate question"
+      data-tooltip-place="bottom"
+      type="button">
         <IoDuplicateOutline />
       </button>
       <button
@@ -74,6 +83,14 @@ function FormHeader({
       >
         <MdOutlineDelete />
       </button>
+      <Tooltip
+        id={`tooltip-arrow`}
+        style={{ zIndex: 30, position: "fixed" }}
+      />
+      <Tooltip
+        id={`tooltip-duplicate`}
+        style={{ zIndex: 30, position: "fixed" }}
+      />
     </div>
   );
 }
