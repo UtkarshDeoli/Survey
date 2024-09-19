@@ -11,6 +11,8 @@ import { getUser } from '@/networks/user_networks';
 
 function Page() {
   const [surveys, setSurveys] = useState<{ name: string }[]>([]);
+  const [pageNo, setPageNo] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [userData, setUserData] = useState<any>();
   const [filter, setFilter] = useState<string>('');
   const [userId, setUserId] = useState<string | null>(null);
@@ -42,14 +44,17 @@ function Page() {
     }
   };
 
+  async function getSurveys(page: number = 1) {
+    const res = await getAllSurveys({page: page, filter: filter, created_by: "rohitchand490@gmail.com" });
+    // console.log(res.survey);
+    setTotalPages(res.totalPages);
+    console.log("res::", res)
+    setSurveys(res.survey);
+  }
+
   useEffect(() => {
-    async function getSurveys() {
-      const res = await getAllSurveys({ search: filter, created_by: "rohitchand490@gmail.com" });
-      // console.log(res.survey);
-      setSurveys(res.survey);
-    }
-    getSurveys();
-  }, [filter])
+    getSurveys(pageNo);
+  }, [pageNo])
 
   
   useEffect(() => {
@@ -150,7 +155,6 @@ function Page() {
                   <div className=" w-1/2 font-medium">Role</div>
                   <div className="space-y-2 w-1/2">
                     {[
-                      { label: 'Admin', name: 'Admin' },
                       { label: 'Survey Manager', name: 'Survey Manager' },
                       { label: 'Booth Karyakarta', name: 'Booth Karyakarta' },
                       { label: 'Survey Collector', name: 'Survey Collector' },
@@ -212,13 +216,14 @@ function Page() {
                 <div className="space-y-4 p-2 rounded-lg border border-[#939393] max-h-fit">
                   <p className="text-gray-700 font-medium">Assign Survey</p>
 
-                  <div>
+                  <div className='flex justify-between'>
                     <input
                       type="text"
                       onChange={(e) => setFilter(e.target.value)}
                       placeholder="Search survey"
                       className="border border-gray-300 rounded-md px-2 py-1 w-4/5"
                     />
+                    <button type='button' className='text-white bg-blue-500 p-1 px-4 rounded-md' onClick={() => {setPageNo(1); getSurveys()}}>Search</button>
                   </div>
 
                   <div className="space-y-2">
@@ -234,7 +239,7 @@ function Page() {
                         }}
                         className="rounded text-blue-500"
                       />
-                      <label htmlFor="selectAllUsers" className="text-gray-700">
+                      <label htmlFor="selectAllUsers" className="text-gray-700 font-semibold">
                         Select All
                       </label>
                     </div>
@@ -263,6 +268,11 @@ function Page() {
                         <label className="text-gray-700">{survey.name}</label>
                       </div>
                     ))}
+                  </div>
+                  <div className='flex justify-between items-center'>
+                    <button type='button' onClick={()=>{ if(pageNo > 1) setPageNo(pageNo-1)}}  className='text-white bg-blue-500 p-1 px-4 rounded-md'>Previous</button>
+                    <p className='text-xs'>{pageNo} of {totalPages} Pages</p>
+                    <button type='button' onClick={()=>{ if(pageNo < totalPages) setPageNo(pageNo+1)}} className='text-white bg-blue-500 p-1 px-4 rounded-md'>Next</button>
                   </div>
                 </div>
               </div>

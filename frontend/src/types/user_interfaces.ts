@@ -18,4 +18,5 @@ export interface IUser{
   status:"active"|"inactive";
   _id: string;
   filter?: string;
+  userDetails?: any;
 }

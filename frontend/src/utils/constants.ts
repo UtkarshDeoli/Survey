@@ -5,6 +5,7 @@ export const SERVER_URI = "https://survey-3uf0.onrender.com";
 export const get_user = "api/user/getUser";
 export const get_all_users = "api/user/getAllUsers";
 export const add_users = "api/user/addUsers";
+export const add_multiple_users = "api/user/addMultipleUsers";
 export const update_user = "api/user/updateUser";
 
 // surveys
