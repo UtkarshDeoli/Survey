@@ -21,12 +21,10 @@ import logolg from "../../../public/icons/logo-large.png";
 import { BiTestTube } from "react-icons/bi";
 
 // Paths that should have a small sidebar
-const SMALL_PATHS = ["/admin/data/analytics", "/admin/surveys/questions"];
 
-function Sidebar() {
+function Sidebar({ sidebarOpen }: any) {
   const path = usePathname();
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(!SMALL_PATHS.includes(path));
 
   const SidebarScreens: any = [
     {
@@ -66,8 +64,6 @@ function Sidebar() {
       tooltip: "Settings",
     },
   ];
-
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   return (
     <aside
@@ -129,15 +125,8 @@ function Sidebar() {
           ))}
         </div>
       </div>
-      <button
-        onClick={toggleSidebar}
-        className={`mt-2 text-secondary-300 mx-auto ${sidebarOpen ? "self-end" : "self-start"}`}
-      >
-        <VscThreeBars size={22} />
-      </button>
     </aside>
   );
 }
 
 export default Sidebar;
-

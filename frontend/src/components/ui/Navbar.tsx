@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import ButtonBordered from "./buttons/ButtonBordered";
 import { useEffect, useState } from "react";
 import { checkToken } from "@/utils/common_functions";
+import { VscThreeBars } from "react-icons/vsc";
 
 interface UserData {
   id: string;
@@ -10,7 +11,7 @@ interface UserData {
   role: string;
 }
 
-function Navbar() {
+function Navbar({ onSidebarToggle }: any) {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
   useEffect(() => {
@@ -23,7 +24,10 @@ function Navbar() {
     }
   }, [router]);
   return (
-    <nav className="sticky top-0 flex px-8 py-[18px] shadow-md justify-end bg-white">
+    <nav className="sticky top-0 flex px-8 py-[18px] shadow-md justify-between bg-white">
+      <button onClick={() => onSidebarToggle()} className="text-secondary-300">
+        <VscThreeBars size={22} />
+      </button>
       <div className="flex gap-9 justify-center items-center">
         <ButtonBordered className="text-[14px] font-semibold">
           Notifications
@@ -49,4 +53,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

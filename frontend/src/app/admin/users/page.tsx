@@ -66,7 +66,7 @@ function page() {
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
         <div className="flex justify-between">
           <input
-            className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
+            className="w-[387px] h-[42.5px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
             placeholder="Name / Username / Role"
             value={searchBarInput}
             onChange={(e) => setSearchBarInput(e.target.value)}
@@ -93,61 +93,69 @@ function page() {
         </div>
       </div>
 
-      <div className="p-5 text-sm text-my-gray-200">
-        <div className="w-full mt-3 text-center text-sm">
-          <div className="w-full overflow-hidden border-2 rounded-t-2xl ">
-            <div className="bg-blue-500 text-white grid grid-cols-5 text-center border-b">
-              <p className="rounded-tl-2xl p-3">Name</p>
-              <p className="p-3">Username</p>
-              <p className="p-3">Email</p>
-              <p className="p-3">Role</p>
-              <div className="flex justify-center gap-5">
-                <p className="p-3">Status</p>
-                <p className="p-3">Action</p>
-              </div>
-            </div>
-            <div>
-              {users &&
-                users.length !== 0 &&
-                users.map((user, index) => (
-                  <div
-                    key={index}
-                    className="bg-white border grid grid-cols-5 text-center text-black"
-                  >
-                    <p className="p-3">{user.name}</p>
-                    <p className="p-3">{user.username}</p>
-                    <p className="p-3">{user.email}</p>
-                    <p className="p-3">
-                      {user.role.map((role: any) => (
-                        <span>{role},</span>
-                      ))}
-                    </p>
-                    <div className="flex justify-center gap-5 items-center">
-                      {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
-                      <Switch
-                        onChange={() => doNothing()}
-                        checked={user.status === "active" ? true : false}
-                        onColor="#4CAF50"
-                        offColor="#DDDDDD"
-                        uncheckedIcon={false}
-                        checkedIcon={false}
-                        className="transition-switch duration-300 ease-in-out"
-                      />
-                      <p
-                        className="p-3"
-                        onClick={() => {
-                          handleEditUser(user._id);
-                        }}
-                      >
-                        <FaRegEdit className="block mx-auto" />
-                      </p>
-                    </div>
-                  </div>
-                ))}
-            </div>
+      <div className="w-full px-5 py-5 text-sm">
+        <div className="grid grid-cols-5 text-white bg-blue-500 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+          <p className="col-span-1 flex justify-center items-center">Name</p>
+          <p className="col-span-1 flex justify-center items-center">
+            Username
+          </p>
+          <p className="col-span-1 flex justify-center items-center">Email</p>
+          <p className="col-span-1 flex justify-center items-center">Role</p>
+          <div className="flex col-span-1 gap-12 justify-center">
+            <p className="flex justify-center items-center">Status</p>
+            <p className="flex justify-center items-center">Action</p>
           </div>
         </div>
+        {users &&
+          users.length !== 0 &&
+          users.map((user, index) => (
+            <div
+              key={index}
+              className="bg-white border grid grid-cols-5 text-center text-black"
+            >
+              <p className="col-span-1 flex justify-center items-center">
+                {user.name}
+              </p>
+              <p className="col-span-1 flex justify-center items-center">
+                {user.username}
+              </p>
+              <p className="col-span-1 flex justify-center items-center">
+                {user.email}
+              </p>
+              <div className="col-span-1 flex justify-center items-center">
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {user.role.map((role, roleIndex) => (
+                    <span key={roleIndex} className="whitespace-nowrap">
+                      {role}
+                      {roleIndex < user.role.length - 1 ? "," : ""}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-center gap-12 items-center">
+                {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
+                <Switch
+                  onChange={() => doNothing()}
+                  checked={user.status === "active" ? true : false}
+                  onColor="#4CAF50"
+                  offColor="#DDDDDD"
+                  uncheckedIcon={false}
+                  checkedIcon={false}
+                  className="transition-switch duration-300 ease-in-out"
+                />
+                <p
+                  className="p-3"
+                  onClick={() => {
+                    handleEditUser(user._id);
+                  }}
+                >
+                  <FaRegEdit className="block mx-auto" />
+                </p>
+              </div>
+            </div>
+          ))}
       </div>
+
       {/* <CustomModal
         open={publishModal}
         closeModal={() => {

@@ -4,6 +4,10 @@ import { BiSolidPhone } from "react-icons/bi";
 import { BsPersonCircle, BsWhatsapp } from "react-icons/bs";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import { RiSurveyLine } from "react-icons/ri";
+import james from "@/../public/icons/james_profile.png";
+import olivia from "@/../public/icons/olivia_profile.png";
+import Image from "next/image";
+import ProfileImage from "./ProfileImage";
 
 interface RequestInterface {
   id: number;
@@ -20,11 +24,15 @@ interface Message {
   isUser: boolean;
 }
 
-function MessageHeader({ request }: { request: RequestInterface | null }) {
+function MessageHeader({ request }: { request: RequestInterface }) {
   return (
     <div className="w-full h-20 flex shadow-md justify-between px-4 items-center mb-1">
       <div className="flex items-center gap-8">
-        <BsPersonCircle className="text-primary-300" size={56} />
+        <ProfileImage
+          src={request?.id % 2 ? james.src : olivia.src}
+          isOnline={request?.id % 2 ? false : true}
+          alt="profile pic"
+        />
         <p className="text-[20px] font-medium">{request?.name}</p>
       </div>
       <button className="text-white bg-primary-300 rounded-lg p-2">

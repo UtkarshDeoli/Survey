@@ -61,7 +61,7 @@ function Page() {
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
         <div className="flex justify-between">
           <input
-            className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
+            className="w-[387px] h-[42.5px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
             placeholder="Search Surveys here"
             value={searchBarInput}
             onChange={(e) => setSearchBarInput(e.target.value)}

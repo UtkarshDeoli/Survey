@@ -56,7 +56,7 @@ function page() {
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
         <div className="flex justify-between">
           <input
-            className="w-[387px] h-[41px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
+            className="w-[387px] h-[42.5px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
             placeholder="Search Surveys here"
           />
           <div className="flex space-x-3 ">
@@ -67,7 +67,7 @@ function page() {
               <ButtonBordered>Reset</ButtonBordered>
             </div>
           </div>
-          <div className="flex h-10 items-center space-x-10 ">
+          <div className="flex items-center space-x-10 ">
             <p className="">Sort By:</p>
             <div className="rounded-md py-2 px-2 justify-between border-2 border-secondary-200">
               <select

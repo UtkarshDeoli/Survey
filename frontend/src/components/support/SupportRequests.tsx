@@ -1,6 +1,10 @@
 "use client";
 import { useState } from "react";
 import { BsPersonCircle, BsSearch } from "react-icons/bs";
+import Image from "next/image";
+import james from "@/../public/icons/james_profile.png";
+import olivia from "@/../public/icons/olivia_profile.png";
+import ProfileImage from "./ProfileImage";
 
 interface RequestInterface {
   id: number;
@@ -38,7 +42,11 @@ function RequestCard({ request, onClick, isSelected }: RequestCardProp) {
     >
       <div className="flex h-full justify-between items-center">
         <span className="flex items-center gap-2">
-          <BsPersonCircle className="text-primary-300" size={40} />
+          <ProfileImage
+            src={request.id % 2 ? james.src : olivia.src}
+            isOnline={request.id % 2 ? false : true}
+            alt="profile pic"
+          />
           <div className="flex flex-col">
             <p className="text-[16px]">{request.name}</p>
             <p className="text-[13px] text-my-gray-200">
