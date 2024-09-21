@@ -11,28 +11,31 @@ import { Tooltip } from "react-tooltip";
 
 interface Props {
   id: string;
+  index?:number;
   register: ReturnType<typeof useForm>["register"];
   input: boolean;
-  handleDelete: (id: string) => void;
-  setHide:()=>void;
+  handleDelete: (id: number) => void;
+  handleHide: (id: number) => void;
+  handleDuplicate: (id: number) => void;
   hide:boolean;
   control: ReturnType<typeof useForm>["control"];
   defaultQuestionTitle?: string;
 }
 function FormHeader({
-  id,
+  index,
   input,
   register,
   handleDelete,
+  handleDuplicate,
   defaultQuestionTitle,
   hide,
   control,
-  setHide
+  handleHide
 }: Props) {
 
   const media = useWatch({
     control,
-    name: `questions.${id}.parameters.question`,
+    name: `questions.${index || 0}.parameters.question`,
     defaultValue: "",
   });
   
@@ -49,7 +52,7 @@ function FormHeader({
           <input
             defaultValue={defaultQuestionTitle}
             placeholder="Type your question here..."
-            {...register(`questions.${id}.parameters.question`, {
+            {...register(`questions.${index}.parameters.question`, {
               required: true,
             })}
             className="py-2 px-4 text-secondary-300 flex-grow focus:outline-none"
@@ -60,7 +63,7 @@ function FormHeader({
       data-tooltip-id={`tooltip-arrow`}
       data-tooltip-content="Expand/Shrink survey"
       data-tooltip-place="bottom"
-      onClick={setHide} type="button">
+      onClick={()=>handleHide(index || 0)} type="button">
         {hide ? <IoIosArrowDown /> : <IoIosArrowUp/>}
       </button>
       <button type="button">
@@ -70,6 +73,7 @@ function FormHeader({
         <FaEye />
       </button>
       <button
+      onClick={()=>handleDuplicate(index || 0)}
       data-tooltip-id={`tooltip-duplicate`}
       data-tooltip-content="Duplicate question"
       data-tooltip-place="bottom"
@@ -79,7 +83,7 @@ function FormHeader({
       <button
         type="button"
         className="hover:text-red-500"
-        onClick={() => handleDelete(id)}
+        onClick={() => handleDelete(index || 0)}
       >
         <MdOutlineDelete />
       </button>

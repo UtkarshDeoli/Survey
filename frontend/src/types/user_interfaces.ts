@@ -20,3 +20,4 @@ export interface IUser{
   filter?: string;
   userDetails?: any;
 }
+

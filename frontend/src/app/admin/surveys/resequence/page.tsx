@@ -56,13 +56,13 @@ function Page() {
     const [draggedItem] = reorderedQuestions.splice(draggingIndex, 1); // Remove dragged item
     reorderedQuestions.splice(index, 0, draggedItem); // Insert at new position
 
-    // Update question_id to reflect new index
-    const updatedQuestions = reorderedQuestions.map((question, idx) => ({
-      ...question,
-      question_id: idx, 
-    }));
+    // // Update question_id to reflect new index
+    // const updatedQuestions = reorderedQuestions.map((question, idx) => ({
+    //   ...question,
+    //   question_id: idx, 
+    // }));
 
-    setSurveyQuestions(updatedQuestions);
+    setSurveyQuestions(reorderedQuestions);
     setDraggingIndex(null);
   };
 

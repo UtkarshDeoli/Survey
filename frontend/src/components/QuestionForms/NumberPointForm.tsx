@@ -1,37 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import FormHeader from "./FormHeader";
-
-interface Props {
-  id: string;
-  endIndex: number;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  control: ReturnType<typeof useForm>["control"];
-  handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
-  defaultQuestionTitle?: string;
-}
+import { FormProps } from "@/types/forms_interfaces";
 
 function NumberPointForm({
   id,
-  endIndex,
+  index,
   register,
-  setValue,
+  handleHide,
   control,
+  hide,
   handleDelete,
-  handleDragEnter,
+  handleDuplicate,
   handleDragStart,
+  handleDragEnter,
+  endIndex,
   defaultQuestionTitle,
-}: Props) {
-  const [hide,setHide] = useState<boolean>(false)
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "Number Point");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
+}: FormProps) {
   return (
     <div
       onDragStart={handleDragStart}
@@ -41,11 +26,13 @@ function NumberPointForm({
     >
       <FormHeader
         handleDelete={handleDelete}
+        handleDuplicate={handleDuplicate}
         register={register}
         id={id}
+        index={index}
         input={true}
         hide={hide}
-        setHide={()=>setHide((prev:boolean)=>!prev)}
+        handleHide={handleHide}
         defaultQuestionTitle={defaultQuestionTitle}
         control={control}
       />
@@ -58,7 +45,7 @@ function NumberPointForm({
                   Display title
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.display_title`)}
+                  {...register(`questions.${index}.parameters.display_title`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8"
                   placeholder="Display title"
@@ -70,7 +57,7 @@ function NumberPointForm({
                   Variable name
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.variable_name`)}
+                  {...register(`questions.${index}.parameters.variable_name`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8"
                   placeholder="Define Variable Name"
@@ -84,7 +71,7 @@ function NumberPointForm({
                 <select
                   className="border border-secondary-200 rounded-md p-2 col-span-8"
                   id="mediaType"
-                  {...register(`questions.${id}.parameters.mediaType`, {})}
+                  {...register(`questions.${index}.parameters.mediaType`, {})}
                 >
                   <option value="">Include Media Type</option>
                   <option value="image">Image</option>
@@ -100,7 +87,7 @@ function NumberPointForm({
                 <span className="col-span-8">
                   <input
                     {...register(
-                      `questions.${id}.parameters.limit_value_between_start`,
+                      `questions.${index}.parameters.limit_value_between_start`,
                     )}
                     type="number"
                     className="[appearance:textfield] border border-secondary-200 rounded-md p-2 mr-5 w-1/3"
@@ -108,7 +95,7 @@ function NumberPointForm({
                   <span>-</span>
                   <input
                     {...register(
-                      `questions.${id}.parameters.limit_value_between_end`,
+                      `questions.${index}.parameters.limit_value_between_end`,
                     )}
                     type="number"
                     className="[appearance:textfield] border border-secondary-200 rounded-md p-2 ml-5 w-1/3"
@@ -121,7 +108,7 @@ function NumberPointForm({
                   Start Value Label
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.start_value_label`)}
+                  {...register(`questions.${index}.parameters.start_value_label`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8"
                 />
@@ -132,7 +119,7 @@ function NumberPointForm({
                   Mid Value Label
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.mid_value_label`)}
+                  {...register(`questions.${index}.parameters.mid_value_label`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8"
                 />
@@ -143,7 +130,7 @@ function NumberPointForm({
                   End Value Label
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.end_value_label`)}
+                  {...register(`questions.${index}.parameters.end_value_label`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8"
                 />
@@ -153,7 +140,7 @@ function NumberPointForm({
                   Is Question Required?
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.is_question_required`)}
+                  {...register(`questions.${index}.parameters.is_question_required`)}
                   type="Checkbox"
                   className="border border-secondary-200 rounded-md p-2"
                 />

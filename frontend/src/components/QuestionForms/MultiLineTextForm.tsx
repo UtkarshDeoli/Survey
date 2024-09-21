@@ -1,42 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import FormHeader from "./FormHeader";
 import { FaRegFolderOpen } from "react-icons/fa";
-
-interface Props {
-  id: string;
-  endIndex: number;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  control: ReturnType<typeof useForm>["control"];
-  handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
-  defaultQuestionTitle?: string;
-}
+import { FormProps } from "@/types/forms_interfaces";
 
 function MultiLineTextForm({
   id,
-  endIndex,
+  index,
   register,
-  setValue,
+  handleHide,
   control,
+  hide,
   handleDelete,
-  handleDragEnter,
+  handleDuplicate,
   handleDragStart,
+  handleDragEnter,
+  endIndex,
   defaultQuestionTitle,
-}: Props) {
-  const [hide,setHide] = useState<boolean>(false)
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "Multiline Text Input");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
-
+}: FormProps) {
   const media = useWatch({
     control,
-    name: `questions.${id}.parameters.question_media_type`,
+    name: `questions.${index}.parameters.question_media_type`,
     defaultValue: "",
   });
 
@@ -49,11 +34,13 @@ function MultiLineTextForm({
     >
       <FormHeader
         handleDelete={handleDelete}
+        handleDuplicate={handleDuplicate}
         register={register}
         id={id}
+        index={index}
         input={true}
         hide={hide}
-        setHide={()=>setHide((prev:boolean)=>!prev)}
+        handleHide={handleHide}
         defaultQuestionTitle={defaultQuestionTitle}
         control={control}
       />
@@ -64,7 +51,7 @@ function MultiLineTextForm({
               <div className="grid grid-cols-12 w-3/4">
                 <label className="col-span-4 text-secondary-300">Description</label>
                 <input
-                  {...register(`questions.${id}.parameters.description`)}
+                  {...register(`questions.${index}.parameters.description`)}
                   type="email"
                   className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                   placeholder="Type help information for question here..."
@@ -75,7 +62,7 @@ function MultiLineTextForm({
                   Display title
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.display_title`)}
+                  {...register(`questions.${index}.parameters.display_title`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                   placeholder="Display title"
@@ -86,7 +73,7 @@ function MultiLineTextForm({
                   Variable name
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.variable_name`)}
+                  {...register(`questions.${index}.parameters.variable_name`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                   placeholder="Variable name"
@@ -95,7 +82,7 @@ function MultiLineTextForm({
               <div className="grid grid-cols-12 w-3/4">
                 <label className="col-span-4 text-secondary-300">Formula</label>
                 <input
-                  {...register(`questions.${id}.parameters.formula`)}
+                  {...register(`questions.${index}.parameters.formula`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                   placeholder="Define formula"
@@ -106,7 +93,7 @@ function MultiLineTextForm({
                   Default value
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.default_value`)}
+                  {...register(`questions.${index}.parameters.default_value`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                   placeholder="Set default value"
@@ -117,7 +104,7 @@ function MultiLineTextForm({
                   Question media type
                 </label>
                 <select
-                  {...register(`questions.${id}.parameters.question_media_type`)}
+                  {...register(`questions.${index}.parameters.question_media_type`)}
                   className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                 >
                   <option value="">-- Select Media Type --</option>
@@ -138,7 +125,7 @@ function MultiLineTextForm({
                       </p>
                     </div>
                     <input
-                      {...register(`questions.${id}.parameters.question_image`)}
+                      {...register(`questions.${index}.parameters.question_image`)}
                       type="file"
                       className="hidden"
                       accept={
@@ -159,7 +146,7 @@ function MultiLineTextForm({
               <div className="grid grid-cols-12 w-3/4">
                 <label className="col-span-4 text-secondary-300">Suffix</label>
                 <input
-                  {...register(`questions.${id}.parameters.suffix`)}
+                  {...register(`questions.${index}.parameters.suffix`)}
                   type="text"
                   className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
                 />
@@ -169,7 +156,7 @@ function MultiLineTextForm({
                   Limit length
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.limit_length.from`)}
+                  {...register(`questions.${index}.parameters.limit_length.from`)}
                   type="number"
                   className="border border-secondary-200 rounded-md p-2 col-span-3 focus:outline-none"
                 />
@@ -178,7 +165,7 @@ function MultiLineTextForm({
                   to
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.limit_length.to`)}
+                  {...register(`questions.${index}.parameters.limit_length.to`)}
                   type="number"
                   className="border border-secondary-200 rounded-md p-2 col-span-3 focus:outline-none"
                 />
@@ -188,7 +175,7 @@ function MultiLineTextForm({
                   Is question required
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.question_required`)}
+                  {...register(`questions.${index}.parameters.question_required`)}
                   type="checkbox"
                   className="border border-secondary-200 rounded-md p-2 col-span-1 focus:outline-none"
                 />
@@ -198,7 +185,7 @@ function MultiLineTextForm({
                   Display in survey
                 </label>
                 <input
-                  {...register(`questions.${id}.parameters.display_in_survey`)}
+                  {...register(`questions.${index}.parameters.display_in_survey`)}
                   type="checkbox"
                   className="border border-secondary-200 rounded-md p-2 col-span-1 focus:outline-none"
                 />
