@@ -1,48 +1,50 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import FormHeader from "./FormHeader";
+import { FormProps } from "@/types/forms_interfaces";
 
-interface Props {
-  id: string;
-  endIndex:number;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  handleDelete: (id: string) => void;
-  handleDragEnter:()=>void
-  handleDragStart:()=>void
-  control: ReturnType<typeof useForm>["control"];
-}
-
-function DropDownForm({ id, register, setValue, handleDelete,control, handleDragStart, handleDragEnter,endIndex }: Props) {
-  const [hide,setHide] = useState<boolean>(false)
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "DropDown");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
+function DropDownForm({
+  id,
+  index,
+  register,
+  handleHide,
+  control,
+  hide,
+  handleDelete,
+  handleDuplicate,
+  handleDragStart,
+  handleDragEnter,
+  endIndex,
+  defaultQuestionTitle,
+}: FormProps) {
   return (
-    <div 
+    <div
       onDragStart={handleDragStart}
       onDragEnter={handleDragEnter}
-      draggable 
-      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}>
+      draggable
+      className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
+    >
       <FormHeader
-        id={id}
-        register={register}
-        input={true}
         handleDelete={handleDelete}
-        control={control}
+        handleDuplicate={handleDuplicate}
+        register={register}
+        id={id}
+        index={index}
+        input={true}
         hide={hide}
-        setHide={()=>setHide((prev:boolean)=>!prev)}
+        handleHide={handleHide}
+        defaultQuestionTitle={defaultQuestionTitle}
+        control={control}
       />
       {!hide && (
         <div className="bg-blue-100 p-5 w-full">
           <div className="flex flex-col justify-center items-center p-5 gap-3 bg-white w-full">
             <div className="grid grid-cols-12 w-3/4">
-              <label className="col-span-4 text-secondary-300">Description</label>
+              <label className="col-span-4 text-secondary-300">
+                Description
+              </label>
               <input
-                {...register(`questions.${id}.parameters.description`)}
+                {...register(`questions.${index}.parameters.description`)}
                 type="email"
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 placeholder="Type help information for question here..."
@@ -54,7 +56,7 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 Display title
               </label>
               <input
-                {...register(`questions.${id}.parameters.display_title`)}
+                {...register(`questions.${index}.parameters.display_title`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 placeholder="Display title"
@@ -66,7 +68,7 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 Variable name
               </label>
               <input
-                {...register(`questions.${id}.parameters.variable_name`)}
+                {...register(`questions.${index}.parameters.variable_name`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 placeholder="Define Variable Name"
@@ -80,7 +82,7 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
               <select
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 id="mediaType"
-                {...register(`questions.${id}.parameters.mediaType`, {})}
+                {...register(`questions.${index}.parameters.mediaType`, {})}
               >
                 <option value="">Include Media Type</option>
                 <option value="image">Image</option>
@@ -95,7 +97,7 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="options"
-                  {...register(`questions.${id}.parameters.options`)}
+                  {...register(`questions.${index}.parameters.options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line</p>
@@ -107,7 +109,7 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 Default Value
               </label>
               <input
-                {...register(`questions.${id}.parameters.default_value`)}
+                {...register(`questions.${index}.parameters.default_value`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 placeholder="Set Default Value"
@@ -122,7 +124,7 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="hiddenOptions"
-                  {...register(`questions.${id}.parameters.hiddenOptions`)}
+                  {...register(`questions.${index}.parameters.hiddenOptions`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line</p>
@@ -134,7 +136,9 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 Is Question Required?
               </label>
               <input
-                {...register(`questions.${id}.parameters.is_question_required`)}
+                {...register(
+                  `questions.${index}.parameters.is_question_required`,
+                )}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
               />
@@ -145,7 +149,9 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 Enable Text Search
               </label>
               <input
-                {...register(`questions.${id}.parameters.enable_text_search`)}
+                {...register(
+                  `questions.${index}.parameters.enable_text_search`,
+                )}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
               />
@@ -156,15 +162,14 @@ function DropDownForm({ id, register, setValue, handleDelete,control, handleDrag
                 Randomize Options
               </label>
               <input
-                {...register(`questions.${id}.parameters.randomize_options`)}
+                {...register(`questions.${index}.parameters.randomize_options`)}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
               />
             </div>
           </div>
         </div>
-      )
-      }
+      )}
     </div>
   );
 }

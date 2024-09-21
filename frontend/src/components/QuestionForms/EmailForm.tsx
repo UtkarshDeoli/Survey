@@ -1,6 +1,6 @@
 "use client";
 
-import {useForm, useWatch } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 import FormHeader from "./FormHeader";
 import { FaRegFolderOpen } from "react-icons/fa";
 import { FormProps } from "@/types/forms_interfaces";
@@ -87,7 +87,7 @@ function EmailForm({
               </label>
               <select
                 {...register(
-                  `questions.${index}.parameters.question_media_type`
+                  `questions.${index}.parameters.question_media_type`,
                 )}
                 className="border border-secondary-200 rounded-md p-2 col-span-8 focus:outline-none"
               >
@@ -112,7 +112,7 @@ function EmailForm({
                   </div>
                   <input
                     {...register(
-                      `questions.${index}.parameters.question_media_type`
+                      `questions.${index}.parameters.question_media_type`,
                     )}
                     type="file"
                     className="hidden"
@@ -120,12 +120,12 @@ function EmailForm({
                       media === "image"
                         ? "image/*"
                         : media === "video"
-                        ? "video/*"
-                        : media === "audio"
-                        ? "audio/*"
-                        : media === "document"
-                        ? ".pdf,.doc,.docx"
-                        : ""
+                          ? "video/*"
+                          : media === "audio"
+                            ? "audio/*"
+                            : media === "document"
+                              ? ".pdf,.doc,.docx"
+                              : ""
                     }
                   />
                 </label>
