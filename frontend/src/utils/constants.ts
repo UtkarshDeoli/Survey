@@ -7,6 +7,7 @@ export const get_all_users = "api/user/getAllUsers";
 export const add_users = "api/user/addUsers";
 export const add_multiple_users = "api/user/addMultipleUsers";
 export const update_user = "api/user/updateUser";
+export const get_all_chats_data = "api/chatroom/getAllChatsData";
 
 // surveys
 export const create_survey = "api/survey/saveSurvey";

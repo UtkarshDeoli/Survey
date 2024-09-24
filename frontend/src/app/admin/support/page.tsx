@@ -1,26 +1,46 @@
 "use client";
-import RequestMessages from "@/components/support/RequestMessages";
-import SupportRequests from "@/components/support/SupportRequests";
+import ChatComponent from "@/components/support/ChatComponent";
+import SupportChatsList from "@/components/support/SupportChats";
+import useSupportSocket from "@/hooks/useSupportSocket";
+import { UserDataInterface } from "@/types/support_interfaces";
 import { useState } from "react";
 
-interface RequestInterface {
-  id: number;
-  name: string;
-  lastMessage: string;
-  lastMessageDate: string;
-}
-
 function page() {
-  const [selectedRequest, setSelectedRequest] =
-    useState<RequestInterface | null>(null);
+  const [selectedChat, setSelectedChat] = useState<UserDataInterface | null>(
+    null,
+  );
 
-  const handleRequestClick = (request: RequestInterface) => {
-    setSelectedRequest(request);
+  const {
+    messages,
+    currentUserData,
+    userData,
+    selectedRole,
+    handleRoleSelect,
+    handleSearchClick,
+    sendMessage,
+    joinRoom,
+  } = useSupportSocket();
+
+  const handleChatClick = (chat: UserDataInterface) => {
+    joinRoom(currentUserData.id, chat._id);
+    setSelectedChat(chat);
   };
+
   return (
-    <main className="w-full flex bg-[#ECF0FA] h-[93vh] overflow-clip">
-      <SupportRequests onRequestClick={handleRequestClick} />
-      <RequestMessages selectedRequest={selectedRequest} />
+    <main className="w-full flex bg-[#ECF0FA] h-full">
+      <SupportChatsList
+        onChatClick={handleChatClick}
+        userData={userData}
+        selectedRole={selectedRole}
+        handleRoleSelect={handleRoleSelect}
+        handleSearchClick={handleSearchClick}
+      />
+      <ChatComponent
+        messages={messages}
+        sendMessage={sendMessage}
+        currentUserData={currentUserData}
+        otherUserData={selectedChat}
+      />
     </main>
   );
 }

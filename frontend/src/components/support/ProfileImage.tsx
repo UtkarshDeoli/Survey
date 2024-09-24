@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image, { StaticImageData } from "next/image";
+import olivia from "@/../public/icons/olivia_profile.png";
+import { UserDataInterface } from "@/types/support_interfaces";
 
 interface ProfileImageProps {
-  src: string | StaticImageData;
+  user: UserDataInterface;
   alt: string;
   isOnline: boolean;
   width?: number;
@@ -10,16 +12,27 @@ interface ProfileImageProps {
 }
 
 const ProfileImage = ({
-  src,
+  user,
   alt,
   isOnline,
   width,
   height,
 }: ProfileImageProps) => {
+  const [imageSrc, setImageSrc] = useState<string>(olivia.src);
+
+  useEffect(() => {
+    if (user && user.profile_picture) {
+      const base64string = user.profile_picture.data;
+      const imageType = user.profile_picture.type;
+
+      const imageUrl = `data:${imageType};base64,${base64string}`;
+      setImageSrc(imageUrl);
+    }
+  }, [user]);
   return (
     <div className="relative inline-block">
       <Image
-        src={src}
+        src={imageSrc}
         alt={alt}
         width={width ? width : 45}
         height={height ? height : 45}
