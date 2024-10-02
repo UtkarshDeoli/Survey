@@ -15,10 +15,12 @@ function page() {
     currentUserData,
     userData,
     selectedRole,
+    totalUsers,
     handleRoleSelect,
     handleSearchClick,
     sendMessage,
     joinRoom,
+    setUserData,
   } = useSupportSocket();
 
   const handleChatClick = (chat: UserDataInterface) => {
@@ -27,21 +29,27 @@ function page() {
   };
 
   return (
-    <main className="w-full flex bg-[#ECF0FA] h-full">
+    <main className="w-full flex gap-8 p-6 bg-[#ECF0FA] h-[calc(100vh-80px)] overflow-hidden">
       <SupportChatsList
         onChatClick={handleChatClick}
         userData={userData}
         selectedRole={selectedRole}
+        currentUserData={currentUserData}
+        total={totalUsers}
         handleRoleSelect={handleRoleSelect}
         handleSearchClick={handleSearchClick}
+        setUserData={(data:any)=>{
+          setUserData((prev:any)=>[...prev,data])
+        }}
       />
       <ChatComponent
         messages={messages}
         sendMessage={sendMessage}
         currentUserData={currentUserData}
         otherUserData={selectedChat}
+
       />
-    </main>
+  </main>
   );
 }
 

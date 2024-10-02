@@ -24,7 +24,7 @@ function Navbar({ onSidebarToggle }: any) {
     }
   }, [router]);
   return (
-    <nav className="sticky top-0 flex px-8 py-[18px] shadow-md justify-between bg-white">
+    <nav className="sticky z-50 top-0 flex px-8 py-[18px] h-[80px] shadow-md justify-between bg-white">
       <button onClick={() => onSidebarToggle()} className="text-secondary-300">
         <VscThreeBars size={22} />
       </button>

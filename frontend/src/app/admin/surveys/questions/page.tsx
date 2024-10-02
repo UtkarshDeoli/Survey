@@ -10,11 +10,12 @@ import { Toaster } from "react-hot-toast";
 function Page() {
   const params = useSearchParams()
   const id = params.get("id");
+  const surveyName = params.get("name");
   const created_by = params.get("created_by");
 
   return (
     <main className="w-full">
-      <QuestionHeader id={id || ""} created_by={created_by || ""} name="Questionnaire" />
+      <QuestionHeader id={id || ""} created_by={created_by || ""} name="Questionnaire" surveyName={surveyName || ""}/>
       <div className="flex bg-secondary-600">
         <AllQuestions />
         <SurveyForm />

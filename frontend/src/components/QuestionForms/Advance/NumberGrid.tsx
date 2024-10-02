@@ -1,35 +1,22 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProps } from "@/types/forms_interfaces";
 import FormHeader from "../FormHeader";
 
-interface Props {
-  id: string;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
-  endIndex: number;
-  control: ReturnType<typeof useForm>["control"];
-}
 
 function NumberGridForm({
   id,
+  index,
   register,
-  setValue,
-  handleDelete,
-  handleDragEnter,
-  handleDragStart,
-  endIndex,
+  handleHide,
   control,
-}: Props) {
-  const [hide, setHide] = useState<boolean>(false);
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "Number Grid");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
+  hide,
+  handleDelete,
+  handleDuplicate,
+  handleDragStart,
+  handleDragEnter,
+  endIndex,
+  defaultQuestionTitle,
+}: FormProps) {
   return (
     <div
       onDragStart={handleDragStart}
@@ -38,12 +25,15 @@ function NumberGridForm({
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
       <FormHeader
-        id={id}
-        register={register}
-        input={true}
         handleDelete={handleDelete}
+        handleDuplicate={handleDuplicate}
+        register={register}
+        id={id}
+        index={index}
+        input={true}
         hide={hide}
-        setHide={() => setHide((prev: boolean) => !prev)}
+        handleHide={handleHide}
+        defaultQuestionTitle={defaultQuestionTitle}
         control={control}
       />
       {!hide && (
@@ -57,7 +47,7 @@ function NumberGridForm({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="rowOptions"
-                  {...register(`questions.${id}.parameters.row_options`)}
+                  {...register(`questions.${index}.parameters.row_options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">
@@ -73,7 +63,7 @@ function NumberGridForm({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="columnOptions"
-                  {...register(`questions.${id}.parameters.column_options`)}
+                  {...register(`questions.${index}.parameters.column_options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line.</p>
@@ -85,7 +75,7 @@ function NumberGridForm({
                 Variable name
               </label>
               <input
-                {...register(`questions.${id}.parameters.variable_name`)}
+                {...register(`questions.${index}.parameters.variable_name`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
                 placeholder="Define Variable Name"
@@ -98,7 +88,7 @@ function NumberGridForm({
               <span className="col-span-7">
                 <input
                   {...register(
-                    `questions.${id}.parameters.limit_value_between_start`,
+                    `questions.${index}.parameters.limit_value_between_start`,
                   )}
                   type="number"
                   className="[appearance:textfield] border border-secondary-200 rounded-md p-2 mr-5 w-1/3"
@@ -106,7 +96,7 @@ function NumberGridForm({
                 <span>-</span>
                 <input
                   {...register(
-                    `questions.${id}.parameters.limit_value_between_end`,
+                    `questions.${index}.parameters.limit_value_between_end`,
                   )}
                   type="number"
                   className="[appearance:textfield] border border-secondary-200 rounded-md p-2 ml-5 w-1/3"
@@ -119,7 +109,7 @@ function NumberGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.are_all_questions_required`,
+                  `questions.${index}.parameters.are_all_questions_required`,
                 )}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
@@ -131,7 +121,7 @@ function NumberGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.forward_row_options_from`,
+                  `questions.${index}.parameters.forward_row_options_from`,
                 )}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -146,7 +136,7 @@ function NumberGridForm({
                 className="border border-secondary-200 rounded-md p-2 col-span-5"
                 id="mediaType"
                 {...register(
-                  `questions.${id}.parameters.forward_row_options_type`,
+                  `questions.${index}.parameters.forward_row_options_type`,
                 )}
               >
                 <option value=""></option>
@@ -160,7 +150,7 @@ function NumberGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.forward_column_options_from`,
+                  `questions.${index}.parameters.forward_column_options_from`,
                 )}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -175,7 +165,7 @@ function NumberGridForm({
                 className="border border-secondary-200 rounded-md p-2 col-span-5"
                 id="mediaType"
                 {...register(
-                  `questions.${id}.parameters.forward_column_options_type`,
+                  `questions.${index}.parameters.forward_column_options_type`,
                 )}
               >
                 <option value=""></option>
@@ -190,7 +180,7 @@ function NumberGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.display_as_grid_in_tablet_ipad`,
+                  `questions.${index}.parameters.display_as_grid_in_tablet_ipad`,
                 )}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"

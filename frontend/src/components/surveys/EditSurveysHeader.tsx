@@ -16,8 +16,8 @@ function EditSurveysHeader({id, created_by,name}:editSurveyProps) {
         <div className="bg-secondary-100 h-full w-full px-8 py-3 flex justify-between items-center">
            <h3 className="text-secondary-300 text-[14px] font-semibold">Edit survey : {name} </h3>
            <div className=" flex gap-2">
-                <button onClick={()=>router.push(`/admin/surveys/questions?id=${id}&created_by=${created_by}`)} className={`border text-black bg-primary-300 px-4 py-2 rounded-md text-[14px] font-sem font-semibold ${path === `/admin/surveys/questions` ? "text-white" : "bg-secondary-200"}`}>Questionnaire</button>
-                <button onClick={()=>router.push("/admin/surveys/resequence")} className={`border text-black bg-primary-300 px-4 py-2 rounded-md text-[14px] font-sem font-semibold ${path === "/admin/surveys/resequence" ? "text-white" : "bg-secondary-200"}`}>users</button>
+                <button onClick={()=>router.push(`/admin/surveys/questions?id=${id}&created_by=${created_by}&name=${name}`)} className={`border text-black bg-primary-300 px-4 py-2 rounded-md text-[14px] font-sem font-semibold ${path === `/admin/surveys/questions` ? "text-white" : "bg-secondary-200"}`}>Questionnaire</button>
+                <button onClick={()=>router.push("/admin/users")} className={`border text-black bg-primary-300 px-4 py-2 rounded-md text-[14px] font-sem font-semibold ${path === "/admin/surveys/resequence" ? "text-white" : "bg-secondary-200"}`}>users</button>
            </div>
         </div>
     </header>

@@ -16,9 +16,11 @@ import ButtonFilled from "../ui/buttons/ButtonFilled";
 import toast from "react-hot-toast";
 import Loader from "../ui/Loader";
 import Switch from "react-switch"; // Using a third-party switch component for toggle
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 interface AllSurveysProps {
   queryParams: Params;
+  setQueryParams:(params:any)=>void
 }
 interface Params {
   page: number;
@@ -30,7 +32,7 @@ interface Params {
   filter: string;
 }
 
-function AllSurveys({ queryParams }: AllSurveysProps) {
+function AllSurveys({ queryParams, setQueryParams }: AllSurveysProps) {
   const [allSurveys, setAllSurveys] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -42,6 +44,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
     null,
   );
   const [publishModal, setPublishModal] = useState<boolean>(false);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const router = useRouter();
 
@@ -92,7 +95,9 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
     const params = queryParams;
     setLoading(true);
     const response = await getAllSurveys(params);
-    setAllSurveys(response.survey);
+    console.log(response)
+    setAllSurveys(response.surveys);
+    setTotalPages(response.totalPages);
     setLoading(false);
   }
 
@@ -106,6 +111,28 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
     setisSurveyPublished(survey.published);
     setSurveyToPublish(survey._id);
     setPublishModal(true); // Show modal for confirmation
+  };
+
+
+  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setQueryParams({
+      ...queryParams,
+      limit: newLimit,
+      page: 1, // Reset to the first page on limit change
+    });
+  };
+
+  const handleNextPage = () => {
+    if (queryParams.page < totalPages) {
+      setQueryParams({ ...queryParams, page: queryParams.page + 1 });
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (queryParams.page > 1) {
+      setQueryParams({ ...queryParams, page: queryParams.page - 1 });
+    }
   };
 
   return (
@@ -182,6 +209,7 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
                   )}
                 </div>
               </div>
+
             </div>
           ))
         : !loading &&
@@ -191,6 +219,52 @@ function AllSurveys({ queryParams }: AllSurveysProps) {
             </p>
           )}
 
+       {/* Pagination Controls */}
+       {
+        !loading && (
+          <div className="flex gap-3 items-center mt-4">
+            {/* Limit Select */}
+            <div>
+              <label htmlFor="limit-select" className="mr-2">
+                Show:
+              </label>
+              <select
+                id="limit-select"
+                value={queryParams.limit}
+                onChange={handleLimitChange}
+                className="p-2 border rounded-md"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+
+            {/* Navigation Arrows */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handlePreviousPage}
+                disabled={queryParams.page === 1}
+                className="p-2 border rounded-md disabled:opacity-50"
+              >
+                <IoIosArrowBack />
+              </button>
+              <span>
+                Page {queryParams.page} of {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={queryParams.page === totalPages}
+                className="p-2 border rounded-md disabled:opacity-50"
+              >
+                <IoIosArrowForward />
+              </button>
+            </div>
+          </div>
+        )
+       }
+      
       {/* modals */}
       <CustomModal
         open={publishModal}

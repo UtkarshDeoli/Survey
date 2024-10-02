@@ -48,8 +48,8 @@ function AddressForm({
   const { handleSubmit, unregister } = useForm();
 
   useEffect(() => {
-    setValue(`questions.${id}.type`, "Address");
-    setValue(`questions.${id}.question_id`, id);
+    setValue(`questions.${index}.type`, "Address");
+    setValue(`questions.${index}.question_id`, id);
   }, []);
   function handleSubmitForm(data: any) {
     console.log("Inside Address Form: ", data);

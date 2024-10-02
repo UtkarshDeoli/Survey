@@ -31,6 +31,18 @@ export const advanceQuestions = [
   "Checkbox Grid",
   "Checkbox Grid With Other",
   "Number Point Grid",
-  "Contact Form",
-  "Address",
+  // "Contact Form",
+  // "Address",
 ];
+
+export const errorToastStyles = {
+  style: {
+    background: "#ff4d4d", // Red background
+    color: "#fff", // White text
+    maxWidth: "600px"
+  },
+  iconTheme: {
+    primary: "#fff", // White icon
+    secondary: "#ff4d4d", // Red icon background
+  },
+}

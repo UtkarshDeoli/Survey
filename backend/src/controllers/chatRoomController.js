@@ -4,7 +4,7 @@ const User = require("../models/user");
 
 exports.getAllChatsData = async (req, res) => {
   try {
-    const { currentUserId, filter, role } = req.query;
+  const { currentUserId, filter, role, page=1, limit=10 } = req.query;
 
     const validRoles = [
       "Admin",
@@ -13,7 +13,7 @@ exports.getAllChatsData = async (req, res) => {
       "Support Executive",
       "Survey Manager",
     ];
-
+    const skip = (page-1)*limit;
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });
     searchConditions.push({ username: { $regex: filter, $options: "i" } });
@@ -36,7 +36,11 @@ exports.getAllChatsData = async (req, res) => {
         profile_picture: 1,
         isOnline: 1,
       })
-      .populate("profile_picture");
+      .populate("profile_picture")
+      .skip(skip)
+      .limit(Number(limit))
+
+    const total = await User.countDocuments(query);
 
     const usersWithLastMessageData = await Promise.all(
       users.map(async (user) => {
@@ -83,7 +87,7 @@ exports.getAllChatsData = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, data: sortedUsersWithLastMessageData });
+      .json({ success: true, data: sortedUsersWithLastMessageData , total});
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
   }

@@ -1,35 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import FormHeader from "../FormHeader";
-
-interface Props {
-  id: string;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
-  endIndex: number;
-  control: ReturnType<typeof useForm>["control"];
-}
-
+import { FormProps } from "@/types/forms_interfaces";
 function RadioButtonWithText({
   id,
+  index,
   register,
-  setValue,
-  handleDelete,
-  handleDragEnter,
-  handleDragStart,
-  endIndex,
+  handleHide,
   control,
-}: Props) {
-  const [hide, setHide] = useState<boolean>(false);
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "Radio Button With Text");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
+  hide,
+  handleDelete,
+  handleDuplicate,
+  handleDragStart,
+  handleDragEnter,
+  endIndex,
+  defaultQuestionTitle,
+}: FormProps) {
   return (
     <div
       onDragStart={handleDragStart}
@@ -37,13 +23,16 @@ function RadioButtonWithText({
       draggable
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
-      <FormHeader
-        id={id}
-        register={register}
-        input={true}
+       <FormHeader
         handleDelete={handleDelete}
+        handleDuplicate={handleDuplicate}
+        register={register}
+        id={id}
+        index={index}
+        input={true}
         hide={hide}
-        setHide={() => setHide((prev: boolean) => !prev)}
+        handleHide={handleHide}
+        defaultQuestionTitle={defaultQuestionTitle}
         control={control}
       />
       {!hide && (
@@ -54,7 +43,7 @@ function RadioButtonWithText({
                 Display title
               </label>
               <input
-                {...register(`questions.${id}.parameters.display_title`)}
+                {...register(`questions.${index}.parameters.display_title`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 placeholder="Display title"
@@ -66,7 +55,7 @@ function RadioButtonWithText({
                 Variable name
               </label>
               <input
-                {...register(`questions.${id}.parameters.variable_name`)}
+                {...register(`questions.${index}.parameters.variable_name`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 placeholder="Define Variable Name"
@@ -80,7 +69,7 @@ function RadioButtonWithText({
               <select
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 id="mediaType"
-                {...register(`questions.${id}.parameters.mediaType`, {})}
+                {...register(`questions.${index}.parameters.mediaType`, {})}
               >
                 <option value="">Include Media Type</option>
                 <option value="image">Image</option>
@@ -94,7 +83,7 @@ function RadioButtonWithText({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="options"
-                  {...register(`questions.${id}.parameters.options`)}
+                  {...register(`questions.${index}.parameters.options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line</p>
@@ -105,7 +94,7 @@ function RadioButtonWithText({
                 Default Value
               </label>
               <input
-                {...register(`questions.${id}.parameters.default_value`)}
+                {...register(`questions.${index}.parameters.default_value`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-8"
                 placeholder="Set default value"
@@ -119,7 +108,7 @@ function RadioButtonWithText({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="hiddenOptions"
-                  {...register(`questions.${id}.parameters.hiddenOptions`)}
+                  {...register(`questions.${index}.parameters.hiddenOptions`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line</p>
@@ -130,7 +119,7 @@ function RadioButtonWithText({
                 Number of Columns
               </label>
               <input
-                {...register(`questions.${id}.parameters.number_of_columns`)}
+                {...register(`questions.${index}.parameters.number_of_columns`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-2"
               />
@@ -143,7 +132,7 @@ function RadioButtonWithText({
                 Is Question Required?
               </label>
               <input
-                {...register(`questions.${id}.parameters.is_question_required`)}
+                {...register(`questions.${index}.parameters.is_question_required`)}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
               />
@@ -154,7 +143,7 @@ function RadioButtonWithText({
                 Randomize Options
               </label>
               <input
-                {...register(`questions.${id}.parameters.randomize_options`)}
+                {...register(`questions.${index}.parameters.randomize_options`)}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
               />

@@ -8,6 +8,7 @@ import {
   UserDataInterface,
 } from "@/types/support_interfaces";
 import { truncateText, getDateAndMonth } from "@/utils/common_functions";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface ChatCardProp {
   chat: UserDataInterface;
@@ -29,7 +30,9 @@ function ChatCard({ chat, onClick, isSelected }: ChatCardProp) {
   return (
     <div
       key={chat._id}
-      className={`h-14 bg-opacity-20 mb-[18px] items-center px-[10px] py-[6px] rounded-lg cursor-pointer ${isSelected ? "bg-primary-300" : "bg-white"}`}
+      className={`h-14 bg-opacity-20 mb-[18px] items-center px-[10px] py-[6px] rounded-lg cursor-pointer ${
+        isSelected ? "bg-primary-300" : "bg-white"
+      }`}
       onClick={() => onClick(chat)}
     >
       <div className="flex h-full justify-between items-center">
@@ -67,7 +70,11 @@ function RoleChips({ Roles, selectedRole, handleRoleSelect }: RoleChipsProps) {
           return (
             <p
               key={role}
-              className={`flex flex-col h-full ${selected ? "bg-primary-300 border-2 border-primary-300 text-white" : "text-secondary-300 border-2 border-secondary-200"} text-[15px] px-2 py-2 font-medium mr-2 rounded-full whitespace-nowrap cursor-pointer`}
+              className={`flex flex-col h-full ${
+                selected
+                  ? "bg-primary-300 border-2 border-primary-300 text-white"
+                  : "text-secondary-300 border-2 border-secondary-200"
+              } text-[15px] px-2 py-2 font-medium mr-2 rounded-full whitespace-nowrap cursor-pointer`}
               onClick={() => handleRoleSelect(role)}
             >
               {role}
@@ -85,6 +92,9 @@ interface SupportChatProps {
   selectedRole: string;
   handleRoleSelect: (role: string) => void;
   handleSearchClick: (input: string) => void;
+  setUserData: (userData: UserDataInterface[]) => void;
+  currentUserData: any;
+  total:number;
 }
 
 function SupportChatsList({
@@ -93,6 +103,9 @@ function SupportChatsList({
   selectedRole,
   handleRoleSelect,
   handleSearchClick,
+  setUserData,
+  currentUserData,
+  total
 }: SupportChatProps) {
   const Roles = [
     "Admin",
@@ -103,9 +116,26 @@ function SupportChatsList({
   ];
   const [searchBarInput, setSearchBarInput] = useState<string>("");
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [page,setPage] = useState <number> (1);
+  const [limit,setLimit] = useState <number> (10);
+
+  async function loadMoreChats() {
+    const params = {
+      currentUserId: currentUserData?.id!,
+      searchBarInput,
+      selectedRole,
+      page:page+1,
+      limit:10,
+
+    };
+    console.log("loading more...")
+    const res = await getAllChatsData(params);
+    setUserData(res.data);
+    setPage(page+1);
+  }
 
   return (
-    <div className="w-4/12 h-5/6 bg-white m-8 flex flex-col items-center px-[10px] py-2 rounded-lg ">
+    <div className="w-4/12 h-full bg-white  flex flex-col items-center px-[10px] py-2 rounded-lg ">
       <div className="relative w-full h-12 mb-[18px]">
         <BsSearch
           className="cursor-pointer absolute right-4 top-1/2 transform -translate-y-1/2 text-secondary-300"
@@ -126,20 +156,29 @@ function SupportChatsList({
         handleRoleSelect={handleRoleSelect}
       />
 
-      <div className="w-full h-full flex-1 flex-col overflow-y-scroll rounded-lg">
-        {userData?.map((chat) => {
-          return (
-            <ChatCard
-              key={chat._id}
-              chat={chat}
-              onClick={(chat) => {
-                setSelectedChatId(chat._id);
-                onChatClick(chat);
-              }}
-              isSelected={selectedChatId === chat._id}
-            />
-          );
-        })}
+      <div className="w-full h-full flex-1 flex-col overflow-y-scroll rounded-lg" id="scrollableDiv">
+        <InfiniteScroll
+          dataLength={userData?.length} // This is the length of the current items
+          next={loadMoreChats} // Function to call when scrolled to bottom
+          hasMore={userData?.length < total} // Whether there are more items to load
+          loader={<h4>Loading...</h4>}
+          scrollableTarget="scrollableDiv" // The scrollable container
+          endMessage={<p style={{ textAlign: "center" }}>No more chats</p>}
+        >
+          {userData?.map((chat) => {
+            return (
+              <ChatCard
+                key={chat._id}
+                chat={chat}
+                onClick={(chat) => {
+                  setSelectedChatId(chat._id);
+                  onChatClick(chat);
+                }}
+                isSelected={selectedChatId === chat._id}
+              />
+            );
+          })}
+        </InfiniteScroll>
       </div>
     </div>
   );

@@ -33,6 +33,7 @@ function Page() {
   const [searchBarInput, setSearchBarInput] = useState("");
   const [published, setPublished] = useState("all");
   const [sortSelect, setSortSelect] = useState("dateDesc");
+  
 
   useEffect(() => {}, [queryParams]);
 
@@ -122,7 +123,8 @@ function Page() {
         </div>
       </div>
 
-      <AllSurveys queryParams={queryParams} />
+      <AllSurveys setQueryParams={(params:any)=>setQueryParams((prev)=>({...prev,...params}))} queryParams={queryParams} />
+
     </section>
   );
 }

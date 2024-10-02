@@ -1,5 +1,14 @@
 const Survey = require("../models/survey");
 
+
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
 exports.saveSurvey = async (req, res) => {
   try {
     const {
@@ -14,10 +23,14 @@ exports.saveSurvey = async (req, res) => {
     let welcome_image, thankyou_image;
     if (req.files && req.files.welcome_image) {
       welcome_image = req.files.welcome_image.data;
+    }else{
+      welcome_image = null
     }
 
     if (req.files && req.files.thankyou_image) {
       thankyou_image = req.files.thankyou_image.data;
+    }else{
+      thankyou_image = null
     }
 
     const survey = new Survey({
@@ -68,24 +81,50 @@ exports.getSurvey = async (req, res) => {
     const id = req.query._id;
     const survey = await Survey.findById(id);
     if (!survey) {
-      return res
-        .status(404)
-        .json({ success: "false", message: "Survey not found" });
-    } else {
-      return res.status(201).json({ success: "true", data: survey });
+      return res.status(404).json({ success: false, message: "Survey not found" });
     }
+
+//*** This is the logic for randomisation , that may be added in case when we request the actual forms ***//
+    // const questions = survey.questions;
+
+    // const questionsToRandomize = [];
+    // const originalOrder = [];
+
+    // questions.forEach((question) => {
+    //   if (question.randomize) {
+    //     questionsToRandomize.push(question);
+    //     originalOrder.push(null);
+    //   } else {
+    //     originalOrder.push(question);
+    //   }
+    // });
+
+    // const shuffledQuestions = shuffleArray(questionsToRandomize);
+
+    // let shuffledIndex = 0;
+    // const finalQuestions = originalOrder.map((question) => {
+    //   if (question === null) {
+    //     return shuffledQuestions[shuffledIndex++];
+    //   }
+    //   return question;
+    // });
+
+    return res.status(200).json({
+      success: true,
+      // data: { ...survey, questions: finalQuestions },
+      data:survey
+    });
   } catch (error) {
-    return res.status(400).json({ success: "false", message: error.message });
+    return res.status(400).json({ success: false, message: error.message });
   }
 };
 
 exports.getAllSurvey = async (req, res) => {
   try {
     console.log("route getAll hitting");
-    // console.log("query--->", req.query);
 
     const {
-      filter,
+      filter = "",  // Default filter to an empty string
       page = 1,
       limit = 10,
       sortBy = "name",
@@ -93,54 +132,61 @@ exports.getAllSurvey = async (req, res) => {
       created_by,
       published,
     } = req.query;
+    console.log(req.query)
 
     const order = sortOrder === "asc" ? 1 : -1;
     const skip = (page - 1) * limit;
     const sortOptions = {};
 
-    if (sortBy && sortBy === "name") {
+    if (sortBy === "name") {
       sortOptions.name = order;
-    } else if (sortBy && sortBy === "createdAt") {
+    } else if (sortBy === "createdAt") {
       sortOptions.createdAt = order;
     }
-    console.log("filter--->", req.query);
-    const searchConditions = [{ name: { $regex: filter, $options: "i" } }];
-    const findOptions = { $and: searchConditions };
+
+    const searchConditions = [];
+
+    if (filter && filter.trim()) {
+      searchConditions.push({ name: { $regex: filter, $options: "i" } });
+    }
 
     if (created_by) {
-      findOptions.created_by = created_by;
+      searchConditions.push({ created_by });
     }
 
-    if (published != "undefined") {
-      findOptions.published = published == "true" ? true : false;
+    if (published !== undefined && published !== "" && published !== "undefined") {
+      searchConditions.push({ published: published === "true" });
     }
 
-    // console.log("findOptions--->", findOptions);
+    const findOptions = searchConditions.length > 0 ? { $and: searchConditions } : {};
+    console.log("findoptions are-->",findOptions)
+
     const total = await Survey.countDocuments(findOptions);
-    const survey = await Survey.find(findOptions)
+
+    const surveys = await Survey.find(findOptions)
       .skip(skip)
       .limit(Number(limit))
       .sort(sortOptions)
       .collation({ locale: "en", strength: 2 });
 
-    if (survey.length === 0) {
+    if (surveys.length === 0) {
       return res
         .status(404)
-        .json({ success: "false", message: "No surveys found" });
+        .json({ success: false, message: "No surveys found" });
     }
-
     return res.status(200).json({
-      success: "true",
+      success: true,
       total,
-      page,
-      limit,
+      page: Number(page),
+      limit: Number(limit),
       totalPages: Math.ceil(total / limit),
-      survey,
+      surveys,
     });
   } catch (error) {
-    return res.status(400).json({ success: "false", message: error.message });
+    return res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 exports.updateSurvey = async (req, res) => {
   try {
@@ -167,10 +213,26 @@ exports.updateSurvey = async (req, res) => {
     if (published !== undefined && published !== null) updateFields.published = published;
 
     if (req.files && req.files.welcome_image) {
+      console.log("Welcome image found");
       updateFields.welcome_image = req.files.welcome_image.data;
+    } else if (req.body.welcome_image === '') {
+      // If the frontend sends an empty array for welcome_image, delete it
+      console.log("Deleting welcome image");
+      updateFields.welcome_image = null;
+    } else {
+      console.log("No changes to welcome image");
     }
+
+    // Handle thankyou_image: Update, retain, or delete
     if (req.files && req.files.thankyou_image) {
+      console.log("Thankyou image found");
       updateFields.thankyou_image = req.files.thankyou_image.data;
+    } else if (req.body.thankyou_image === '') {
+      // If the frontend sends an empty array for thankyou_image, delete it
+      console.log("Deleting thankyou image");
+      updateFields.thankyou_image = null;
+    } else {
+      console.log("No changes to thankyou image");
     }
 
     const result = await Survey.findOneAndUpdate(

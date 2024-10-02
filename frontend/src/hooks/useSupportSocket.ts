@@ -21,6 +21,7 @@ const useSupportSocket = () => {
   const [userData, setUserData] = useState<UserDataInterface[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [searchBarInput, setSearchBarInput] = useState<string>("");
+  const [totalUsers,setTotalUsers] = useState <number>(0)
 
   useEffect(() => {
     // Create a new socket connection
@@ -36,12 +37,14 @@ const useSupportSocket = () => {
   }, []);
 
   async function getAllChatData() {
-    const data = await getAllChatsData(
-      currentUserData?.id!,
+    const params = {
+      currentUserId:currentUserData?.id!,
       searchBarInput,
       selectedRole,
-    );
-    setUserData(data);
+    }
+    const res = await getAllChatsData(params);
+    setUserData(res.data);
+    setTotalUsers(res.total);
   }
 
   const handleRoomJoined = ({
@@ -130,10 +133,12 @@ const useSupportSocket = () => {
     userData,
     currentUserData,
     selectedRole,
+    totalUsers,
     handleRoleSelect,
     handleSearchClick,
     sendMessage,
     joinRoom,
+    setUserData
   };
 };
 

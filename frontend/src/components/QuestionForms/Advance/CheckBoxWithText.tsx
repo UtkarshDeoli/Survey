@@ -1,35 +1,22 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProps } from "@/types/forms_interfaces";
 import FormHeader from "../FormHeader";
 
-interface Props {
-  id: string;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
-  endIndex: number;
-  control: ReturnType<typeof useForm>["control"];
-}
 
 function CheckBoxWithTextForm({
   id,
+  index,
   register,
-  setValue,
-  handleDelete,
-  handleDragEnter,
-  handleDragStart,
-  endIndex,
+  handleHide,
   control,
-}: Props) {
-  const [hide, setHide] = useState<boolean>(false);
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "Checkbox With Text");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
+  hide,
+  handleDelete,
+  handleDuplicate,
+  handleDragStart,
+  handleDragEnter,
+  endIndex,
+  defaultQuestionTitle,
+}: FormProps) {
   return (
     <div
       onDragStart={handleDragStart}
@@ -38,12 +25,15 @@ function CheckBoxWithTextForm({
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
       <FormHeader
-        id={id}
-        register={register}
-        input={true}
         handleDelete={handleDelete}
+        handleDuplicate={handleDuplicate}
+        register={register}
+        id={id}
+        index={index}
+        input={true}
         hide={hide}
-        setHide={() => setHide((prev: boolean) => !prev)}
+        handleHide={handleHide}
+        defaultQuestionTitle={defaultQuestionTitle}
         control={control}
       />
       {!hide && (
@@ -54,7 +44,7 @@ function CheckBoxWithTextForm({
                 Display title
               </label>
               <input
-                {...register(`questions.${id}.parameters.display_title`)}
+                {...register(`questions.${index}.parameters.display_title`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7 focus:outline-none"
                 placeholder="Display title"
@@ -66,7 +56,7 @@ function CheckBoxWithTextForm({
                 Variable name
               </label>
               <input
-                {...register(`questions.${id}.parameters.variable_name`)}
+                {...register(`questions.${index}.parameters.variable_name`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
                 placeholder="Define Variable Name"
@@ -78,7 +68,7 @@ function CheckBoxWithTextForm({
               <div className="col-span-7">
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
-                  {...register(`questions.${id}.parameters.options`)}
+                  {...register(`questions.${index}.parameters.options`)}
                   id="options"
                   placeholder=""
                 />
@@ -91,7 +81,7 @@ function CheckBoxWithTextForm({
                 Default Value
               </label>
               <input
-                {...register(`questions.${id}.parameters.default_value`)}
+                {...register(`questions.${index}.parameters.default_value`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
                 placeholder="Set Default Value"
@@ -106,7 +96,7 @@ function CheckBoxWithTextForm({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="hiddenOptions"
-                  {...register(`questions.${id}.parameters.hidden_options`)}
+                  {...register(`questions.${index}.parameters.hidden_options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line.</p>
@@ -119,7 +109,7 @@ function CheckBoxWithTextForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.is_questions_required`,
+                  `questions.${index}.parameters.is_questions_required`,
                 )}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
@@ -131,7 +121,7 @@ function CheckBoxWithTextForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.minimum_options_required`,
+                  `questions.${index}.parameters.minimum_options_required`,
                 )}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -146,7 +136,7 @@ function CheckBoxWithTextForm({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="uniqueOptions"
-                  {...register(`questions.${id}.parameters.unique_options`)}
+                  {...register(`questions.${index}.parameters.unique_options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line.</p>
@@ -159,7 +149,7 @@ function CheckBoxWithTextForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.maximum_options_selectable`,
+                  `questions.${index}.parameters.maximum_options_selectable`,
                 )}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -172,7 +162,7 @@ function CheckBoxWithTextForm({
                 Randomize Options
               </label>
               <input
-                {...register(`questions.${id}.parameters.randomize_options`)}
+                {...register(`questions.${index}.parameters.randomize_options`)}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
               />

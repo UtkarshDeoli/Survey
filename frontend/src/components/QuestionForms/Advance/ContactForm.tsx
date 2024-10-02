@@ -11,17 +11,8 @@ import EmailForm from "../EmailForm";
 import MultiLineTextForm from "../MultiLineTextForm";
 import { ignore_nesting_forms } from "@/utils/constants";
 import { toast } from "react-hot-toast";
+import { FormProps } from "@/types/forms_interfaces";
 
-interface Props {
-  id: string;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
-  endIndex: number;
-  control: ReturnType<typeof useForm>["control"];
-}
 
 // Combined form component and name type
 interface FormItem {
@@ -31,15 +22,19 @@ interface FormItem {
 
 function ContactForm({
   id,
+  index,
   register,
-  setValue,
-  handleDelete,
-  handleDragEnter,
-  handleDragStart,
-  endIndex,
+  handleHide,
   control,
-}: Props) {
-  const [hide, setHide] = useState<boolean>(false);
+  hide,
+  handleDelete,
+  handleDuplicate,
+  handleDragStart,
+  handleDragEnter,
+  endIndex,
+  defaultQuestionTitle,
+}: FormProps) {
+  const [childhide, setChildHide] = useState<boolean>(false);
   const [formItems, setFormItems] = useState<FormItem[]>([
     { component: SingleLineTextForm, name: "First Name" },
     { component: SingleLineTextForm, name: "Last Name" },
@@ -48,13 +43,9 @@ function ContactForm({
     { component: MultiLineTextForm, name: "Message" },
   ]);
 
-  console.log(formItems);
+  // console.log(formItems);
   const { handleSubmit, unregister } = useForm();
 
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "Contact Form");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
   function handleSubmitForm(data: any) {
     console.log("Inside Contact Form: ", data);
   }
@@ -97,15 +88,17 @@ function ContactForm({
       draggable
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
-      <FormHeader
-        id={id}
-        register={register}
-        input={true}
+     <FormHeader
         handleDelete={handleDelete}
-        defaultQuestionTitle="Contact Form"
-        control={control}
-        setHide={() => setHide((prev: boolean) => !prev)}
+        handleDuplicate={handleDuplicate}
+        register={register}
+        id={id}
+        index={index}
+        input={true}
         hide={hide}
+        handleHide={handleHide}
+        defaultQuestionTitle={defaultQuestionTitle}
+        control={control}
       />
       {!hide && (
         <div className="bg-blue-100 p-5 w-full ">
@@ -127,11 +120,11 @@ function ContactForm({
                   <Form
                     handleDelete={handleChildDelete}
                     control={control}
-                    setValue={setValue}
                     register={register}
                     defaultQuestionTitle={formItem.name}
                     key={ind}
                     id={`${id}_${ind}`}
+                    index={ind}
                   />
                 );
               })}

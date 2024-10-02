@@ -16,3 +16,14 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+.cursor-move {
+  cursor: grab;
+}
+
+.cursor-move:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  opacity: 1; /* Makes it look like it’s being dragged */
+}

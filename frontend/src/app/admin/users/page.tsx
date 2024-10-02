@@ -1,42 +1,60 @@
 "use client";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
-import Active from "@/components/ui/status/Active";
-import Inactive from "@/components/ui/status/Inactive";
 import { getAllUsers } from "@/networks/user_networks";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { IUser } from "@/types/user_interfaces";
-import CustomModal from "@/components/ui/Modal";
 import Switch from "react-switch";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import Loader from "@/components/ui/Loader";
 
 function page() {
   const [users, setUsers] = useState<IUser[]>([]);
   const [searchBarInput, setSearchBarInput] = useState<string>("");
+  const [limit,setLimit] = useState <number> (10);
+  const [page,setPage] = useState <number> (1);
+  const [totalPages,setTotalPages] = useState <number>(0);
+  const [loading,setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [limit,page]);
 
   async function getData() {
-    const res: any = await getAllUsers(searchBarInput);
+    const params = {searchBarInput,page,limit}
+    setLoading(true);
+    const res: any = await getAllUsers(params);
+    setLoading(false);
     console.log("res::::", res);
     if (res.error) return;
-    setUsers(res);
+    setUsers(res.data);
+    setTotalPages(res.totalPages)
   }
   const router = useRouter();
 
   function handleEditUser(_id: string) {
     router.push(`/admin/users/add-user?_id=${_id}`);
   }
-  //   const handleToggleClick = (survey: any) => {
+  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setLimit(newLimit)
+    setPage(1)
+  };
 
-  //     setPublishModal(true); // Show modal for confirmation
-  //   };
+  const handleNextPage = () => {
+    if (page < totalPages) {
+      setPage(page + 1)
+    }
+  };
 
-  function doNothing() {}
-
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage(page-1)
+    }
+  };
+  const doNothing = () => {}
   return (
     <div className="w-full bg-[#ECF0FA] text-sm h-full">
       <nav className="h-16 w-full py-3 px-8 flex justify-between">
@@ -106,12 +124,13 @@ function page() {
             <p className="flex justify-center items-center">Action</p>
           </div>
         </div>
-        {users &&
+        {loading && <Loader className="h-[50vh] flex justify-center items-center w-full"/>}
+        {!loading && users &&
           users.length !== 0 &&
           users.map((user, index) => (
             <div
               key={index}
-              className="bg-white border grid grid-cols-5 text-center text-black"
+              className="bg-white border grid px-8 py-[16px] grid-cols-5 text-center text-black"
             >
               <p className="col-span-1 flex justify-center items-center">
                 {user.name}
@@ -154,6 +173,50 @@ function page() {
               </div>
             </div>
           ))}
+        {
+          !loading && (
+            <div className="flex gap-3 items-center mt-4">
+                  {/* Limit Select */}
+                  <div>
+                    <label htmlFor="limit-select" className="mr-2">
+                      Show:
+                    </label>
+                    <select
+                      id="limit-select"
+                      value={limit}
+                      onChange={handleLimitChange}
+                      className="p-2 border rounded-md"
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={handlePreviousPage}
+                      disabled={page === 1}
+                      className="p-2 border rounded-md disabled:opacity-50"
+                    >
+                      <IoIosArrowBack />
+                    </button>
+                    <span>
+                      Page {page} of {totalPages}
+                    </span>
+                    <button
+                      onClick={handleNextPage}
+                      disabled={page === totalPages}
+                      className="p-2 border rounded-md disabled:opacity-50"
+                    >
+                      <IoIosArrowForward />
+                    </button>
+                  </div>
+            </div>
+          )
+        }
       </div>
 
       {/* <CustomModal

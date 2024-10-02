@@ -1,35 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import FormHeader from "../FormHeader";
-
-interface Props {
-  id: string;
-  register: ReturnType<typeof useForm>["register"];
-  setValue: ReturnType<typeof useForm>["setValue"];
-  handleDelete: (id: string) => void;
-  handleDragEnter: () => void;
-  handleDragStart: () => void;
-  endIndex: number;
-  control: ReturnType<typeof useForm>["control"];
-}
+import { FormProps } from "@/types/forms_interfaces";
 
 function DropDownGridForm({
   id,
+  index,
   register,
-  setValue,
-  handleDelete,
-  handleDragEnter,
-  handleDragStart,
-  endIndex,
+  handleHide,
   control,
-}: Props) {
-  const [hide, setHide] = useState<boolean>(false);
-  useEffect(() => {
-    setValue(`questions.${id}.type`, "DropDown Grid");
-    setValue(`questions.${id}.question_id`, id);
-  }, []);
+  hide,
+  handleDelete,
+  handleDuplicate,
+  handleDragStart,
+  handleDragEnter,
+  endIndex,
+  defaultQuestionTitle,
+}: FormProps) {
   return (
     <div
       onDragStart={handleDragStart}
@@ -37,13 +24,16 @@ function DropDownGridForm({
       draggable
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
-      <FormHeader
-        id={id}
-        register={register}
-        input={true}
+       <FormHeader
         handleDelete={handleDelete}
+        handleDuplicate={handleDuplicate}
+        register={register}
+        id={id}
+        index={index}
+        input={true}
         hide={hide}
-        setHide={() => setHide((prev: boolean) => !prev)}
+        handleHide={handleHide}
+        defaultQuestionTitle={defaultQuestionTitle}
         control={control}
       />
       {!hide && (
@@ -57,7 +47,7 @@ function DropDownGridForm({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="rowOptions"
-                  {...register(`questions.${id}.parameters.row_options`)}
+                  {...register(`questions.${index}.parameters.row_options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">
@@ -72,7 +62,7 @@ function DropDownGridForm({
               <div className="col-span-7">
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
-                  {...register(`questions.${id}.parameters.column_options`)}
+                  {...register(`questions.${index}.parameters.column_options`)}
                   id="columnOptions"
                   placeholder=""
                 />
@@ -88,7 +78,7 @@ function DropDownGridForm({
                 <textarea
                   className="border border-secondary-200 rounded-md p-2 w-full"
                   id="questionOptions"
-                  {...register(`questions.${id}.parameters.question_options`)}
+                  {...register(`questions.${index}.parameters.question_options`)}
                   placeholder=""
                 />
                 <p className="text-secondary-300">One option per line.</p>
@@ -100,7 +90,7 @@ function DropDownGridForm({
                 Variable name
               </label>
               <input
-                {...register(`questions.${id}.parameters.variable_name`)}
+                {...register(`questions.${index}.parameters.variable_name`)}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
                 placeholder="Define Variable Name"
@@ -113,7 +103,7 @@ function DropDownGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.are_all_questions_required`,
+                  `questions.${index}.parameters.are_all_questions_required`,
                 )}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"
@@ -125,7 +115,7 @@ function DropDownGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.forward_row_options_from`,
+                  `questions.${index}.parameters.forward_row_options_from`,
                 )}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -140,7 +130,7 @@ function DropDownGridForm({
                 className="border border-secondary-200 rounded-md p-2 col-span-5"
                 id="mediaType"
                 {...register(
-                  `questions.${id}.parameters.forward_row_options_type`,
+                  `questions.${index}.parameters.forward_row_options_type`,
                 )}
               >
                 <option value=""></option>
@@ -154,7 +144,7 @@ function DropDownGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.forward_column_options_from`,
+                  `questions.${index}.parameters.forward_column_options_from`,
                 )}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -169,7 +159,7 @@ function DropDownGridForm({
                 className="border border-secondary-200 rounded-md p-2 col-span-5"
                 id="mediaType"
                 {...register(
-                  `questions.${id}.parameters.forward_column_options_type`,
+                  `questions.${index}.parameters.forward_column_options_type`,
                 )}
               >
                 <option value=""></option>
@@ -183,7 +173,7 @@ function DropDownGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.forward_question_options_from`,
+                  `questions.${index}.parameters.forward_question_options_from`,
                 )}
                 type="text"
                 className="border border-secondary-200 rounded-md p-2 col-span-7"
@@ -198,7 +188,7 @@ function DropDownGridForm({
                 className="border border-secondary-200 rounded-md p-2 col-span-5"
                 id="mediaType"
                 {...register(
-                  `questions.${id}.parameters.forward_question_options_type`,
+                  `questions.${index}.parameters.forward_question_options_type`,
                 )}
               >
                 <option value=""></option>
@@ -212,7 +202,7 @@ function DropDownGridForm({
               </label>
               <input
                 {...register(
-                  `questions.${id}.parameters.display_as_grid_in_tablet_ipad`,
+                  `questions.${index}.parameters.display_as_grid_in_tablet_ipad`,
                 )}
                 type="Checkbox"
                 className="border border-secondary-200 rounded-md p-2"

@@ -45,27 +45,31 @@ export const getUser = async (params: any) => {
   }
 };
 
-export const getAllUsers = async (
-  searchBarInput: string,
-  withProfilePic: boolean = false,
-  selectedRole: string,
-) => {
+export const getAllUsers = async (params: {
+  searchBarInput?: string;
+  selectedRole?: string;
+  withProfilePic?: boolean;
+  page?: number;
+  limit?: number;
+}) => {
   try {
     const bearerToken = localStorage.getItem("token");
     const options = {
       method: "GET",
       url: `${SERVER_URI}/${get_all_users}`,
       params: {
-        filter: searchBarInput,
-        getWithProfilePicture: withProfilePic,
-        role: selectedRole,
+        filter: params.searchBarInput || "",
+        getWithProfilePicture: params.withProfilePic ?? false,
+        role: params.selectedRole || "",
+        page: params.page,
+        limit: params.limit,
       },
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
     };
     const response = await axios.request(options);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }
@@ -114,22 +118,27 @@ export const addMultipleUsers = async (params: any) => {
   }
 };
 
-export const getAllChatsData = async (
-  currentUserId: string,
-  searchBarInput: string = "",
-  selectedRole: string,
-) => {
+export const getAllChatsData = async (params: {
+  currentUserId: string;
+  searchBarInput: string;
+  selectedRole: string;
+  page?:number;
+  limit?: number;
+}) => {
   try {
     const options = {
       method: "GET",
-      url: `${SERVER_URI}/${get_all_chats_data}?currentUserId=${currentUserId}`,
+      url: `${SERVER_URI}/${get_all_chats_data}`,
       params: {
-        filter: searchBarInput,
-        role: selectedRole,
+        filter: params.searchBarInput,
+        role: params.selectedRole,
+        currentUserId:params.currentUserId,
+        page:params.page,
+        limit:params.limit
       },
     };
     const response = await axios.request(options);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     return {
       success: false,

@@ -22,7 +22,7 @@ function ChatHeader({ otherUserData }: { otherUserData: UserDataInterface }) {
         <p className="text-[20px] font-medium">{otherUserData?.name}</p>
       </div>
       <button className="text-white bg-primary-300 rounded-lg p-2">
-        <BiSolidPhone size={40} />
+        <BiSolidPhone size={25} />
       </button>
     </div>
   );
@@ -38,8 +38,8 @@ function ChatBody({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" ,block: "end",inline: "nearest"});
+  }
 
   useEffect(() => {
     scrollToBottom();
@@ -64,7 +64,7 @@ function ChatBody({
             <div
               className={`max-w-[70%] mt-1 flex p-3 rounded-lg items-end gap-2 ${message.sender === currentUserId ? "bg-primary-300" : "bg-[#85a7ff]"} text-white`}
             >
-              <p className="break-words text-[24px] font-medium mb-1">
+              <p className="break-words font-medium mb-1">
                 {message.content}
               </p>
               <p className="min-w-16 text-[12px] text-my-gray-100 mt-1 text-right">
@@ -92,6 +92,14 @@ function ChatFooter({
       setSearchBarInput("");
     }
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
     <div className="w-full p-2 pt-1 flex justify-center items-center gap-4">
       <input
@@ -99,6 +107,7 @@ function ChatFooter({
         placeholder="Type a message"
         value={searchBarInput}
         onChange={(e) => setSearchBarInput(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <ButtonFilled className="h-14 bg-my-blue-600" onClick={handleSendMessage}>
         Send
@@ -146,7 +155,7 @@ function ChatComponent({
   otherUserData,
 }: ChatComponentInterface) {
   return (
-    <div className="w-3/4 h-5/6 bg-white m-8 ml-0 flex flex-col items-center rounded-lg">
+    <div className="w-3/4 h-full overflow-auto bg-white ml-0 flex flex-col items-center rounded-lg">
       {otherUserData ? (
         <ChatComponentBody
           messages={messages}

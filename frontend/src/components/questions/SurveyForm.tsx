@@ -34,7 +34,6 @@ function SurveyForm() {
     control,
     name: "questions",
   });
-  console.log("fields are---->",fields)
   // Effects
   useEffect(() => {
     if (_id) {
@@ -62,6 +61,9 @@ function SurveyForm() {
           question_id: question.question_id,
           type: question.type,
           parameters: question.parameters,
+          children:question.children,
+          dependency:question.dependency,
+          randomize:question.randomize,
         });
         Object.keys(question.parameters).forEach((parameter: string) =>
           setValue(
@@ -90,11 +92,26 @@ function SurveyForm() {
     }
   }
 
-  // Handle form deletion
   function handleDelete(ind: number) {
+    const deletedQuestionId = getValues(`questions.${ind}.question_id`);
+    fields.forEach((_, index) => {
+      if (index !== ind) {
+        const dependencies = getValues(`questions.${index}.dependency`) || [];
+        const updatedDependencies = dependencies.filter(
+          (dep: any) => dep.question !== deletedQuestionId.toString()
+        );
+        setValue(`questions.${index}.dependency`, updatedDependencies);
+        const children = getValues(`questions.${index}.children`) || [];
+        const updatedChildren = children.filter(
+          (childId: number) => childId !== deletedQuestionId
+        );
+        setValue(`questions.${index}.children`, updatedChildren);
+      }
+    });
     setForms(forms.filter((_, index) => index !== ind));
     remove(ind);
   }
+  
 
   // Handle start of drag
   function handleDragStart(e: React.DragEvent<HTMLDivElement>, index: number) {
@@ -112,7 +129,7 @@ function SurveyForm() {
     if (data !== "form_reorder") {
       const newForm = {component:formMapping[data],hide:false}
       setForms([...forms, newForm]);
-      append({ question_id: questId, type: data });
+      append({ question_id: questId, type: data , randomize:true, children:[], dependency:[]});
       setQuestId((prev) => prev + 1);
     }
   }
@@ -149,7 +166,7 @@ function SurveyForm() {
       const type = data?.questions?.[index]?.type;
       const newForm = {component: forms[index].component,hide:false}
       setForms([...forms, newForm]);
-      append({ question_id: questId , type});
+      append({ question_id: questId , type, randomize:true, children:[], dependency:[]});
       setQuestId((prev) => prev + 1);
   }
 

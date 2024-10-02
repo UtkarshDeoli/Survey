@@ -61,7 +61,7 @@ exports.updateUser = async (req, res) => {
     const dbRes = await User.findOneAndUpdate(
       { username: user.username },
       { $set: user },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
     return res
       .status(200)
@@ -90,10 +90,14 @@ exports.getUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
+    console.log(req.query)
     let filter = req.query.filter || "";
     let created_by = req.query.created_by;
     const getWithProfilePicture = Boolean(req.query.getWithProfilePicture);
     const role = req.query.role;
+    const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;
+    const limit =
+      req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
     const validRoles = [
       "Admin",
       "Booth Karyakarta",
@@ -101,6 +105,8 @@ exports.getAllUsers = async (req, res) => {
       "Support Executive",
       "Survey Manager",
     ];
+
+    const skip = (page - 1) * limit;
 
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });
@@ -116,13 +122,24 @@ exports.getAllUsers = async (req, res) => {
 
     let users;
 
-    if (getWithProfilePicture) {
+    if (getWithProfilePicture === "true") {
       users = await User.find(query).populate("profile_picture");
     } else {
-      users = await User.find(query);
+      users = await User.find(query).skip(skip).limit(limit);
     }
 
-    return res.status(200).json({ success: true, data: users });
+    const total = await User.countDocuments(query);
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+        data: users,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      });
   } catch (error) {
     return res
       .status(400)
@@ -145,7 +162,7 @@ exports.uploadProfilePicture = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { profile_picture: profilePicture._id } },
-      { new: true },
+      { new: true }
     );
 
     return res.status(200).json({
