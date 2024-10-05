@@ -2,7 +2,6 @@
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { CiMail } from "react-icons/ci";
-import { FaEye } from "react-icons/fa";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { IoDuplicateOutline } from "react-icons/io5";
 import { MdOutlineDelete } from "react-icons/md";
@@ -11,13 +10,13 @@ import { Tooltip } from "react-tooltip";
 
 interface Props {
   id: string;
-  index?:number;
+  index?: number;
   register: ReturnType<typeof useForm>["register"];
   input: boolean;
   handleDelete: (id: number) => void;
   handleHide: (id: number) => void;
   handleDuplicate: (id: number) => void;
-  hide:boolean;
+  hide: boolean;
   control: ReturnType<typeof useForm>["control"];
   defaultQuestionTitle?: string;
 }
@@ -30,15 +29,14 @@ function FormHeader({
   defaultQuestionTitle,
   hide,
   control,
-  handleHide
+  handleHide,
 }: Props) {
-
   const media = useWatch({
     control,
     name: `questions.${index || 0}.parameters.question`,
     defaultValue: "",
   });
-  
+
   return (
     <div className="flex gap-3 items-center w-full bg-white p-2">
       <p>
@@ -46,9 +44,9 @@ function FormHeader({
       </p>
       <div className="flex items-center gap-2 w-full">
         <CiMail />
-        {input && hide ?(
+        {input && hide ? (
           <p>{media}</p>
-        ): (
+        ) : (
           <input
             defaultValue={defaultQuestionTitle}
             placeholder="Type your question here..."
@@ -59,25 +57,22 @@ function FormHeader({
           />
         )}
       </div>
-      <button 
-      data-tooltip-id={`tooltip-arrow`}
-      data-tooltip-content="Expand/Shrink survey"
-      data-tooltip-place="bottom"
-      onClick={()=>handleHide(index || 0)} type="button">
-        {hide ? <IoIosArrowDown /> : <IoIosArrowUp/>}
-      </button>
-      <button type="button">
-        <VscThreeBars />
-      </button>
-      <button type="button">
-        <FaEye />
+      <button
+        data-tooltip-id={`tooltip-arrow`}
+        data-tooltip-content="Expand/Shrink survey"
+        data-tooltip-place="bottom"
+        onClick={() => handleHide(index || 0)}
+        type="button"
+      >
+        {hide ? <IoIosArrowDown /> : <IoIosArrowUp />}
       </button>
       <button
-      onClick={()=>handleDuplicate(index || 0)}
-      data-tooltip-id={`tooltip-duplicate`}
-      data-tooltip-content="Duplicate question"
-      data-tooltip-place="bottom"
-      type="button">
+        onClick={() => handleDuplicate(index || 0)}
+        data-tooltip-id={`tooltip-duplicate`}
+        data-tooltip-content="Duplicate question"
+        data-tooltip-place="bottom"
+        type="button"
+      >
         <IoDuplicateOutline />
       </button>
       <button
@@ -87,10 +82,7 @@ function FormHeader({
       >
         <MdOutlineDelete />
       </button>
-      <Tooltip
-        id={`tooltip-arrow`}
-        style={{ zIndex: 30, position: "fixed" }}
-      />
+      <Tooltip id={`tooltip-arrow`} style={{ zIndex: 30, position: "fixed" }} />
       <Tooltip
         id={`tooltip-duplicate`}
         style={{ zIndex: 30, position: "fixed" }}

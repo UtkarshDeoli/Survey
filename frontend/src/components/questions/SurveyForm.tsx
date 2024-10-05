@@ -15,7 +15,9 @@ function SurveyForm() {
   const created_by = searchParams.get("created_by");
 
   // states
-  const [forms, setForms] = useState<{ component: React.ComponentType<any>; hide: boolean }[]>([]);
+  const [forms, setForms] = useState<
+    { component: React.ComponentType<any>; hide: boolean }[]
+  >([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [endDragIndex, setEndDragIndex] = useState<number | null>(null);
   const [questId, setQuestId] = useState<number>(10);
@@ -49,30 +51,31 @@ function SurveyForm() {
     setLoading(false);
     if (response.success) {
       const formMappings = FormMappings();
-      const receivedForms = response.data.questions?.map(
-        (question: any) => ({component:formMappings[question.type],hide:false})
-      );
+      const receivedForms = response.data.questions?.map((question: any) => ({
+        component: formMappings[question.type],
+        hide: false,
+      }));
       if (receivedForms) setForms(receivedForms);
-      remove()
-      let max = 10
+      remove();
+      let max = 10;
       response.data.questions?.forEach((question: any, index: number) => {
-        max = question.question_id > max ? question.question_id : max
+        max = question.question_id > max ? question.question_id : max;
         append({
           question_id: question.question_id,
           type: question.type,
           parameters: question.parameters,
-          children:question.children,
-          dependency:question.dependency,
-          randomize:question.randomize,
+          children: question.children,
+          dependency: question.dependency,
+          randomize: question.randomize,
         });
         Object.keys(question.parameters).forEach((parameter: string) =>
           setValue(
             `questions.${index}.parameters[${parameter}]`,
-            question.parameters[parameter]
-          )
+            question.parameters[parameter],
+          ),
         );
       });
-      if(max !== 10) setQuestId(max+1);
+      if (max !== 10) setQuestId(max + 1);
     } else {
       toast.error("Something went wrong");
     }
@@ -98,12 +101,12 @@ function SurveyForm() {
       if (index !== ind) {
         const dependencies = getValues(`questions.${index}.dependency`) || [];
         const updatedDependencies = dependencies.filter(
-          (dep: any) => dep.question !== deletedQuestionId.toString()
+          (dep: any) => dep.question !== deletedQuestionId.toString(),
         );
         setValue(`questions.${index}.dependency`, updatedDependencies);
         const children = getValues(`questions.${index}.children`) || [];
         const updatedChildren = children.filter(
-          (childId: number) => childId !== deletedQuestionId
+          (childId: number) => childId !== deletedQuestionId,
         );
         setValue(`questions.${index}.children`, updatedChildren);
       }
@@ -111,7 +114,6 @@ function SurveyForm() {
     setForms(forms.filter((_, index) => index !== ind));
     remove(ind);
   }
-  
 
   // Handle start of drag
   function handleDragStart(e: React.DragEvent<HTMLDivElement>, index: number) {
@@ -124,12 +126,18 @@ function SurveyForm() {
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     const formMapping = FormMappings();
     const data = e.dataTransfer.getData(
-      "text/plain"
+      "text/plain",
     ) as keyof typeof formMapping;
     if (data !== "form_reorder") {
-      const newForm = {component:formMapping[data],hide:false}
+      const newForm = { component: formMapping[data], hide: false };
       setForms([...forms, newForm]);
-      append({ question_id: questId, type: data , randomize:true, children:[], dependency:[]});
+      append({
+        question_id: questId,
+        type: data,
+        randomize: true,
+        children: [],
+        dependency: [],
+      });
       setQuestId((prev) => prev + 1);
     }
   }
@@ -156,18 +164,24 @@ function SurveyForm() {
   function handleHide(index: number) {
     setForms((prevForms) =>
       prevForms.map((form, i) =>
-        i === index ? { ...form, hide: !form.hide } : form
-      )
+        i === index ? { ...form, hide: !form.hide } : form,
+      ),
     );
   }
 
-  function handleDuplicate(index:number){
-      const data = getValues()
-      const type = data?.questions?.[index]?.type;
-      const newForm = {component: forms[index].component,hide:false}
-      setForms([...forms, newForm]);
-      append({ question_id: questId , type, randomize:true, children:[], dependency:[]});
-      setQuestId((prev) => prev + 1);
+  function handleDuplicate(index: number) {
+    const data = getValues();
+    const type = data?.questions?.[index]?.type;
+    const newForm = { component: forms[index].component, hide: false };
+    setForms([...forms, newForm]);
+    append({
+      question_id: questId,
+      type,
+      randomize: true,
+      children: [],
+      dependency: [],
+    });
+    setQuestId((prev) => prev + 1);
   }
 
   return (
@@ -192,7 +206,9 @@ function SurveyForm() {
                   return (
                     <Form
                       handleDragEnter={() => handleDragEnter(index)}
-                      handleDragStart={(e: React.DragEvent<HTMLDivElement>) =>handleDragStart(e, index)}
+                      handleDragStart={(e: React.DragEvent<HTMLDivElement>) =>
+                        handleDragStart(e, index)
+                      }
                       endIndex={endDragIndex}
                       key={field.id}
                       id={questId}

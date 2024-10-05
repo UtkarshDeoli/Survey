@@ -5,7 +5,6 @@ import RadioButton from "../components/QuestionForms/RadioButton";
 import SingleLineTextForm from "../components/QuestionForms/SingleLineTextForm";
 import MultiLineTextForm from "../components/QuestionForms/MultiLineTextForm";
 import DropDownForm from "@/components/QuestionForms/DropDownForm";
-import NumberPointForm from "@/components/QuestionForms/NumberPointForm";
 import PhoneNumberForm from "@/components/QuestionForms/PhoneNumberForm";
 import RatingForm from "@/components/QuestionForms/RatingForm";
 import DateForm from "@/components/QuestionForms/DateForm";
@@ -23,6 +22,7 @@ import CheckBoxWithTextForm from "@/components/QuestionForms/Advance/CheckBoxWit
 import CheckBoxGridForm from "@/components/QuestionForms/Advance/CheckBoxGridForm";
 import CheckBoxGridOtherForm from "@/components/QuestionForms/Advance/CheckBoxGridOtherForm";
 import NumberPointGridForm from "@/components/QuestionForms/Advance/NumberPointGridForm";
+import NumberInputForm from "@/components/QuestionForms/NumberInputForm";
 
 function FormMappings(): { [key: string]: React.ComponentType<any> } {
   return {
@@ -34,7 +34,7 @@ function FormMappings(): { [key: string]: React.ComponentType<any> } {
     "Radio Button": RadioButton,
     DropDown: DropDownForm,
     "DropDown With Other": DropDownForm,
-    "Number Point": NumberPointForm,
+    "Number Input": NumberInputForm,
     "Phone Number": PhoneNumberForm,
     Rating: RatingForm,
     Date: DateForm,
