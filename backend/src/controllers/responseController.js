@@ -1,42 +1,68 @@
-const Responses = require('../models/response');
+const Responses = require("../models/response");
 
 exports.saveResponse = async (req, res) => {
-    try {
-        const { Response } = req.body;
-        const response = new Responses({ Response });
-        await response.save();
-        return res.status(201).json({ success: true, message: 'Response created successfully' });
-    } catch (error) {
-        return res.status(400).json({ success: false, message: error.message });
-    }
-}
+  try {
+    const { survey_id, responses } = req.body;
+    const count = await Responses.countDocuments({ survey_id });
+    const response = new Responses({
+      response_id: count + 1,
+      survey_id,
+      responses,
+    });
+    await response.save();
+    return res
+      .status(201)
+      .json({ success: true, message: "Response created successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
 
 exports.getCount = async (req, res) => {
-    try {
-        const surveyId = req.query.surveyId;
-        const response = await Responses.find({surveyId});
-        if(!response) {
-            return res.status(404).json({ success: "false", message: 'Response not found' });
-        }
-        else{
-            return res.status(201).json({ success: "true", data: response.length });
-        }
-    } catch (error) {
-        return res.status(400).json({ success: "false", message: error.message });
+  try {
+    const surveyId = req.query.surveyId;
+    const response = await Responses.find({ surveyId });
+    if (!response) {
+      return res
+        .status(404)
+        .json({ success: "false", message: "Response not found" });
+    } else {
+      return res.status(201).json({ success: "true", data: response.length });
     }
-}
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
+
+exports.getAllResponses = async (req, res) => {
+  try {
+    const surveyId = req.query.surveyId;
+    const response = await Responses.find({ surveyId });
+    if (!response) {
+      return res
+        .status(404)
+        .json({ success: "false", message: "Response not found" });
+    } else {
+      return res.status(201).json({ success: "true", data: response });
+    }
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
 
 exports.getResponse = async (req, res) => {
-    try {
-        const surveyId = req.query.surveyId;
-        const response = await Responses.find({surveyId});
-        if(!response) {
-            return res.status(404).json({ success: "false", message: 'Response not found' });
-        }
-        else{
-            return res.status(201).json({ success: "true", data: response });
-        }
-    } catch (error) {
-        return res.status(400).json({ success: "false", message: error.message });
+  try {
+    const responseId = req.query.responseId;
+    const response = await Responses.findById(responseId);
+    if (!response) {
+      return res
+        .status(404)
+        .json({ success: "false", message: "Response not found" });
+    } else {
+      return res.status(201).json({ success: "true", data: response });
     }
-}
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
