@@ -157,7 +157,7 @@ function AllSurveys({ queryParams, setQueryParams }: AllSurveysProps) {
                 onClick={() =>
                   router.push(`/admin/surveys/edit?survey_id=${el._id}`)
                 }
-                className="col-span-2 cursor-pointer underline"
+                className="col-span-2 cursor-pointer"
               >
                 {el.name}
               </p>

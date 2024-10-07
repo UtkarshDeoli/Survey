@@ -22,6 +22,10 @@ function SurveyForm() {
   const [endDragIndex, setEndDragIndex] = useState<number | null>(null);
   const [questId, setQuestId] = useState<number>(10);
   const [loading, setLoading] = useState(false);
+  const [isValidDrag, setIsValidDrag] = useState <boolean>(true);
+  const [draggingOverIndex, setDraggingOverIndex] = useState<number | null>(
+    null,
+  );
 
   // React hook form
   const {
@@ -142,23 +146,65 @@ function SurveyForm() {
     }
   }
 
-  // Handle drop event (rearrange forms based on the dragged and dropped indices)
+  const isValidDrop = (draggingIndex: number, targetIndex: number) => {
+    const surveyQuestions = getValues("questions");
+    const draggedQuestion = surveyQuestions[draggingIndex];
+  
+    // Check if any dependencies would be violated
+    for (let dep of draggedQuestion.dependency) {
+      const depIndex = surveyQuestions.findIndex(
+        (q:any) => q.question_id.toString() === dep.question,
+      );
+      if (depIndex !== -1 && targetIndex <= depIndex) {
+        return false; // Cannot move before dependent question
+      }
+    }
+  
+    // Check if any child relationships would be violated
+    for (let childId of draggedQuestion.children) {
+      const childIndex = surveyQuestions.findIndex(
+        (q:any) => q.question_id === childId,
+      );
+      if (childIndex !== -1 && targetIndex >= childIndex) {
+        return false; // Cannot move after a child question
+      }
+    }
+  
+    return true; // Valid drop
+  };
+  
+
   function handleDropForm(e: React.DragEvent<HTMLDivElement>) {
-    if (draggedIndex === null) return;
-    move(draggedIndex, endDragIndex || 0);
-    const reorderedForms = [...forms];
-    const [draggedItem] = reorderedForms.splice(draggedIndex, 1);
-    reorderedForms.splice(endDragIndex || 0, 0, draggedItem);
-    setForms(reorderedForms);
-    setDraggedIndex(null);
-    setEndDragIndex(null);
+    if (draggedIndex === null || endDragIndex === null) return;
+  
+    // Get the dragged question and its target index
+    const surveyQuestions = getValues("questions");
+  
+    // Validate the drop before moving
+    if (isValidDrop(draggedIndex, endDragIndex)) {
+      move(draggedIndex, endDragIndex);
+  
+      const reorderedForms = [...forms];
+      const [draggedItem] = reorderedForms.splice(draggedIndex, 1);
+      reorderedForms.splice(endDragIndex, 0, draggedItem);
+      setForms(reorderedForms);
+      setDraggedIndex(null);
+      setEndDragIndex(null);
+    } else {
+      toast.error("Action not allowed. Please consider editing conditional display.");
+    }
   }
+  
 
   // Handle drag enter event (update the end drag index)
   function handleDragEnter(index: number) {
     if (draggedIndex !== null && index !== draggedIndex) {
       setEndDragIndex(index);
+
+      const isValid = isValidDrop(draggedIndex, index);
+      setIsValidDrag(isValid);
     }
+    setDraggingOverIndex(index);
   }
 
   function handleHide(index: number) {

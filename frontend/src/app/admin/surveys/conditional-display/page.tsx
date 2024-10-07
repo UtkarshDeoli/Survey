@@ -113,7 +113,7 @@ function Page() {
   const getOperatorOptions = (questionType: string) => {
     if (["Single line Text Input", "Multiline Text Input", "Email", "Phone Number"].includes(questionType)) {
       return operatorOptions.text;
-    } else if (["Number Point", "Rating", "Date"].includes(questionType)) {
+    } else if (["Number", "Number Point", "Rating", "Date"].includes(questionType)) {
       return operatorOptions.number;
     } else if (["Radio Button", "DropDown", "DropDown With Other", "Checkbox List", "Checkbox List With Other"].includes(questionType)) {
       return operatorOptions.choice;
