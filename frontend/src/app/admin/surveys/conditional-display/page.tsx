@@ -5,7 +5,7 @@ import ButtonBordered from '@/components/ui/buttons/ButtonBordered';
 import Loader from '@/components/ui/Loader';
 import { getSurvey, updateSurvey } from '@/networks/survey_networks';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { FaTimes } from 'react-icons/fa';
@@ -245,4 +245,11 @@ function Page() {
   );
 }
 
-export default Page;
+const SuspendedCreateSurveyPage = () => (
+  <Suspense>
+    <Page />
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;
+

@@ -300,4 +300,10 @@ function Page() {
   );
 }
 
-export default Page;
+const SuspendedCreateSurveyPage = () => (
+  <Suspense>
+    <Page />
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;

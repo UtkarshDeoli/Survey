@@ -47,10 +47,10 @@ function AddressForm({
 
   const { handleSubmit, unregister } = useForm();
 
-  useEffect(() => {
-    setValue(`questions.${index}.type`, "Address");
-    setValue(`questions.${index}.question_id`, id);
-  }, []);
+  // useEffect(() => {
+  //   setValue(`questions.${index}.type`, "Address");
+  //   setValue(`questions.${index}.question_id`, id);
+  // }, []);
   function handleSubmitForm(data: any) {
     console.log("Inside Address Form: ", data);
   }
@@ -94,16 +94,16 @@ function AddressForm({
       draggable
       className={`flex justify-center items-center flex-col gap-2 border border-secondary-200 rounded-md overflow-hidden cursor-move ${endIndex?.toString() === id ? "border-2 border-blue-500" : ""}`}
     >
-      <FormHeader
+      {/* <FormHeader
         id={id}
         register={register}
         input={true}
-        handleDelete={handleDelete}
+        // handleDelete={handleDelete}
         hide={hide}
         control={control}
-        setHide={() => setHide((prev: boolean) => !prev)}
+        // setHide={() => setHide((prev: boolean) => !prev)}
         defaultQuestionTitle="Address Form"
-      />
+      /> */}
       {!hide && (
         <div className="bg-blue-100 p-5 w-full">
           <div

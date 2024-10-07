@@ -4,7 +4,7 @@ import QuestionHeader from "@/components/questions/QuestionHeader";
 import Loader from "@/components/ui/Loader";
 import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import toast from "react-hot-toast";
 
 function Page() {
@@ -98,4 +98,10 @@ function Page() {
   );
 }
 
-export default Page;
+const SuspendedCreateSurveyPage = () => (
+  <Suspense>
+    <Page />
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;
