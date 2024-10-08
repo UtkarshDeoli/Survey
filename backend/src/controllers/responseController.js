@@ -3,9 +3,7 @@ const Responses = require("../models/response");
 exports.saveResponse = async (req, res) => {
   try {
     const { survey_id, responses } = req.body;
-    const count = await Responses.countDocuments({ survey_id });
     const response = new Responses({
-      response_id: count + 1,
       survey_id,
       responses,
     });
@@ -38,7 +36,8 @@ exports.getCount = async (req, res) => {
 exports.getAllResponses = async (req, res) => {
   try {
     const surveyId = req.query.surveyId;
-    const response = await Responses.find({ surveyId });
+
+    const response = await Responses.find({ survey_id: surveyId });
     if (!response) {
       return res
         .status(404)
