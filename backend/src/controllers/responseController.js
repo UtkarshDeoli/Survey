@@ -2,10 +2,11 @@ const Responses = require("../models/response");
 
 exports.saveResponse = async (req, res) => {
   try {
-    const { survey_id, responses } = req.body;
+    const { survey_id, responses, other_details } = req.body;
     const response = new Responses({
       survey_id,
       responses,
+      other_details,
     });
     await response.save();
     return res
