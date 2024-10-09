@@ -2,6 +2,8 @@
 
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useRef } from "react";
+import * as XLSX from "xlsx";
 
 interface props{
   id:string;
@@ -12,6 +14,7 @@ interface props{
 function QuestionHeader({id, created_by, name, surveyName}:props) {
   const path = usePathname();
   const router = useRouter();
+  
   return (
     <header className=" top-0 left-0 w-full h-16 border-2 z-20">
         <div className="bg-secondary-100 h-full w-full px-8 py-3 flex justify-between items-center">
@@ -22,7 +25,9 @@ function QuestionHeader({id, created_by, name, surveyName}:props) {
                 <button onClick={()=>router.push(`/admin/surveys/conditional-display?id=${id}&created_by=${created_by}&name=${surveyName}`)} className={`border text-black bg-primary-300 px-4 py-2 rounded-md text-[14px] font-sem font-semibold ${path === "/admin/surveys/conditional-display" ? "text-white" : "bg-secondary-200"}`}>Conditional display</button>
                 <button onClick={()=>router.push(`/admin/surveys/randomize?id=${id}&created_by=${created_by}&name=${surveyName}`)} className={`border text-black bg-primary-300 px-4 py-2 rounded-md text-[14px] font-sem font-semibold ${path === "/admin/surveys/randomize" ? "text-white" : "bg-secondary-200"}`}>Randomization</button>
                 <button onClick={()=>router.push("/admin/surveys/preview")} className={`border text-black bg-primary-300 px-4 py-2 rounded-md text-[14px] font-sem font-semibold ${path === "/admin/surveys/preview" ? "text-white" : "bg-secondary-200"}`}>Preview</button>
+                
            </div>
+
         </div>
     </header>
   )

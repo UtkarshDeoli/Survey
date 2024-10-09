@@ -4,7 +4,7 @@ import AllQuestions from "@/components/questions/AllQuestions";
 import QuestionHeader from "@/components/questions/QuestionHeader";
 import SurveyForm from "@/components/questions/SurveyForm";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Toaster } from "react-hot-toast";
 
 function Page() {
@@ -12,6 +12,8 @@ function Page() {
   const id = params.get("id");
   const surveyName = params.get("name");
   const created_by = params.get("created_by");
+  const [excelData, setExcelData] = useState<any[]>([]);
+  console.log(excelData)
 
   return (
     <main className="w-full">

@@ -29,10 +29,10 @@ const defaultParams: Params = {
 
 function Page() {
   const [queryParams, setQueryParams] = useState<Params>(defaultParams);
-
   const [searchBarInput, setSearchBarInput] = useState("");
   const [published, setPublished] = useState("all");
   const [sortSelect, setSortSelect] = useState("dateDesc");
+  const [updated,setUpdatd] = useState(false)
   
 
   useEffect(() => {}, [queryParams]);
@@ -57,7 +57,7 @@ function Page() {
 
   return (
     <section className="w-full  bg-[#ECF0FA] h-full">
-      <SurveyHeader />
+      <SurveyHeader setUpdated={setUpdatd}/>
 
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
         <div className="flex justify-between">
@@ -123,7 +123,7 @@ function Page() {
         </div>
       </div>
 
-      <AllSurveys setQueryParams={(params:any)=>setQueryParams((prev)=>({...prev,...params}))} queryParams={queryParams} />
+      <AllSurveys updated={updated} setQueryParams={(params:any)=>setQueryParams((prev)=>({...prev,...params}))} queryParams={queryParams} />
 
     </section>
   );

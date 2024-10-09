@@ -20,7 +20,8 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 interface AllSurveysProps {
   queryParams: Params;
-  setQueryParams:(params:any)=>void
+  setQueryParams:(params:any)=>void,
+  updated:boolean
 }
 interface Params {
   page: number;
@@ -32,7 +33,7 @@ interface Params {
   filter: string;
 }
 
-function AllSurveys({ queryParams, setQueryParams }: AllSurveysProps) {
+function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   const [allSurveys, setAllSurveys] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -50,7 +51,7 @@ function AllSurveys({ queryParams, setQueryParams }: AllSurveysProps) {
 
   useEffect(() => {
     handleGetAllSurveys();
-  }, [queryParams]);
+  }, [queryParams,updated]);
 
   // Delete a survey
   async function handleDeleteSurvey() {

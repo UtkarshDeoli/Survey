@@ -23,7 +23,7 @@ function Layout({ children }: LayoutProps) {
   return (
     <div className="flex">
       <Sidebar sidebarOpen={sidebarOpen} />
-      <div className="w-full flex flex-col">
+      <div className={` flex-col ${sidebarOpen ? "w-[calc(100vw-250px)]" : "w-[calc(100vw-75px)]"}`}>
         <Navbar onSidebarToggle={handleToggle} />
         <main className="w-full h-full">{children}</main>
       </div>

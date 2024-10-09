@@ -3,11 +3,11 @@
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
-import Image from "next/image";
-import { useState } from "react";
-import eye from "../../../../../public/icons/survey_data/eye.png";
-import file_plus from "../../../../../public/icons/survey_data/file_plus.png";
-
+import { useEffect, useState } from "react";
+import { getSurveyResponses } from "@/networks/response_networks";
+import { useSearchParams } from "next/navigation";
+import { AiOutlineFileAdd } from "react-icons/ai";
+import { FaEye } from "react-icons/fa";
 
 interface SurveyResponse {
   userId: string;
@@ -18,44 +18,24 @@ interface SurveyResponse {
   }[];
 }
 
-interface ColumnHead {
-  columns: string[];
-}
-
-
 function page() {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [user,setUsers] = useState <any>("");
+  const searchParams = useSearchParams()
+  const surveyId = searchParams.get("survey_id")
+  const [responses, setResponses] = useState<any[]>([])
 
-    // get colums(questions) from survey info query
-    const columns = [
-      "How Often Does This?",
-      "Compared To Similar",
-      "How Often Does This?",
-      "Compared To Similar",
-    ];
-  
-    // get all responses of this survey
-    const data: SurveyResponse[] = [
-      {
-        userId: "iuyb234fbp9w59",
-        collected_at: "03-Sep-2024 11:47:00",
-        id: "789",
-        questions: [
-          { response: "Very Often" },
-          { response: "Slightly Fair" },
-        ],
-      },
-      {
-        userId: "WE34m567i8234hm",
-        collected_at: "04-Sep-2024 11:47:00",
-        id: "463",
-        questions: [
-          { response: "Occasionally" },
-          { response: "Fair" },
-        ],
-      },
-    ];
+  useEffect(()=>{
+      getUserResponses();
+  },[])
+
+  async function getUserResponses(){
+    const params = {surveyId}
+    const response = await getSurveyResponses(params)
+    console.log("data--->",response.data)
+    setResponses(response.data);
+  }
 
   return (
     <div className="w-full bg-my-gray-100 font-medium">
@@ -136,46 +116,31 @@ function page() {
         </div>
       </div>
 
-      {/* table */}
-      {/* fix/add overflow-scroll */}
-      <div className="px-4 overflow-x-scroll text-my-gray-200">
-        <div className="w-full shadow-md overflow-x-scroll rounded-t-2xl mt-8">
-          <div className="grid grid-cols-7 gap-4 items-center rounded-t-2xl py-4 px-6 bg-my-gray-105 font-semibold border-2 border-secondary-200">
-            <div className="col-span-1">--</div>
-            <div className="col-span-1">ID</div>
-            <div className="col-span-1">Data Collected</div>
-            <div className="col-span-1">User ID</div>
-            {columns.map((column, index) => (
-              <div key={index} className="col-span-1 text-center">
-                {column}
-              </div>
-            ))}
-          </div>
-
-          {data.map((row, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-7 gap-4 items-center p-4 text-black font-normal text-base border bg-white border-gray-200"
-            >
-              <div className="col-span-1 flex justify-center items-center space-x-2">
-                <Image src={file_plus.src} alt="filter icon" height={24} width={24}/>
-                <Image src={eye.src} alt="filter icon" height={24} width={24}/>
-              </div>
-              <div className="col-span-1">{row.id}</div>
-              <div className="col-span-1">{row.collected_at}</div>
-              <div className="col-span-1">{row.userId}</div>
-
-              {columns.map((column, index) => (
-                <div key={index} className="col-span-1 text-center">
-                  {/* if that indexed answer not there, then print - */}
-                  {row.questions[index] && row.questions[index].response
-                    ? row.questions[index].response
-                    : "-"}
-                </div>
+      
+       {/* Table Container */}
+       <div className="overflow-x-auto rounded-t-2xl border border-secondary-200 mx-4">
+        <table className="min-w-full table-auto">
+          <thead>
+            <tr className="bg-secondary-100">
+              <td className="min-w-20 px-4 py-2 border-b"></td>
+              <td className="min-w-20 px-4 py-2 border-b"></td>
+              {responses.length > 0 && responses[0].responses.map((response:any, index:number) => (
+                <td key={index} className="text-secondary-300 px-4 py-2 text-left border-b min-w-20">{response.question}</td>
               ))}
-            </div>
-          ))}
-        </div>
+            </tr>
+          </thead>
+          <tbody className="bg-white">
+            {responses.map((response, rowIndex) => (
+              <tr key={rowIndex}>
+                <td className="min-w-20 px-4 py-2 border-b"><AiOutlineFileAdd /></td>
+                <td className="min-w-20 px-4 py-2 border-b"><FaEye /></td>
+                {response.responses.map((res:any, colIndex:any) => (
+                  <td key={colIndex} className="px-4 py-2 border-b min-w-20 ">{res.response || '-'}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
     </div>

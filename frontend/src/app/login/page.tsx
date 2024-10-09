@@ -94,9 +94,6 @@ export default function login() {
         </div>
       </ReactModal>
 
-
-
-
       <div id="main" className="relative bg-blue-50 rounded-lg shadow-lg p-10 w-full max-w-md">
         <h2 className="text-center text-xl font-semibold text-orange-500 mb-6">
           Survey Login

@@ -7,6 +7,9 @@ import { useSearchParams } from "next/navigation";
 import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import toast from "react-hot-toast";
 import Loader from "../ui/Loader";
+import { saveResponses } from "@/networks/response_networks";
+
+
 
 function SurveyForm() {
   // search params
@@ -26,6 +29,7 @@ function SurveyForm() {
   const [draggingOverIndex, setDraggingOverIndex] = useState<number | null>(
     null,
   );
+  
 
   // React hook form
   const {
