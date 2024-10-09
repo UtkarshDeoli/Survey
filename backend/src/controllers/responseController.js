@@ -57,12 +57,7 @@ exports.getCount = async (req, res) => {
 exports.getAllResponses = async (req, res) => {
   try {
     const surveyId = req.query.surveyId;
-<<<<<<< HEAD
     const response = await Responses.find({ survey_id:surveyId });
-=======
-
-    const response = await Responses.find({ survey_id: surveyId });
->>>>>>> b7660fb2a5bde2322ed2db75d71ea0abaf9d02dd
     if (!response) {
       return res
         .status(404)
