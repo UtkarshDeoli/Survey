@@ -3,25 +3,15 @@
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { getSurveyResponses } from "@/networks/response_networks";
 import { useSearchParams } from "next/navigation";
 import { AiOutlineFileAdd } from "react-icons/ai";
 import { FaEye } from "react-icons/fa";
 
-interface SurveyResponse {
-  userId: string;
-  collected_at: string;
-  id: string;
-  questions: {
-    response?: string
-  }[];
-}
-
-function page() {
+function Page() {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [user,setUsers] = useState <any>("");
   const searchParams = useSearchParams()
   const surveyId = searchParams.get("survey_id")
   const [responses, setResponses] = useState<any[]>([])
@@ -147,4 +137,10 @@ function page() {
   );
 }
 
-export default page;
+const SuspendedCreateSurveyPage = () => (
+  <Suspense>
+    <Page />
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;
