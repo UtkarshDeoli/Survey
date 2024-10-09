@@ -2,17 +2,36 @@ const Responses = require("../models/response");
 
 exports.saveResponse = async (req, res) => {
   try {
-    const { survey_id, responses } = req.body;
-    const count = await Responses.countDocuments({ survey_id });
+    const { survey_id, user_id,responses, other_details } = req.body;
     const response = new Responses({
-      response_id: count + 1,
       survey_id,
+      user_id,
       responses,
+      other_details
     });
     await response.save();
     return res
       .status(201)
       .json({ success: true, message: "Response created successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+exports.saveResponses = async (req, res) => {
+  try {
+    const responsesArray = req.body;
+
+    if (!Array.isArray(responsesArray) || responsesArray.length === 0) {
+      return res.status(400).json({ success: false, message: "Invalid input data" });
+    }
+    await Responses.insertMany(responsesArray);
+
+    return res.status(201).json({
+      success: true,
+      message: `${responsesArray.length} responses saved successfully`,
+    });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success: false, message: error.message });
@@ -38,7 +57,7 @@ exports.getCount = async (req, res) => {
 exports.getAllResponses = async (req, res) => {
   try {
     const surveyId = req.query.surveyId;
-    const response = await Responses.find({ surveyId });
+    const response = await Responses.find({ survey_id:surveyId });
     if (!response) {
       return res
         .status(404)
@@ -66,3 +85,69 @@ exports.getResponse = async (req, res) => {
     return res.status(400).json({ success: "false", message: error.message });
   }
 };
+
+exports.getSurveyResponses = async (req, res) => {
+  try {
+    const { search, sortOrder = 'desc' } = req.query;
+
+    const pipeline = [
+      {
+        $group: {
+          _id: "$survey_id",
+          responseCount: { $sum: 1 },
+          latestResponseCreatedAt: { $max: "$createdAt" }
+        }
+      },
+      {
+        $lookup: {
+          from: "survey99",
+          localField: "_id",
+          foreignField: "_id",
+          as: "surveyDetails"
+        }
+      },
+      {
+        $unwind: "$surveyDetails"
+      },
+      {
+        $project: {
+          _id: 0,
+          survey_id: "$_id",
+          surveyName: "$surveyDetails.name",
+          responseCount: 1,
+          latestResponseCreatedAt: 1,
+          surveyCreatedAt: "$surveyDetails.createdAt"
+        }
+      }
+    ];
+
+    if (search) {
+      pipeline.push({
+        $match: {
+          surveyName: { $regex: search, $options: "i" }
+        }
+      });
+    }
+
+    pipeline.push({
+      $sort: {
+        latestResponseCreatedAt: sortOrder === 'asc' ? 1 : -1 
+      }
+    });
+
+    const results = await Responses.aggregate(pipeline);
+
+    return res.status(200).json({
+      success: true,
+      message: "Responses grouped by survey retrieved successfully",
+      data: results
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+
+
+

@@ -18,6 +18,7 @@ exports.saveSurvey = async (req, res) => {
       access_pin,
       background_location_capture,
       thank_time_duration,
+      questions
     } = req.body;
     console.log(req.files);
     let welcome_image, thankyou_image;
@@ -43,13 +44,16 @@ exports.saveSurvey = async (req, res) => {
       thankyou_image,
       thank_time_duration,
     });
+    if (questions && Array.isArray(questions) && questions.length > 0) {
+      survey.questions = questions;
+    }
     await survey.save();
 
     return res
       .status(201)
       .json({ success: true, message: "Survey created successfully", survey });
   } catch (error) {
-    console.log(error);
+    console.log("error is-->",error);
     return res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -159,7 +163,7 @@ exports.getAllSurvey = async (req, res) => {
     }
 
     const findOptions = searchConditions.length > 0 ? { $and: searchConditions } : {};
-    console.log("findoptions are-->",findOptions)
+    
 
     const total = await Survey.countDocuments(findOptions);
 
@@ -200,6 +204,7 @@ exports.updateSurvey = async (req, res) => {
       questions,
       thank_time_duration,
       published,
+      response_count
     } = req.body;
 
     let updateFields = {};
@@ -211,6 +216,7 @@ exports.updateSurvey = async (req, res) => {
     if (questions !== undefined && questions !== null) updateFields.questions = questions;
     if (thank_time_duration !== undefined && thank_time_duration !== null) updateFields.thank_time_duration = thank_time_duration;
     if (published !== undefined && published !== null) updateFields.published = published;
+    if (response_count !== undefined && response_count !== null) updateFields.response_count = response_count;
 
     if (req.files && req.files.welcome_image) {
       console.log("Welcome image found");

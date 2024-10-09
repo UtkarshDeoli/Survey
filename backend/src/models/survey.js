@@ -35,7 +35,12 @@ const surveySchema = new Schema({
         default: false
     },
     questions: {
-        type: Schema.Types.Mixed
+        type: Schema.Types.Mixed,
+        default:[]
+    },
+    response_count :{
+        type:Number,
+        default:0
     }
 },{timestamps:true});
 
