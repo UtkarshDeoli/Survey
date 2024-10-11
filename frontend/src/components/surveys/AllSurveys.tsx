@@ -7,7 +7,7 @@ import {
   getAllSurveys,
   updateSurvey,
 } from "@/networks/survey_networks";
-import { formatDate } from "@/utils/common_functions";
+import { checkToken, formatDate } from "@/utils/common_functions";
 import { useRouter } from "next/navigation";
 import { FaRegEdit, FaRegUser } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import Loader from "../ui/Loader";
 import Switch from "react-switch"; // Using a third-party switch component for toggle
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { getAllUsers, getUser, updateMultipleUsers } from "@/networks/user_networks";
 
 interface AllSurveysProps {
   queryParams: Params;
@@ -46,12 +47,27 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   );
   const [publishModal, setPublishModal] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [users, setUsers] = useState<any[]>([]);
+  const [assignModal, setAssignModal] = useState<boolean>(false);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [surveyToAssign,setSurveyToAssign] = useState <string>("")
+  const [user,setUser] = useState <any> (null);
+  console.log("users----------->",users)
+  console.log("selected users ----- >",selectedUsers)
+  console.log("survey to assign -- >",surveyToAssign)
 
   const router = useRouter();
 
   useEffect(() => {
     handleGetAllSurveys();
   }, [queryParams,updated]);
+  useEffect(()=>{
+    const token = checkToken()
+    if(token){
+      setUser(token)
+    }
+    getUsers()
+  },[])
 
   // Delete a survey
   async function handleDeleteSurvey() {
@@ -69,6 +85,14 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       toast.error("Failed to delete survey");
     }
   }
+
+  const handleUserSelection = (userId: string) => {
+    setSelectedUsers((prevSelected) =>
+      prevSelected.includes(userId)
+        ? prevSelected.filter((id) => id !== userId)
+        : [...prevSelected, userId]
+    );
+  };
 
   // Toggle publish/unpublish survey
   async function handlePublishSurvey() {
@@ -99,6 +123,14 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
     console.log(response)
     setAllSurveys(response.surveys);
     setTotalPages(response.totalPages);
+    setLoading(false);
+  }
+
+  async function getUsers() {
+    setLoading(true);
+    const response = await getAllUsers({selectedRole:"Survey Collector"});
+    console.log(response.data)
+    setUsers(response.data);
     setLoading(false);
   }
 
@@ -135,6 +167,42 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       setQueryParams({ ...queryParams, page: queryParams.page - 1 });
     }
   };
+
+  async function handleAssignSurvey(){
+    const paramsUsers = selectedUsers.map((user)=>{
+      const userData = users.find(el=>el._id ===user)
+      let prevSurveys
+      if(userData){
+        prevSurveys = [...userData.assigned_survey]
+      }
+      console.log("user data --- >",userData)
+      let assigned_survey
+      console.log("previous surveys--->",prevSurveys)
+      if(prevSurveys && prevSurveys.includes(surveyToAssign)) assigned_survey = prevSurveys
+      else if(prevSurveys) assigned_survey = [...prevSurveys,surveyToAssign]
+      return {
+        user_id : user,
+        assigned_survey
+      }
+    })
+    
+    const params = {
+      users:paramsUsers
+    }
+    setLoading(true)
+    const response = await updateMultipleUsers(params);
+    console.log(response);
+    if(response.success){
+      toast.success("Survey assigned to users successfully!")
+      getAllSurveys(queryParams)
+    }else{
+      toast.error("Something went wrong")
+    }
+    setLoading(false)
+    setAssignModal(false)
+    setActiveDropdown(null)
+    setSelectedUsers([])
+  }
 
   return (
     <div className="w-full px-5 py-5 text-sm">
@@ -194,7 +262,12 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                       >
                         <FaRegEdit /> Edit
                       </button>
-                      <button className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
+                      <button
+                      onClick={()=>{
+                        setSurveyToAssign(el._id);
+                        setAssignModal(true);
+                      }}
+                      className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
                         <FaRegUser /> Assign to user
                       </button>
                       <button
@@ -325,6 +398,28 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
               No
             </ButtonFilled>
           </div>
+        </div>
+      </CustomModal>
+       {/* Assign Survey to Users Modal */}
+       <CustomModal open={assignModal} closeModal={() => {setAssignModal(false); setSelectedUsers([]);}}>
+        <div className="flex flex-col h-[40vh] w-[40vw] p-5 justify-center items-center gap-5">
+          <h1 className="text-xl w-full text-center">Select users to assign the survey</h1>
+          <div className="flex flex-col gap-4 max-h-60 w-full overflow-y-auto justify-center items-center">
+            {users && user && users.map(({_id,email,name,assigned_survey}) => {
+              if(user.id === _id){
+                return null
+              }
+              return(
+                  <label key={user._id} className="cursor-pointer flex items-center gap-10 min-w-[50%] justify-between">
+                    {name || email}
+                    <input className="h-5 w-5 disabled:cursor-not-allowed" disabled ={assigned_survey.includes(surveyToAssign)} type="checkbox" defaultChecked = {assigned_survey.includes(surveyToAssign)} checked = {selectedUsers.includes(_id)} onChange={() => handleUserSelection(_id)} />
+                  </label>
+                )
+              })}
+          </div>
+          <ButtonFilled onClick={handleAssignSurvey} className="w-40">
+            Assign Survey
+          </ButtonFilled>
         </div>
       </CustomModal>
     </div>

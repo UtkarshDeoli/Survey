@@ -7,6 +7,7 @@ import {
   get_all_users,
   add_users,
   get_all_chats_data,
+  update_users,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -23,6 +24,23 @@ export const updateUsers = async (params: IUser) => {
     };
     const response = await axios.request(options);
     return response.data.success;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+export const updateMultipleUsers = async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "POST",
+      url: `${SERVER_URI}/${update_users}`,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+      data: params,
+    };
+    const response = await axios.request(options);
+    return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }

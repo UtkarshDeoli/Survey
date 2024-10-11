@@ -7,9 +7,9 @@ interface LayoutProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick?:()=>void
 }
 
-function ButtonFilled({children, className,onClick} : LayoutProps) {
+function ButtonFilled({children, className,onClick,...props} : LayoutProps) {
   return (
-    <button onClick={onClick} className={twMerge('border text-white bg-primary-300 px-4 py-2 rounded-md',className)}>
+    <button {...props} onClick={onClick} className={twMerge('border text-white bg-primary-300 px-4 py-2 rounded-md',className)}>
         {children}
     </button>
   )

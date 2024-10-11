@@ -5,7 +5,7 @@ import ResponseChart from "./ResponseChart";
 interface Props {
   questionTitle: string;
   responses: {
-    responseTitle: string;
+    response_value: string;
     count: number;
   }[];
   totalResponses: number;
@@ -41,7 +41,7 @@ function QuestionDataCard({ questionTitle, responses, totalResponses }: Props) {
                 key={index}
                 className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
               >
-                <td className="py-2 px-4 border-b">{row.responseTitle}</td>
+                <td className="py-2 px-4 border-b">{row.response_value}</td>
                 <td className="py-2 px-4 border-b text-center">{row.count}</td>
                 <td className="py-2 px-4 border-b text-center">
                   {percentage}%

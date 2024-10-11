@@ -78,8 +78,8 @@ function SurveyHeader({setUpdated}:props) {
               const responses: any = [];
               Object.keys(data).forEach((key, ind) => {
                 let obj: any = {};
-                obj.response = data[key];
-                obj.question_id = 1;
+                obj.response = String(data[key]);
+                obj.question_id = ind+10;
                 obj.question = key;
                 obj.question_type = "Single line Text Input";
                 responses.push(obj);

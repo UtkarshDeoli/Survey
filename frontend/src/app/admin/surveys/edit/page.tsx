@@ -170,6 +170,14 @@ function Page() {
                   className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
                 />
               </div>
+              <div className="grid grid-cols-3">
+                <label className="text-secondary-300 font-medium">Header text</label>
+                <input
+                  value={surveyData?.header_text || ""}
+                  {...register("header_text")}
+                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
+                />
+              </div>
 
               {/* Welcome Image */}
               <div className="grid grid-cols-3">

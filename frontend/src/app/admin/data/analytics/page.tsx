@@ -3,7 +3,7 @@ import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
-import { getSurvey } from "@/networks/survey_networks";
+import { getSurvey, getSurveyResponseStats } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import QuestionChart from "@/components/data/QuestionChart";
@@ -18,6 +18,7 @@ interface QuestionResponseData {
 }
 
 function Page() {
+  const [responseStats,setResponseStats] = useState <any[]>([]);
   const searchParams = useSearchParams();
   const surveyID = searchParams.get("survey_id");
 
@@ -88,16 +89,18 @@ function Page() {
 
   //const [surveyResponseData, setSurveyResponseData] = useState<any>([]);
 
-  // useEffect(() => {
-  //   fetchSurveyData();
-  // }, []);
+  useEffect(() => {
+    fetchSurveyData();
+  }, []);
 
-  // async function fetchSurveyData() {
-  //   console.log("fetching survey data for id", surveyID);
-  //   const response = await getSurvey({ _id: surveyID });
-  //   setSurveyResponseData(response.data.questions);
-  //   console.log("Surveydata:", response.data.questions);
-  // }
+  async function fetchSurveyData() {
+    const response = await getSurveyResponseStats({ survey_id: surveyID });
+    console.log("response is---->",response.data);
+    if(response.success){
+      setResponseStats(response.data)
+    }
+    
+  }
 
   return (
     <div className="w-full bg-[#ECF0FA]  font-medium ">
@@ -151,14 +154,14 @@ function Page() {
       </div>
 
       <div className="p-5 text-sm text-my-gray-200">
-        {surveyResponseData.questions.map(
-          (responseData: QuestionResponseData, index: number) => {
+        {responseStats && responseStats.length > 0 && responseStats.map(
+          (responseData:any, index: number) => {
             return (
               <QuestionChart
                 key={index}
-                questionTitle={responseData.questionTitle}
+                questionTitle={responseData.question}
                 responses={responseData.responses}
-                totalResponses={responseData.totalResponses}
+                totalResponses={responseData.total_responses}
               />
             );
           },

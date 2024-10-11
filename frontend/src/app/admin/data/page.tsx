@@ -22,10 +22,8 @@ function page() {
   const [reset,setReset] = useState <boolean>(false)
   
   const router = useRouter();
-  function handleClick(target: string) {
-    router.push(`/admin/data/${target}?survey_id=66e46be571b4ac2116bf1f9c`);
-  }
- 
+  
+ console.log(data)
   useEffect(()=>{
     getResponses()
    },[sortOrder,reset])
@@ -129,8 +127,9 @@ function page() {
               <p className="col-span-1 flex justify-center items-center">
                 <BsPieChart
                   size={24}
-                  onClick={() => {
-                    handleClick("analytics");
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  router.push(`/admin/data/analytics?survey_id=${el.survey_id}`)
                   }}
                   className="cursor-pointer"
                 />

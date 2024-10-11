@@ -28,7 +28,7 @@ ChartJS.register(
 
 interface ResponseChartProps {
   responses: {
-    responseTitle: string;
+    response_value: string;
     count: number;
   }[];
   chartType: "column" | "bar" | "pie" | "line";
@@ -36,7 +36,7 @@ interface ResponseChartProps {
 
 function ResponseChart({ responses, chartType }: ResponseChartProps) {
   console.log(chartType);
-  const labels = responses.map((item) => item.responseTitle);
+  const labels = responses.map((item) => item.response_value);
   const dataValues = responses.map((item) => item.count);
   const backgroundColors = [
     "#EF9595",
