@@ -7,6 +7,7 @@ router.get("/getAllUsers", userController.getAllUsers);
 router.post("/addUsers", userController.addUsers);
 router.post("/addMultipleUsers", userController.addMultipleUsers);
 router.post("/updateUser", userController.updateUser);
+router.post("/updateUsers", userController.updateUsers);
 router.post("/uploadProfilePicture", userController.uploadProfilePicture);
 
 module.exports = router;

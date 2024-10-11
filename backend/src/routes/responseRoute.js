@@ -8,6 +8,7 @@ router.post("/saveResponse", responseController.saveResponse);
 router.post("/saveResponses", responseController.saveResponses);
 router.get("/getCount", responseController.getCount);
 router.get("/getAllSurveyResponses", responseController.getSurveyResponses);
+router.get("/getSurveyResponseStats", responseController.getSurveyResponseStats);
 
 module.exports = router;
 

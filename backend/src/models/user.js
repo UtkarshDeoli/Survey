@@ -66,7 +66,12 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  assigned_survey: [String],
+  assigned_survey: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Survey99", 
+    },
+  ],
   status: {
     type: String,
     enum: ["active", "inactive"],

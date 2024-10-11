@@ -55,11 +55,11 @@ exports.addMultipleUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const user = req.body;
-    if (!user || !user.username) {
+    if (!user || !user.user_id) {
       return res.status(400).json({ error: "Username is required" });
     }
     const dbRes = await User.findOneAndUpdate(
-      { username: user.username },
+      {_id: user.user_id },
       { $set: user },
       { new: true, runValidators: true }
     );
@@ -72,6 +72,50 @@ exports.updateUser = async (req, res) => {
       .json({ success: false, message: "something went wrong" });
   }
 };
+
+exports.updateUsers = async (req, res) => {
+  try {
+    const {users} = req.body;
+    console.log(users)
+    
+    if (!Array.isArray(users) || users.length === 0) {
+      return res.status(400).json({ error: "No users provided for update" });
+    }
+
+    const updatePromises = users.map(user => {
+      if (!user.user_id) {
+        return Promise.reject(new Error("User ID is required for each user"));
+      }
+
+      let updateFields = {};
+      
+      if (user.name !== undefined) updateFields.name = user.name;
+      if (user.email !== undefined) updateFields.email = user.email;
+      if (user.phone_number !== undefined) updateFields.phone_number = user.phone_number;
+      if (user.role !== undefined) updateFields.role = user.role;
+      if (user.assigned_survey !== undefined) {
+        updateFields.assigned_survey= user.assigned_survey ;
+      }
+
+      return User.findOneAndUpdate(
+        { _id: user.user_id },
+        { $set: updateFields },
+        { new: true, runValidators: true }
+      );
+    });
+
+    const dbRes = await Promise.all(updatePromises); 
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Users updated successfully", updatedUsers: dbRes });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+  }
+};
+
 
 exports.getUser = async (req, res) => {
   try {
