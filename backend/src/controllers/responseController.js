@@ -1,8 +1,30 @@
+const MediaResponse = require("../models/mediaResponse");
 const Responses = require("../models/response");
 const mongoose = require("mongoose");
 exports.saveResponse = async (req, res) => {
   try {
-    const { survey_id, user_id, responses, other_details } = req.body;
+    const { survey_id, user_id, responses, other_details, media_responses } =
+      req.body;
+
+    if (media_responses) {
+      Object.entries(media_responses).map(([key, value]) => {
+        const mediaBuffer = Buffer.from(value.data, "base64");
+        const mediaResponse = new MediaResponse({
+          userId: user_id,
+          surveyId: survey_id,
+          type: value.type,
+          data: mediaBuffer,
+        });
+        mediaResponse.save();
+
+        for (let response of responses) {
+          if (response.question_id == key) {
+            response.response = mediaResponse._id;
+          }
+        }
+      });
+    }
+
     const response = new Responses({
       survey_id,
       user_id,
@@ -59,7 +81,7 @@ exports.getCount = async (req, res) => {
 exports.getAllResponses = async (req, res) => {
   try {
     const { surveyId, userId, startDate, endDate, filters } = req.query;
-    console.log("query is------>",req.query);
+    console.log("query is------>", req.query);
     const matchStage = {};
 
     matchStage.survey_id = new mongoose.Types.ObjectId(String(surveyId));
@@ -80,11 +102,11 @@ exports.getAllResponses = async (req, res) => {
       }
     }
     const responseFilters = [];
-    console.log("filters are-->",filters)
+    console.log("filters are-->", filters);
     if (filters) {
-      console.log("filteres there")
+      console.log("filteres there");
       const filterArray = [JSON.parse(filters)];
-      console.log("fa-->",filterArray);
+      console.log("fa-->", filterArray);
       filterArray.forEach(({ question, operator, response: answer }) => {
         const filter = {
           question_id: Number(question),
@@ -97,7 +119,7 @@ exports.getAllResponses = async (req, res) => {
             filter.response = answer;
             break;
           case "not equals":
-            filter.response ={ $ne: answer };
+            filter.response = { $ne: answer };
             break;
           case "starts with":
             filter.response = { $regex: `^${answer}`, $options: "i" };
@@ -132,26 +154,26 @@ exports.getAllResponses = async (req, res) => {
     }
     const aggregationPipeline = [
       {
-        $match: matchStage, 
+        $match: matchStage,
       },
-      { 
-        $unwind: "$responses"
+      {
+        $unwind: "$responses",
       },
       {
         $project: {
-          _id: 1, 
-          user_id:1,
+          _id: 1,
+          user_id: 1,
           survey_id: 1,
           other_details: 1,
           "responses.question_id": 1,
-          "responses.question_type":1,
-          "responses.question":1,
+          "responses.question_type": 1,
+          "responses.question": 1,
           "responses.response": {
             $cond: {
               if: {
                 $regexMatch: {
                   input: { $toString: "$responses.response" },
-                  regex: /^\d+(\.\d+)?$/, 
+                  regex: /^\d+(\.\d+)?$/,
                 },
               },
               then: { $toDouble: "$responses.response" },
@@ -159,9 +181,9 @@ exports.getAllResponses = async (req, res) => {
             },
           },
         },
-      }
-    ]
-    if(responseFilters && responseFilters.length > 0){
+      },
+    ];
+    if (responseFilters && responseFilters.length > 0) {
       aggregationPipeline.push({
         $match: {
           $or: responseFilters.map((response) => {
@@ -171,29 +193,29 @@ exports.getAllResponses = async (req, res) => {
             };
           }),
         },
-      },)
+      });
     }
-    aggregationPipeline.push( {
+    aggregationPipeline.push({
       $group: {
         _id: "$_id",
-        user_id: { $first: "$user_id" }, 
-        survey_id: { $first: "$survey_id" }, 
-        other_details: { $first: "$other_details" }, 
+        user_id: { $first: "$user_id" },
+        survey_id: { $first: "$survey_id" },
+        other_details: { $first: "$other_details" },
         responses: { $push: "$responses" },
       },
-    },)
+    });
 
-    console.log(JSON.stringify(aggregationPipeline,null,2))
+    console.log(JSON.stringify(aggregationPipeline, null, 2));
     const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
     if (!Array.isArray(filteredResponse)) {
-      return res.status(500).json({ success: false, message: "Unexpected result format." });
+      return res
+        .status(500)
+        .json({ success: false, message: "Unexpected result format." });
     }
 
-      const promises = filteredResponse.map(res=>Responses.findById(res._id))
-      const finalRes = await Promise.all(promises);
-      
-    
+    const promises = filteredResponse.map((res) => Responses.findById(res._id));
+    const finalRes = await Promise.all(promises);
 
     if (!finalRes || finalRes.length === 0) {
       return res
@@ -297,11 +319,11 @@ exports.getSurveyResponseStats = async (req, res) => {
     const stats = await Responses.aggregate([
       {
         $match: {
-          survey_id: new mongoose.Types.ObjectId(String(survey_id)) 
-        }
+          survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+        },
       },
       {
-        $unwind: "$responses"
+        $unwind: "$responses",
       },
       {
         $group: {
@@ -311,38 +333,38 @@ exports.getSurveyResponseStats = async (req, res) => {
             $push: {
               response: "$responses.response",
               question_type: "$responses.question_type",
-            }
+            },
           },
-          total_responses: { $sum: 1 } 
-        }
+          total_responses: { $sum: 1 },
+        },
       },
 
       {
-        $unwind: "$responses"
+        $unwind: "$responses",
       },
       {
         $group: {
           _id: {
             question_id: "$_id",
-            response_value: "$responses.response" 
+            response_value: "$responses.response",
           },
           question: { $first: "$question" },
-          response_count: { $sum: 1 }, 
-          total_responses: { $first: "$total_responses" } 
-        }
+          response_count: { $sum: 1 },
+          total_responses: { $first: "$total_responses" },
+        },
       },
       {
         $group: {
           _id: "$_id.question_id",
-          question: { $first: "$question" }, 
-          total_responses: { $first: "$total_responses" }, 
+          question: { $first: "$question" },
+          total_responses: { $first: "$total_responses" },
           responses: {
             $push: {
               response_value: "$_id.response_value",
-              count: "$response_count"
-            }
-          }
-        }
+              count: "$response_count",
+            },
+          },
+        },
       },
       {
         $project: {
@@ -350,13 +372,29 @@ exports.getSurveyResponseStats = async (req, res) => {
           question_id: "$_id",
           question: 1,
           total_responses: 1,
-          responses: 1
-        }
-      }
+          responses: 1,
+        },
+      },
     ]);
-    return res.status(200).json({success:true, data:stats});
+    return res.status(200).json({ success: true, data: stats });
   } catch (error) {
     console.error("Error fetching survey response stats:", error);
     return res.status(500).json({ message: "Internal server error." });
+  }
+};
+exports.getMediaResource = async (req, res) => {
+  console.log("get media resource called");
+  try {
+    const mediaId = req.query.mediaId;
+    const media = await MediaResponse.findById(mediaId);
+    if (!media) {
+      return res
+        .status(404)
+        .json({ success: "false", message: "Media not found" });
+    } else {
+      return res.status(201).json({ success: "true", data: media });
+    }
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
   }
 };

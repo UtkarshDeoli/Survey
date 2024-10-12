@@ -58,7 +58,7 @@ const chatEvents = (socket, io) => {
         throw new Error("Room not found");
       }
 
-      const message = { sender: senderId, content };
+      const message = { sender: senderId, content, chat_room_id: roomId };
       const messageDocument = new Message(message);
       messageDocument.save();
 

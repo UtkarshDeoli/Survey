@@ -8,6 +8,11 @@ const messageSchema = new Schema(
       required: true,
       ref: "User99",
     },
+    chat_room_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "ChatRoom99",
+    },
     content: { type: String, required: true },
     //delivered: { type: Boolean, default: false },
     read: { type: Boolean, default: false },

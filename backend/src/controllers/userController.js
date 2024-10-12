@@ -59,9 +59,9 @@ exports.updateUser = async (req, res) => {
       return res.status(400).json({ error: "Username is required" });
     }
     const dbRes = await User.findOneAndUpdate(
-      {_id: user.user_id },
+      { _id: user.user_id },
       { $set: user },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     return res
       .status(200)
@@ -75,23 +75,24 @@ exports.updateUser = async (req, res) => {
 
 exports.updateUsers = async (req, res) => {
   try {
-    const {users} = req.body;
-    console.log(users)
-    
+    const { users } = req.body;
+    console.log(users);
+
     if (!Array.isArray(users) || users.length === 0) {
       return res.status(400).json({ error: "No users provided for update" });
     }
 
-    const updatePromises = users.map(user => {
+    const updatePromises = users.map((user) => {
       if (!user.user_id) {
         return Promise.reject(new Error("User ID is required for each user"));
       }
 
       let updateFields = {};
-      
+
       if (user.name !== undefined) updateFields.name = user.name;
       if (user.email !== undefined) updateFields.email = user.email;
-      if (user.phone_number !== undefined) updateFields.phone_number = user.phone_number;
+      if (user.phone_number !== undefined)
+        updateFields.phone_number = user.phone_number;
       if (user.role !== undefined) updateFields.role = user.role;
       if (user.assigned_survey !== undefined) {
         updateFields.$addToSet = {assigned_survey : user.assigned_survey}
@@ -107,28 +108,38 @@ exports.updateUsers = async (req, res) => {
       );
     });
 
-    const dbRes = await Promise.all(updatePromises); 
+    const dbRes = await Promise.all(updatePromises);
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Users updated successfully", updatedUsers: dbRes });
-
+    return res.status(200).json({
+      success: true,
+      message: "Users updated successfully",
+      updatedUsers: dbRes,
+    });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
   }
 };
 
-
 exports.getUser = async (req, res) => {
   try {
-    console.log("get single user hitting");
     const _id = req.query.userId;
-    console.log(_id);
+    const assignedSurveys = req.query.assignedSurveys;
+    if (assignedSurveys) {
+      const assignedSurveys = await User.findOne({ _id: _id })
+        .populate("assigned_survey")
+        .select("assigned_survey _id");
+      return res.status(200).json({ success: true, data: assignedSurveys });
+    }
+
     const user = await User.findOne({ _id: _id });
-    console.log(user);
     return res.status(200).json({ success: true, data: user });
   } catch (error) {
+    console.log(error);
     return res
       .status(400)
       .json({ success: false, message: "something went wrong" });
@@ -137,7 +148,7 @@ exports.getUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    console.log(req.query)
+    console.log(req.query);
     let filter = req.query.filter || "";
     let created_by = req.query.created_by;
     const getWithProfilePicture = Boolean(req.query.getWithProfilePicture);
@@ -177,16 +188,14 @@ exports.getAllUsers = async (req, res) => {
 
     const total = await User.countDocuments(query);
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        data: users,
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      });
+    return res.status(200).json({
+      success: true,
+      data: users,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     return res
       .status(400)
@@ -209,7 +218,7 @@ exports.uploadProfilePicture = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { profile_picture: profilePicture._id } },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({

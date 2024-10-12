@@ -1,10 +1,10 @@
 const ChatRoom = require("../models/chatRoom");
-const ObjectId = require("mongoose").Types.ObjectId;
+const Message = require("../models/message");
 const User = require("../models/user");
 
 exports.getAllChatsData = async (req, res) => {
   try {
-  const { currentUserId, filter, role, page=1, limit=10 } = req.query;
+    const { currentUserId, filter, role, page = 1, limit = 10 } = req.query;
 
     const validRoles = [
       "Admin",
@@ -13,7 +13,7 @@ exports.getAllChatsData = async (req, res) => {
       "Support Executive",
       "Survey Manager",
     ];
-    const skip = (page-1)*limit;
+    const skip = (page - 1) * limit;
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });
     searchConditions.push({ username: { $regex: filter, $options: "i" } });
@@ -38,7 +38,7 @@ exports.getAllChatsData = async (req, res) => {
       })
       .populate("profile_picture")
       .skip(skip)
-      .limit(Number(limit))
+      .limit(Number(limit));
 
     const total = await User.countDocuments(query);
 
@@ -47,6 +47,13 @@ exports.getAllChatsData = async (req, res) => {
         const chatRoom = await ChatRoom.findOne({
           participants: { $all: [currentUserId, user._id] },
         }).populate("lastMessage");
+
+        const unreadMessages = chatRoom
+          ? await Message.countDocuments({
+              chat_room_id: chatRoom._id,
+              read: false,
+            })
+          : 0;
 
         let lastMessageData = null;
         if (chatRoom) {
@@ -87,8 +94,9 @@ exports.getAllChatsData = async (req, res) => {
 
     res
       .status(200)
-      .json({ success: true, data: sortedUsersWithLastMessageData , total});
+      .json({ success: true, data: sortedUsersWithLastMessageData, total });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ success: false, message: error.message });
   }
 };

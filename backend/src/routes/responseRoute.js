@@ -9,6 +9,6 @@ router.post("/saveResponses", responseController.saveResponses);
 router.get("/getCount", responseController.getCount);
 router.get("/getAllSurveyResponses", responseController.getSurveyResponses);
 router.get("/getSurveyResponseStats", responseController.getSurveyResponseStats);
+router.get("/getMediaResource", responseController.getMediaResource);
 
 module.exports = router;
-

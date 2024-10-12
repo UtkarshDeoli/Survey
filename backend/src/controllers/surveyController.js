@@ -1,6 +1,5 @@
 const Survey = require("../models/survey");
 
-
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -18,20 +17,20 @@ exports.saveSurvey = async (req, res) => {
       access_pin,
       background_location_capture,
       thank_time_duration,
-      questions
+      questions,
     } = req.body;
     console.log(req.files);
     let welcome_image, thankyou_image;
     if (req.files && req.files.welcome_image) {
       welcome_image = req.files.welcome_image.data;
-    }else{
-      welcome_image = null
+    } else {
+      welcome_image = null;
     }
 
     if (req.files && req.files.thankyou_image) {
       thankyou_image = req.files.thankyou_image.data;
-    }else{
-      thankyou_image = null
+    } else {
+      thankyou_image = null;
     }
 
     const survey = new Survey({
@@ -53,7 +52,7 @@ exports.saveSurvey = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Survey created successfully", survey });
   } catch (error) {
-    console.log("error is-->",error);
+    console.log("error is-->", error);
     return res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -85,10 +84,12 @@ exports.getSurvey = async (req, res) => {
     const id = req.query._id;
     const survey = await Survey.findById(id);
     if (!survey) {
-      return res.status(404).json({ success: false, message: "Survey not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Survey not found" });
     }
 
-//*** This is the logic for randomisation , that may be added in case when we request the actual forms ***//
+    //*** This is the logic for randomisation , that may be added in case when we request the actual forms ***//
     // const questions = survey.questions;
 
     // const questionsToRandomize = [];
@@ -116,7 +117,7 @@ exports.getSurvey = async (req, res) => {
     return res.status(200).json({
       success: true,
       // data: { ...survey, questions: finalQuestions },
-      data:survey
+      data: survey,
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
@@ -128,15 +129,16 @@ exports.getAllSurvey = async (req, res) => {
     console.log("route getAll hitting");
 
     const {
-      filter = "",  // Default filter to an empty string
+      filter = "", // Default filter to an empty string
       page = 1,
       limit = 10,
       sortBy = "name",
       sortOrder = "asc",
       created_by,
       published,
+      user_id,
     } = req.query;
-    console.log(req.query)
+    console.log(req.query);
 
     const order = sortOrder === "asc" ? 1 : -1;
     const skip = (page - 1) * limit;
@@ -158,12 +160,16 @@ exports.getAllSurvey = async (req, res) => {
       searchConditions.push({ created_by });
     }
 
-    if (published !== undefined && published !== "" && published !== "undefined") {
+    if (
+      published !== undefined &&
+      published !== "" &&
+      published !== "undefined"
+    ) {
       searchConditions.push({ published: published === "true" });
     }
 
-    const findOptions = searchConditions.length > 0 ? { $and: searchConditions } : {};
-    
+    const findOptions =
+      searchConditions.length > 0 ? { $and: searchConditions } : {};
 
     const total = await Survey.countDocuments(findOptions);
 
@@ -191,7 +197,6 @@ exports.getAllSurvey = async (req, res) => {
   }
 };
 
-
 exports.updateSurvey = async (req, res) => {
   try {
     const id = req.query._id;
@@ -204,24 +209,34 @@ exports.updateSurvey = async (req, res) => {
       questions,
       thank_time_duration,
       published,
-      response_count
+      response_count,
     } = req.body;
 
     let updateFields = {};
-    
+
     if (name !== undefined && name !== null) updateFields.name = name;
-    if (header_text !== undefined && header_text !== null) updateFields.header_text = header_text;
-    if (access_pin !== undefined && access_pin !== null) updateFields.access_pin = access_pin;
-    if ( background_location_capture !== undefined && background_location_capture !== null ) updateFields.background_location_capture = background_location_capture;
-    if (questions !== undefined && questions !== null) updateFields.questions = questions;
-    if (thank_time_duration !== undefined && thank_time_duration !== null) updateFields.thank_time_duration = thank_time_duration;
-    if (published !== undefined && published !== null) updateFields.published = published;
-    if (response_count !== undefined && response_count !== null) updateFields.response_count = response_count;
+    if (header_text !== undefined && header_text !== null)
+      updateFields.header_text = header_text;
+    if (access_pin !== undefined && access_pin !== null)
+      updateFields.access_pin = access_pin;
+    if (
+      background_location_capture !== undefined &&
+      background_location_capture !== null
+    )
+      updateFields.background_location_capture = background_location_capture;
+    if (questions !== undefined && questions !== null)
+      updateFields.questions = questions;
+    if (thank_time_duration !== undefined && thank_time_duration !== null)
+      updateFields.thank_time_duration = thank_time_duration;
+    if (published !== undefined && published !== null)
+      updateFields.published = published;
+    if (response_count !== undefined && response_count !== null)
+      updateFields.response_count = response_count;
 
     if (req.files && req.files.welcome_image) {
       console.log("Welcome image found");
       updateFields.welcome_image = req.files.welcome_image.data;
-    } else if (req.body.welcome_image === '') {
+    } else if (req.body.welcome_image === "") {
       // If the frontend sends an empty array for welcome_image, delete it
       console.log("Deleting welcome image");
       updateFields.welcome_image = null;
@@ -233,7 +248,7 @@ exports.updateSurvey = async (req, res) => {
     if (req.files && req.files.thankyou_image) {
       console.log("Thankyou image found");
       updateFields.thankyou_image = req.files.thankyou_image.data;
-    } else if (req.body.thankyou_image === '') {
+    } else if (req.body.thankyou_image === "") {
       // If the frontend sends an empty array for thankyou_image, delete it
       console.log("Deleting thankyou image");
       updateFields.thankyou_image = null;

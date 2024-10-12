@@ -69,7 +69,7 @@ const userSchema = new Schema({
   assigned_survey: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Survey99", 
+      ref: "Survey99",
     },
   ],
   status: {
