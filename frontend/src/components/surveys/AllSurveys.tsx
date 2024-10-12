@@ -50,11 +50,12 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   const [users, setUsers] = useState<any[]>([]);
   const [assignModal, setAssignModal] = useState<boolean>(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [deSelectedUsers, setDeSelectedUsers] = useState<string[]>([]);
   const [surveyToAssign,setSurveyToAssign] = useState <string>("")
   const [user,setUser] = useState <any> (null);
-  console.log("users----------->",users)
-  console.log("selected users ----- >",selectedUsers)
-  console.log("survey to assign -- >",surveyToAssign)
+
+  console.log("selected Users --->",selectedUsers);
+  console.log("deselected Users --->",deSelectedUsers);
 
   const router = useRouter();
 
@@ -87,11 +88,14 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   }
 
   const handleUserSelection = (userId: string) => {
-    setSelectedUsers((prevSelected) =>
-      prevSelected.includes(userId)
-        ? prevSelected.filter((id) => id !== userId)
-        : [...prevSelected, userId]
-    );
+    if(selectedUsers.includes(userId)){
+      setSelectedUsers((prevSelectedUsers=>prevSelectedUsers.filter(u=>u !== userId)))
+      setDeSelectedUsers(prevDeSelectedUsers=>[...prevDeSelectedUsers,userId])
+    }
+    else{
+      setSelectedUsers(prevSelectedUsers=>[...prevSelectedUsers,userId])
+      setDeSelectedUsers(prevDeSelectedUsers=>prevDeSelectedUsers.filter(u=>u !== userId))
+    } 
   };
 
   // Toggle publish/unpublish survey
@@ -169,32 +173,36 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   };
 
   async function handleAssignSurvey(){
-    const paramsUsers = selectedUsers.map((user)=>{
-      const userData = users.find(el=>el._id ===user)
-      let prevSurveys
-      if(userData){
-        prevSurveys = [...userData.assigned_survey]
-      }
-      console.log("user data --- >",userData)
-      let assigned_survey
-      console.log("previous surveys--->",prevSurveys)
-      if(prevSurveys && prevSurveys.includes(surveyToAssign)) assigned_survey = prevSurveys
-      else if(prevSurveys) assigned_survey = [...prevSurveys,surveyToAssign]
+    let paramsUsers:any= selectedUsers.map((user)=>{
       return {
         user_id : user,
-        assigned_survey
+        assigned_survey : surveyToAssign
       }
     })
+    const paramsUsersDeSelected = deSelectedUsers.map(user=>{
+        return {
+          user_id:user,
+          remove_survey:surveyToAssign
+      }
+    })
+    if(paramsUsersDeSelected){
+      paramsUsers = [...paramsUsers,...paramsUsersDeSelected]
+    }
     
+    if(!paramsUsers || paramsUsers.length === 0){
+      toast.error("Please select at least one new user")
+      return
+    }
     const params = {
       users:paramsUsers
     }
+    console.log("params-------->",paramsUsers)
     setLoading(true)
     const response = await updateMultipleUsers(params);
-    console.log(response);
     if(response.success){
-      toast.success("Survey assigned to users successfully!")
+      toast.success("Assigned surveys updated successfully!")
       getAllSurveys(queryParams)
+      getUsers()
     }else{
       toast.error("Something went wrong")
     }
@@ -247,6 +255,8 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                   <button
                     onClick={() => {
                       setSurveyToDelete(el._id);
+                      const selected = users.filter(user=>user.assigned_survey.includes(el._id)).map(u=>u._id);
+                      setSelectedUsers(selected);
                       toggleDropdown(el._id);
                     }}
                   >
@@ -265,6 +275,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                       <button
                       onClick={()=>{
                         setSurveyToAssign(el._id);
+                        setActiveDropdown(null)
                         setAssignModal(true);
                       }}
                       className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
@@ -402,7 +413,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       </CustomModal>
        {/* Assign Survey to Users Modal */}
        <CustomModal open={assignModal} closeModal={() => {setAssignModal(false); setSelectedUsers([]);}}>
-        <div className="flex flex-col h-[40vh] w-[40vw] p-5 justify-center items-center gap-5">
+        <div className="flex flex-col h-[40vh] w-[40vw]  justify-center items-center gap-5">
           <h1 className="text-xl w-full text-center">Select users to assign the survey</h1>
           <div className="flex flex-col gap-4 max-h-60 w-full overflow-y-auto justify-center items-center">
             {users && user && users.map(({_id,email,name,assigned_survey}) => {
@@ -412,13 +423,13 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
               return(
                   <label key={user._id} className="cursor-pointer flex items-center gap-10 min-w-[50%] justify-between">
                     {name || email}
-                    <input className="h-5 w-5 disabled:cursor-not-allowed" disabled ={assigned_survey.includes(surveyToAssign)} type="checkbox" defaultChecked = {assigned_survey.includes(surveyToAssign)} checked = {selectedUsers.includes(_id)} onChange={() => handleUserSelection(_id)} />
+                    <input className="h-5 w-5 disabled:cursor-not-allowed" type="checkbox" defaultChecked = {assigned_survey.includes(surveyToAssign)} onChange={() => handleUserSelection(_id)} />
                   </label>
                 )
               })}
           </div>
-          <ButtonFilled onClick={handleAssignSurvey} className="w-40">
-            Assign Survey
+          <ButtonFilled onClick={handleAssignSurvey} className="whitespace-nowrap">
+            Updated Assigned Surveys
           </ButtonFilled>
         </div>
       </CustomModal>

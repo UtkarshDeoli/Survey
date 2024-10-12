@@ -23,6 +23,7 @@ import CheckBoxGridForm from "@/components/QuestionForms/Advance/CheckBoxGridFor
 import CheckBoxGridOtherForm from "@/components/QuestionForms/Advance/CheckBoxGridOtherForm";
 import NumberPointGridForm from "@/components/QuestionForms/Advance/NumberPointGridForm";
 import NumberInputForm from "@/components/QuestionForms/NumberInputForm";
+import AudioForm from "@/components/QuestionForms/Advance/AudioForm";
 
 function FormMappings(): { [key: string]: React.ComponentType<any> } {
   return {
@@ -52,6 +53,7 @@ function FormMappings(): { [key: string]: React.ComponentType<any> } {
     "Checkbox Grid": CheckBoxGridForm,
     "Checkbox Grid With Other": CheckBoxGridOtherForm,
     "Number Point Grid": NumberPointGridForm,
+    "Audio" : AudioForm
   };
 }
 

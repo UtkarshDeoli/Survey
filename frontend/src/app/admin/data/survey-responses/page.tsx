@@ -27,6 +27,7 @@ function Page() {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [responseModalIsOpen, setResponseModalIsOpen] = useState(false);
   const [questionType, setQuestionType] = useState<string>("");
   const [filters, setFilters] = useState<
     { question: string; operator: string; response: string }[]
@@ -40,16 +41,19 @@ function Page() {
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
   const [responses, setResponses] = useState<any[]>([]);
-  const [reset,setReset] = useState <boolean>(true);
-  const [loading,setLoading] = useState <boolean>(false)
-  const router = useRouter(); // For routing
-  const [more,setMore] = useState <string | null> (null)
+  const [reset, setReset] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [more, setMore] = useState<string | null>(null);
+  const [selectedResponse, setSelectedResponse] = useState<any>(null);
+  const [questions, setQuestions] = useState<any[] | null>(null);
 
+  const router = useRouter(); // For routing
+  console.log("selected response------->", selectedResponse);
   useEffect(() => {
     getUserResponses();
     getUsers();
   }, [reset]);
-console.log("filters---->",filters)
+  console.log("filters---->", filters);
   async function getUserResponses() {
     let nStartDate, nEndDate;
     if (startDate && endDate) {
@@ -63,18 +67,26 @@ console.log("filters---->",filters)
       startDate: nStartDate,
       endDate: nEndDate,
       userId,
-      filters:selectedFilter.trim().length > 0 ? selectedFilter : {}
+      filters: selectedFilter.trim().length > 0 ? selectedFilter : {},
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
     setResponses(response.data);
+    if (response.data && response.data.length > 0) {
+      setQuestions(
+        response.data[0].responses.map((res: any) => ({
+          question: res.question,
+          question_id: res.question_id,
+        }))
+      );
+    }
     setLoading(false);
   }
 
   async function getUsers() {
     setLoading(true);
     const response = await getAllUsers({});
-    console.log(response.data)
+    console.log(response.data);
     setUsers(response.data);
     setLoading(false);
   }
@@ -115,12 +127,7 @@ console.log("filters---->",filters)
     ) {
       return operatorOptions.number;
     } else if (
-      [
-        "Radio Button",
-        "DropDown",
-        "DropDown With Other",
-        
-      ].includes(questionType)
+      ["Radio Button", "DropDown", "DropDown With Other"].includes(questionType)
     ) {
       return operatorOptions.choice;
     }
@@ -149,7 +156,7 @@ console.log("filters---->",filters)
     <div className="w-full bg-my-gray-100 font-medium">
       <nav className="h-16 bg-white w-full py-3 px-8 flex justify-between shadow-md font-semibold">
         <div className="text-my-gray-200 items-center my-auto">
-          <p className="text-sm">Survey Responses : Retail Company</p>
+          <p className="text-sm">Survey Response</p>
         </div>
         <div className="flex space-x-2 text-black text-base font-semibold">
           <ButtonFilled className="rounded-lg px-4 py-2">
@@ -161,7 +168,10 @@ console.log("filters---->",filters)
           <ButtonFilled className="rounded-lg px-4 py-2">
             Configure Fields
           </ButtonFilled>
-          <FilledGreyButton onClick={()=>router.back()} className="rounded-lg px-4 py-2">
+          <FilledGreyButton
+            onClick={() => router.back()}
+            className="rounded-lg px-4 py-2"
+          >
             Back
           </FilledGreyButton>
         </div>
@@ -180,7 +190,7 @@ console.log("filters---->",filters)
                 id="filters"
                 className="border w-full shadow-lg rounded-lg px-4 py-2"
               >
-                <option value ="" disabled selected>
+                <option value="" disabled selected>
                   Select filter
                 </option>
                 {filters &&
@@ -238,7 +248,8 @@ console.log("filters---->",filters)
                   <option value="" disabled selected>
                     Select user
                   </option>
-                  {users && users.length > 0 &&
+                  {users &&
+                    users.length > 0 &&
                     users.map((user) => (
                       <option key={user._id} value={user._id}>
                         {user.name}
@@ -295,69 +306,99 @@ console.log("filters---->",filters)
           </div>
         </div>
       </div>
-      {loading && <Loader className="h-[30vh] w-full flex justify-center items-center"/>}
-      {
-        !loading && responses && responses.length > 0 ? (
-          <div className="overflow-x-auto rounded-t-2xl border border-secondary-200 mx-4">
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="bg-secondary-100">
-              <td className="min-w-24 px-4 py-2 border-b text-center"></td>
-              <td className="min-w-24 px-4 py-2 border-b text-center"></td>
-              <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">Response date</td>
-              <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">User</td>
-              {responses &&
-                responses.length > 0 &&
-                responses[0].responses.map((response: any, index: number) => (
-                  <td
-                    key={index}
-                    className="gap-2 text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center"
-                  >
-                    {more !== response.question_id ? truncateText(response.question,10) : response.question}
-                    <button className="text-primary-300 text-sm ml-2" onClick={()=>setMore(response.question_id)}>{more !== response.question_id && response.question.length > 10 ?  "More" : ""}</button>
-                    <button className="text-primary-300 text-sm ml-2" onClick={()=>setMore(null)}>{more === response.question_id && response.question.length > 10 ?  "Less" : ""}</button>
-                  </td>
-                ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white">
-            {responses &&
-              responses.map((response, rowIndex) => (
-                <tr key={rowIndex}>
-                  <td className="min-w-24 px-4 py-2 border-b text-center">
-                    <AiOutlineFileAdd />
-                  </td>
-                  <td className="min-w-24 px-4 py-2 border-b text-center">
-                    <FaEye />
-                  </td>
-                  <td className="min-w-24 px-4 py-2 border-b text-center">
-                    {formatDate(response.createdAt)}
-                  </td>
-                  <td className="min-w-24 px-4 py-2 border-b text-center">
-                    {users.find(user=>user._id === response.user_id)?.name || "-"}
-                  </td>
-
-                  {response.responses.map((res: any, colIndex: any) => (
-                    <td key={colIndex} className="px-4 py-2 border-b min-w-24 text-center">
-                      {/* {res.response || "-"} */}
-                      {more !== response.question_id ? truncateText(res.response,10) : res.response || "-"}
-                    <button className="text-primary-300 text-sm ml-2" onClick={()=>setMore(response.question_id)}>{more !== response.question_id && res.response.length > 10 ?  "More" : ""}</button>
-                    <button className="text-primary-300 text-sm ml-2" onClick={()=>setMore(null)}>{more === response.question_id && res.response.length > 10 ?  "Less" : ""}</button>
-
+      {loading && (
+        <Loader className="h-[30vh] w-full flex justify-center items-center" />
+      )}
+      {!loading && responses && responses.length > 0 ? (
+        <div className="overflow-x-auto rounded-t-2xl border border-secondary-200 mx-4">
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr className="bg-secondary-100">
+                <td className="min-w-24 px-4 py-2 border-b text-center"></td>
+                <td className="min-w-24 px-4 py-2 border-b text-center"></td>
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">
+                  Response date
+                </td>
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">
+                  User
+                </td>
+                {responses &&
+                  responses.length > 0 &&
+                  responses[0].responses.map((response: any, index: number) => (
+                    <td
+                      key={index}
+                      className="gap-2 text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center"
+                    >
+                      {more !== response.question_id
+                        ? truncateText(response.question, 10)
+                        : response.question}
+                      <button
+                        className="text-primary-300 text-sm ml-2"
+                        onClick={() => setMore(response.question_id)}
+                      >
+                        {more !== response.question_id &&
+                        response.question.length > 10
+                          ? "More"
+                          : ""}
+                      </button>
+                      <button
+                        className="text-primary-300 text-sm ml-2"
+                        onClick={() => setMore(null)}
+                      >
+                        {more === response.question_id &&
+                        response.question.length > 10
+                          ? "Less"
+                          : ""}
+                      </button>
                     </td>
                   ))}
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-        ): !loading && (
+              </tr>
+            </thead>
+            <tbody className="bg-white">
+              {responses &&
+                responses.map((response, rowIndex) => (
+                  <tr
+                    onClick={() => {
+                      setSelectedResponse(response);
+                      setResponseModalIsOpen(true);
+                    }}
+                    className="cursor-pointer"
+                    key={rowIndex}
+                  >
+                    <td className="min-w-24 px-4 py-2 border-b text-center">
+                      <AiOutlineFileAdd />
+                    </td>
+                    <td className="min-w-24 px-4 py-2 border-b text-center">
+                      <FaEye />
+                    </td>
+                    <td className="min-w-24 px-4 py-2 border-b text-center">
+                      {formatDate(response.createdAt)}
+                    </td>
+                    <td className="min-w-44 whitespace-nowrap px-4 py-2 border-b text-center">
+                      {users.find((user) => user._id === response.user_id)
+                        ?.name || "-"}
+                    </td>
+
+                    {response.responses.map((res: any, colIndex: any) => (
+                      <td
+                        key={colIndex}
+                        className="px-4 py-2 border-b min-w-44 whitespace-nowrap text-center"
+                      >
+                        {truncateText(res.response, 20) || "-"}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        !loading && (
           <div className="flex w-full justify-center items-center h-[30vh]">
             <p>No responses found</p>
           </div>
         )
-      }
-      
+      )}
 
       {/* Custom Modal for Data Filter */}
       <CustomModal open={modalIsOpen} closeModal={closeModal}>
@@ -445,6 +486,53 @@ console.log("filters---->",filters)
             </ButtonBordered>
           </div>
         </div>
+      </CustomModal>
+
+      {/* modal for response */}
+      <CustomModal
+        open={responseModalIsOpen}
+        closeModal={() => setResponseModalIsOpen(false)}
+      >
+        {selectedResponse && (
+          <div className="p-4 h-[60vh] flex justify-center items-center w-[50vw]">
+            <div className="flex h-full w-full justify-center items-center flex-col gap-4">
+              {/* Fixed Header */}
+              <div className="grid grid-cols-2 w-full">
+                <h2 className="w-full h-full text-center text-xl font-semibold border-b-2 pb-2">
+                  {" "}
+                  Question{" "}
+                </h2>
+                <p className="w-full h-full text-center text-xl font-semibold border-b-2 pb-2">
+                  Response
+                </p>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex h-full w-full flex-col overflow-y-auto">
+                <div className="grid grid-cols-2 w-full">
+                  <h2 className="py-4 bg-blue-100 w-full h-full text-center font-medium">
+                    Response by
+                  </h2>
+                  <p className="py-4 bg-blue-100 w-full h-full text-center font-medium">
+                    {users.find((u)=>u._id===selectedResponse.user_id)?.name || "-"}
+                  </p>
+                </div>
+                {selectedResponse.responses.map(
+                  (response: any, index: number) => (
+                    <div key={index} className="grid grid-cols-2 w-full">
+                      <h2 className={`w-full py-4 h-full text-center ${index%2 === 0 ? "bg-blue-50" : "bg-blue-100"}`}>
+                        {response.question}
+                      </h2>
+                      <p className={`w-full py-4 h-full text-center ${index%2 === 0 ? "bg-blue-50" : "bg-blue-100"}`}>
+                        {response.response}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </CustomModal>
     </div>
   );

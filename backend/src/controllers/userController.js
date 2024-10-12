@@ -94,12 +94,15 @@ exports.updateUsers = async (req, res) => {
       if (user.phone_number !== undefined) updateFields.phone_number = user.phone_number;
       if (user.role !== undefined) updateFields.role = user.role;
       if (user.assigned_survey !== undefined) {
-        updateFields.assigned_survey= user.assigned_survey ;
+        updateFields.$addToSet = {assigned_survey : user.assigned_survey}
+      }
+      if (user.remove_survey !== undefined) {
+        updateFields.$pull = {assigned_survey : user.remove_survey}
       }
 
       return User.findOneAndUpdate(
         { _id: user.user_id },
-        { $set: updateFields },
+         updateFields ,
         { new: true, runValidators: true }
       );
     });

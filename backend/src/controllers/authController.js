@@ -27,6 +27,7 @@ exports.login = async (req, res) => {
             {
             id: user._id,// i have used mongoDB _id, and removed uuid 
             email: user.email,
+            name:user.name,
             role: user.role
             },
             JWT_SECRET

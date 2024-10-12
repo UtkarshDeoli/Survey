@@ -2,7 +2,7 @@ export const questions = [
   // "Text Block",
   "Single line Text Input",
   "Multiline Text Input",
-  // "Number Input",
+  "Number Input",
   // "Number With Auto Code",
   // "Decimal Input",
   "Email",
@@ -14,7 +14,7 @@ export const questions = [
   "Checkbox List",
   "Checkbox List With Other",
   "Number Input",
-  "Rating",
+  // "Rating",
   "Date",
 ];
 
@@ -31,6 +31,7 @@ export const advanceQuestions = [
   "Checkbox Grid",
   "Checkbox Grid With Other",
   "Number Point Grid",
+  "Audio"
   // "Contact Form",
   // "Address",
 ];

@@ -10,6 +10,7 @@ import * as XLSX from "xlsx";
 import { TbBroadcast } from "react-icons/tb";
 import toast from "react-hot-toast";
 import { saveResponses } from "@/networks/response_networks";
+import { CiImport } from "react-icons/ci";
 
 interface props {
   setUpdated:any;
@@ -129,10 +130,10 @@ function SurveyHeader({setUpdated}:props) {
           </ButtonBordered>
           <ButtonBordered
             onClick={openImportModal}
-            className="bg-white font-semibold"
+            className="flex gap-2 items-center bg-white font-semibold"
           >
-            {" "}
-            + Import survey
+            <CiImport className="tex-xl" />
+             Import survey
           </ButtonBordered>
         </div>
       </div>
