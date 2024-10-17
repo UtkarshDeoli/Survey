@@ -66,6 +66,7 @@ exports.getAllChatsData = async (req, res) => {
         return {
           ...user.toObject(),
           lastMessageData,
+          unreadMessages,
         };
       }),
     );

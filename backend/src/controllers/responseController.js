@@ -3,8 +3,15 @@ const Responses = require("../models/response");
 const mongoose = require("mongoose");
 exports.saveResponse = async (req, res) => {
   try {
-    const { survey_id, user_id, responses, other_details, media_responses } =
-      req.body;
+    const {
+      survey_id,
+      user_id,
+      responses,
+      media_responses,
+      location_data,
+      ac_no,
+      booth_no,
+    } = req.body;
 
     if (media_responses) {
       Object.entries(media_responses).map(([key, value]) => {
@@ -29,7 +36,9 @@ exports.saveResponse = async (req, res) => {
       survey_id,
       user_id,
       responses,
-      other_details,
+      location_data,
+      ac_no,
+      booth_no,
     });
     await response.save();
     return res
