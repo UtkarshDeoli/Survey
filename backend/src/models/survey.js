@@ -10,24 +10,32 @@ const surveySchema = new Schema({
         type: String,
         required: true
     },
-    header_text: {
-        type: String,
+    ac_no:{
+        type:Number,
+        required: true
     },
-    welcome_image: {
-        type: Buffer,
-    }, 
-    thankyou_image: {
-        type: Buffer,
+    booth_no:{
+        type:Number,
+        required: true
     },
-    thank_time_duration: {
-        type: Number,
-        required: false,
-    },
+    // header_text: {
+    //     type: String,
+    // },
+    // welcome_image: {
+    //     type: Buffer,
+    // }, 
+    // thankyou_image: {
+    //     type: Buffer,
+    // },
+    // thank_time_duration: {
+    //     type: Number,
+    //     required: false,
+    // },
     access_pin: {
         type: String,
     },
     background_location_capture: {
-        type: Number,
+        type: Boolean,
         required: false,
     },
     published:{

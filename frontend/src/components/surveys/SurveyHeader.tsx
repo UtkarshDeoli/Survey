@@ -19,6 +19,8 @@ function SurveyHeader({setUpdated}:props) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [name, setName] = useState<string>("");
+  const [acNo, setAcNo] = useState<string>("");
+  const [boothNo, setBoothNo] = useState<string>("");
   const [user, setUser] = useState<any>(null);
   const [excelData, setExcelData] = useState<any[]>([]);
   const router = useRouter();
@@ -140,22 +142,41 @@ function SurveyHeader({setUpdated}:props) {
 
       {/* modal */}
       <CustomModal open={modalIsOpen} closeModal={closeModal}>
-        <div className="min-w-[662px] h-[337px] flex flex-col">
+        <div className="min-w-[662px] h-[400px] flex flex-col justify-center items-center">
           <div className="relative z-10 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">
             Create surveys
           </div>
-          <form className="w-full h-full flex flex-col gap-10 justify-center items-center">
-            <div className="flex items-center gap-10">
-              <label>Name</label>
+          <form className="grid grid-cols-2 h-full w-[90%] place-items-center">
+            
+              <label className="h-full w-full flex justify-center items-center">Name</label>
               <input
                 onChange={(e) => setName(e.target.value)}
                 value={name}
-                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-[185px] h-[35px]"
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none"
                 type="text"
                 placeholder="Survey name"
               />
-            </div>
-            <div className="flex items-center gap-10">
+          
+           
+              <label className="h-full w-full flex justify-center items-center">AC_NO</label>
+              <input
+                onChange={(e) => setAcNo(e.target.value)}
+                value={acNo}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                type="number"
+                placeholder="AC_NO"
+              />
+            
+              <label className="h-full w-full flex justify-center items-center">BOOTH_NO</label>
+              <input
+                onChange={(e) => setBoothNo(e.target.value)}
+                value={boothNo}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                type="number"
+                placeholder="BOOTH_NO"
+              />
+          
+            <div className="col-span-2 flex items-center gap-10">
               <ButtonBordered
                 onClick={closeModal}
                 type="button"
@@ -164,11 +185,12 @@ function SurveyHeader({setUpdated}:props) {
                 Cancel
               </ButtonBordered>
               <button
-                className="px-6 py-2 bg-primary-300 text-white rounded-md"
+                disabled={!name || !acNo || !boothNo}
+                className="px-6 py-2 bg-primary-300 text-white rounded-md disabled:bg-blue-100 disabled:cursor-not-allowed"
                 type="button"
                 onClick={() =>
                   router.push(
-                    `/admin/surveys/create?name=${encodeURIComponent(name)}`
+                    `/admin/surveys/create?name=${encodeURIComponent(name)}&ac_no=${encodeURIComponent(acNo)}&booth_no=${encodeURIComponent(boothNo)}`
                   )
                 }
               >

@@ -20,6 +20,8 @@ function Page() {
 
   const params = useSearchParams();
   const name = params.get("name");
+  const AC_NO = params.get("ac_no")
+  const BOOTH_NO = params.get("booth_no")
 
   const router = useRouter();
 
@@ -33,6 +35,8 @@ function Page() {
   useEffect(() => {
     if (name) {
       setValue("name", name);
+      setValue("ac_no", AC_NO);
+      setValue("booth_no", BOOTH_NO);
     }
   }, []);
 
@@ -53,6 +57,7 @@ function Page() {
   }
 
   async function submitHandler(data: any) {
+    console.log("Submitting form", data);
     const formData = new FormData();
     for (const key in data) {
       if (key !== "welcome_image" && key !== "thankyou_image") {
@@ -132,7 +137,7 @@ function Page() {
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
           </div>
-          <div className="grid grid-cols-3">
+          {/* <div className="grid grid-cols-3">
             <label className="text-secondary-300 font-medium">
               Header text
             </label>
@@ -230,6 +235,28 @@ function Page() {
               type="number"
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
+          </div> */}
+          <div className="grid grid-cols-3">
+            <label className="text-secondary-300 font-medium">
+              AC_NO
+            </label>
+            <input
+              disabled={true}
+              {...register("ac_no")}
+              type="number"
+              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+          <div className="grid grid-cols-3">
+            <label className="text-secondary-300 font-medium">
+              BOOTH_NO
+            </label>
+            <input
+              disabled={true}
+              {...register("booth_no")}
+              type="number"
+              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
           </div>
         </div>
 
@@ -238,8 +265,9 @@ function Page() {
           <div className="grid grid-cols-3">
             <label className="text-secondary-300 font-medium">Access pin</label>
             <input
+              type="number"
               {...register("access_pin")}
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
+              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
           <div className="grid grid-cols-3">
@@ -247,9 +275,9 @@ function Page() {
               Background location capture
             </label>
             <input
-              type="number"
+              type="checkbox"
               {...register("background_location_capture")}
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
+              className="border-secondary-200 focus:outline-none border rounded-md"
             />
           </div>
         </div>

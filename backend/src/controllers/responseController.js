@@ -105,9 +105,9 @@ exports.getAllResponses = async (req, res) => {
     console.log("filters are-->", filters);
     if (filters) {
       console.log("filteres there");
-      const filterArray = [JSON.parse(filters)];
-      console.log("fa-->", filterArray);
-      filterArray.forEach(({ question, operator, response: answer }) => {
+      // const filterArray = JSON.parse(filters);
+      // console.log("fa-->", filterArray);
+      filters.forEach(({ question, operator, response: answer }) => {
         const filter = {
           question_id: Number(question),
         };

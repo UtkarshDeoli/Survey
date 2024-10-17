@@ -3,10 +3,9 @@
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { getSurveyResponses } from "@/networks/response_networks";
 import { useSearchParams } from "next/navigation";
-import { AiOutlineFileAdd } from "react-icons/ai";
 import { FaEye } from "react-icons/fa";
 import { getAllUsers } from "@/networks/user_networks";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
@@ -15,6 +14,9 @@ import CustomModal from "@/components/ui/Modal";
 import toast from "react-hot-toast";
 import { formatDate, truncateText } from "@/utils/common_functions";
 import Loader from "@/components/ui/Loader";
+import { FaLocationDot } from "react-icons/fa6";
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { RxCross2 } from "react-icons/rx";
 
 const operatorOptions = {
   text: ["contains", "equals", "starts with", "ends with"],
@@ -37,23 +39,30 @@ function Page() {
   const [operator, setOperator] = useState<string>("");
   const [response, setResponse] = useState<string>("");
   const [selectedFilter, setSelectedFilter] = useState<string>("");
-
-  const searchParams = useSearchParams();
-  const surveyId = searchParams.get("survey_id");
+  const [appliedFilters, setAppliedFilters] = useState<
+    { question: string; operator: string; response: string }[]
+  >([]);
   const [responses, setResponses] = useState<any[]>([]);
   const [reset, setReset] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [more, setMore] = useState<string | null>(null);
   const [selectedResponse, setSelectedResponse] = useState<any>(null);
+  const [mapModalIsOpen, setMapModalIsOpen] = useState<boolean>(false);
   const [questions, setQuestions] = useState<any[] | null>(null);
+  const [gmap, setGmap] = useState(null);
 
-  const router = useRouter(); // For routing
-  console.log("selected response------->", selectedResponse);
+  const searchParams = useSearchParams();
+  const surveyId = searchParams.get("survey_id");
+  const router = useRouter();
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: "AIzaSyAAOwDBvpg5ZDv5JFG-CoDW23GsKkOPeuA",
+  });
+
   useEffect(() => {
     getUserResponses();
     getUsers();
   }, [reset]);
-  console.log("filters---->", filters);
   async function getUserResponses() {
     let nStartDate, nEndDate;
     if (startDate && endDate) {
@@ -67,7 +76,7 @@ function Page() {
       startDate: nStartDate,
       endDate: nEndDate,
       userId,
-      filters: selectedFilter.trim().length > 0 ? selectedFilter : {},
+      filters: appliedFilters
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
@@ -184,7 +193,21 @@ function Page() {
             <div className="space-y-2">
               <h1 className="text-my-gray-200">Filters</h1>
               <select
-                onChange={(e) => setSelectedFilter(e.target.value)}
+                onChange={(e) => {
+                  const filt = JSON.parse(e.target.value);
+                  const obj = appliedFilters.find(
+                    (el) =>
+                      el.question === filt.question &&
+                      el.operator === filt.operator &&
+                      el.response === filt.response
+                  );
+                  if (obj) return;
+                  else
+                    setAppliedFilters((prev) => [
+                      ...prev,
+                      JSON.parse(e.target.value),
+                    ]);
+                }}
                 value={selectedFilter}
                 name="filters"
                 id="filters"
@@ -218,6 +241,38 @@ function Page() {
                     );
                   })}
               </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              {appliedFilters.map((el) => {
+                const questionResponse = responses[0].responses.find(
+                  (res: any) =>
+                    Number(res.question_id) === Number(el.question)
+                );
+                let questionText
+                if (questionResponse) {
+                  questionText = questionResponse.question;
+                }
+                return (
+                  <div className="flex justify-between w-full border border-secondary-200 rounded-sm px-4 py-2">
+                    <h2>{`${questionText} ${el.operator} ${el.response}`}</h2>
+                    <button
+                      onClick={() =>
+                        setAppliedFilters((prev) =>
+                          prev.filter(
+                            (fil) =>
+                              fil.question !== el.question &&
+                              fil.operator !== el.operator &&
+                              fil.response !== el.response
+                          )
+                        )
+                      }
+                    >
+                     <RxCross2 />
+
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="flex justify-between space-x-6">
@@ -285,7 +340,7 @@ function Page() {
               </FilledGreyButton>
               <ButtonFilled
                 disabled={
-                  !selectedFilter.trim() &&
+                  appliedFilters.length === 0 &&
                   !userId.trim() &&
                   !startDate &&
                   !endDate
@@ -366,7 +421,14 @@ function Page() {
                     key={rowIndex}
                   >
                     <td className="min-w-24 px-4 py-2 border-b text-center">
-                      <AiOutlineFileAdd />
+                      <ButtonFilled
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMapModalIsOpen(true);
+                        }}
+                      >
+                        <FaLocationDot />
+                      </ButtonFilled>
                     </td>
                     <td className="min-w-24 px-4 py-2 border-b text-center">
                       <FaEye />
@@ -514,16 +576,25 @@ function Page() {
                     Response by
                   </h2>
                   <p className="py-4 bg-blue-100 w-full h-full text-center font-medium">
-                    {users.find((u)=>u._id===selectedResponse.user_id)?.name || "-"}
+                    {users.find((u) => u._id === selectedResponse.user_id)
+                      ?.name || "-"}
                   </p>
                 </div>
                 {selectedResponse.responses.map(
                   (response: any, index: number) => (
                     <div key={index} className="grid grid-cols-2 w-full">
-                      <h2 className={`w-full py-4 h-full text-center ${index%2 === 0 ? "bg-blue-50" : "bg-blue-100"}`}>
+                      <h2
+                        className={`w-full py-4 h-full text-center ${
+                          index % 2 === 0 ? "bg-blue-50" : "bg-blue-100"
+                        }`}
+                      >
                         {response.question}
                       </h2>
-                      <p className={`w-full py-4 h-full text-center ${index%2 === 0 ? "bg-blue-50" : "bg-blue-100"}`}>
+                      <p
+                        className={`w-full py-4 h-full text-center ${
+                          index % 2 === 0 ? "bg-blue-50" : "bg-blue-100"
+                        }`}
+                      >
                         {response.response}
                       </p>
                     </div>
@@ -533,6 +604,41 @@ function Page() {
             </div>
           </div>
         )}
+      </CustomModal>
+      <CustomModal
+        open={mapModalIsOpen}
+        closeModal={() => setMapModalIsOpen(false)}
+      >
+        <div className="p-4 h-[60vh] flex justify-center items-center w-[50vw]">
+          <div className="flex h-full w-full justify-center items-center flex-col gap-4">
+            {isLoaded ? (
+              <GoogleMap
+                mapContainerStyle={{
+                  width: "400px",
+                  height: "400px",
+                }}
+                center={{
+                  lat: -3.745,
+                  lng: -38.523,
+                }}
+                zoom={10}
+                onLoad={(map) => {
+                  console.log("gmap--->", map);
+                  const bounds = new window.google.maps.LatLngBounds();
+                  map.fitBounds(bounds);
+                }}
+                onUnmount={(map) => {
+                  // do your stuff before map is unmounted
+                }}
+              >
+                {/* Child components, such as markers, info windows, etc. */}
+                <></>
+              </GoogleMap>
+            ) : (
+              <></>
+            )}
+          </div>
+        </div>
       </CustomModal>
     </div>
   );

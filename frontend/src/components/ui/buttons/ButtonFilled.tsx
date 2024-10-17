@@ -4,7 +4,6 @@ import { twMerge } from 'tailwind-merge'
 interface LayoutProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className? : string;
-  onClick?:()=>void
 }
 
 function ButtonFilled({children, className,onClick,...props} : LayoutProps) {
