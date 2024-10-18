@@ -1,6 +1,8 @@
 const MediaResponse = require("../models/mediaResponse");
 const Responses = require("../models/response");
+const Family = require("../models/family");
 const mongoose = require("mongoose");
+
 exports.saveResponse = async (req, res) => {
   try {
     const {
@@ -11,6 +13,11 @@ exports.saveResponse = async (req, res) => {
       location_data,
       ac_no,
       booth_no,
+      house_no,
+      father_first_name,
+      father_last_name,
+      family_id,
+      save_mode
     } = req.body;
 
     if (media_responses) {
@@ -31,15 +38,24 @@ exports.saveResponse = async (req, res) => {
         }
       });
     }
-
-    const response = new Responses({
+    let responseToSave = {
       survey_id,
       user_id,
       responses,
       location_data,
       ac_no,
       booth_no,
-    });
+      house_no,
+      father_first_name,
+      father_last_name,
+    }
+    if(save_mode === "new_family"){
+      const newFamily = await Family.create({ac_no,booth_no,house_no,father_first_name,father_last_name})
+      responseToSave.family_id = newFamily._id;
+    }else if(family_id){
+      responseToSave.family_id = family_id
+    }
+    const response = new Responses(responseToSave);
     await response.save();
     return res
       .status(201)
