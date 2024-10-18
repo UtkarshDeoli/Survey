@@ -161,12 +161,13 @@ exports.getAllResponses = async (req, res) => {
         responseFilters.push(filter);
       });
     }
-    const aggregationPipeline = [
+
+    const aggregationPipeline2 = [
       {
         $match: matchStage,
       },
       {
-        $unwind: "$responses",
+        $unwind: "$responses", 
       },
       {
         $project: {
@@ -174,6 +175,7 @@ exports.getAllResponses = async (req, res) => {
           user_id: 1,
           survey_id: 1,
           other_details: 1,
+          createdAt: 1, 
           "responses.question_id": 1,
           "responses.question_type": 1,
           "responses.question": 1,
@@ -182,56 +184,51 @@ exports.getAllResponses = async (req, res) => {
               if: {
                 $regexMatch: {
                   input: { $toString: "$responses.response" },
-                  regex: /^\d+(\.\d+)?$/,
+                  regex: /^\d+(\.\d+)?$/, 
                 },
               },
-              then: { $toDouble: "$responses.response" },
-              else: "$responses.response",
+              then: { $toDouble: "$responses.response" }, 
+              else: "$responses.response", 
             },
           },
         },
       },
+      {
+        $group: {
+          _id: "$_id", 
+          user_id: { $first: "$user_id" }, 
+          survey_id: { $first: "$survey_id" },
+          other_details: { $first: "$other_details" },
+          createdAt: { $first: "$createdAt" },
+          responses: { $push: "$responses" }, 
+        },
+      },
     ];
+    
     if (responseFilters && responseFilters.length > 0) {
-      aggregationPipeline.push({
+      aggregationPipeline2.push({
         $match: {
-          $or: responseFilters.map((response) => {
-            return {
-              "responses.question_id": response.question_id,
-              "responses.response": response.response,
-            };
-          }),
+          $and: responseFilters.map((response) => ({
+            responses: {
+              $elemMatch: {
+                question_id: response.question_id,
+                response: response.response,
+              },
+            },
+          })),
         },
       });
     }
-    aggregationPipeline.push({
-      $group: {
-        _id: "$_id",
-        user_id: { $first: "$user_id" },
-        survey_id: { $first: "$survey_id" },
-        other_details: { $first: "$other_details" },
-        responses: { $push: "$responses" },
-      },
-    });
 
-    console.log(JSON.stringify(aggregationPipeline, null, 2));
-    const filteredResponse = await Responses.aggregate(aggregationPipeline);
+    console.log(JSON.stringify(aggregationPipeline2, null, 2));
+    const filteredResponse = await Responses.aggregate(aggregationPipeline2);
 
-    if (!Array.isArray(filteredResponse)) {
-      return res
-        .status(500)
-        .json({ success: false, message: "Unexpected result format." });
-    }
-
-    const promises = filteredResponse.map((res) => Responses.findById(res._id));
-    const finalRes = await Promise.all(promises);
-
-    if (!finalRes || finalRes.length === 0) {
+    if (!filteredResponse) {
       return res
         .status(404)
         .json({ success: "false", message: "Response not found" });
     } else {
-      return res.status(200).json({ success: "true", data: finalRes });
+      return res.status(200).json({ success: "true", data: filteredResponse });
     }
   } catch (error) {
     console.log(error);

@@ -244,7 +244,7 @@ function Page() {
             </div>
             <div className="flex flex-col gap-2">
               {appliedFilters.map((el) => {
-                const questionResponse = responses[0].responses.find(
+                const questionResponse = responses[0]?.responses.find(
                   (res: any) =>
                     Number(res.question_id) === Number(el.question)
                 );
@@ -331,7 +331,7 @@ function Page() {
                   setStartDate(null);
                   setEndDate(null);
                   setUserId("");
-                  setSelectedFilter("");
+                  setAppliedFilters([]);
                   setReset(!reset);
                 }}
                 className="rounded-lg border-my-gray-200 bg-white px-4 py-2"
