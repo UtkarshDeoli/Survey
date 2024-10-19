@@ -1,33 +1,50 @@
 const Family = require("../models/family");
 const Response = require("../models/response");
+const mongoose = require("mongoose");
 
 exports.getFamily = async (req, res) => {
   try {
-    const { house_no, father_first_name, father_last_name, survey_id } =
-      req.query;
+    const { house_no,last_name,survey_id } = req.query;
 
-    const filterOptions = { survey_id };
-
-    if (house_no)
-      filterOptions.house_no = { $regex: new RegExp(`^${house_no}$`, "i") };
-    if (father_first_name)
-      filterOptions.father_first_name = {
-        $regex: new RegExp(`^${father_first_name}$`, "i"),
-      };
-    if (father_last_name)
-      filterOptions.father_last_name = {
-        $regex: new RegExp(`^${father_last_name}$`, "i"),
-      };
-
-    const families = await Family.find(filterOptions);
-
-    res.status(200).json({
+    const filterOptions = { survey_id, house_no };
+    if(last_name){
+      console.log("with last name")
+      filterOptions.last_name = { $regex: last_name, $options:"i"};
+      const families = await Family.find(filterOptions);
+      const responses = await Response.find(filterOptions);
+      return res.status(200).json({
+        success: true,
+        data: families,
+        responses,
+      });
+    }
+    console.log("no last name")
+    const aggregationPipeline = [
+      {
+        $match: {
+          survey_id: new mongoose.Types.ObjectId(String(survey_id)) ,
+          house_no
+        }
+      },
+      {
+        $group: {
+          _id:"$last_name",
+          total_responses: { $sum: 1 },
+          house_no: { $first: "$house_no" },
+          name:{$push :"$name"}
+        }
+      }
+    ]
+    const families = await Family.find(filterOptions)
+    const responses = await Response.aggregate(aggregationPipeline)
+    return res.status(200).json({
       success: true,
-      data: families,
+      families,
+      responses
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -57,12 +74,11 @@ exports.getFamilyResponse = async (req, res) => {
 
 exports.updateFamily = async (req, res) => {
   try {
-    const { family_id, house_no, father_first_name, father_last_name } =
-      req.body;
+    const { family_id, house_no, last_name } = req.body;
     const updatedFamily = {};
     if (house_no) updatedFamily.house_no = house_no;
-    if (father_first_name) updatedFamily.father_first_name = father_first_name;
-    if (father_last_name) updatedFamily.father_last_name = father_last_name;
+    if (last_name) updatedFamily.last_name = last_name;
+
     const family = await Family.findByIdAndUpdate(family_id, updatedFamily, {
       new: true,
     });

@@ -11,11 +11,11 @@ exports.saveResponse = async (req, res) => {
       responses,
       media_responses,
       location_data,
+      name,
       ac_no,
       booth_no,
       house_no,
-      father_first_name,
-      father_last_name,
+      last_name,
       family_id,
       save_mode,
     } = req.body;
@@ -46,8 +46,8 @@ exports.saveResponse = async (req, res) => {
       ac_no,
       booth_no,
       house_no,
-      father_first_name,
-      father_last_name,
+      name,
+      last_name,
     };
     if (save_mode === "new_family") {
       const newFamily = await Family.create({
@@ -55,8 +55,7 @@ exports.saveResponse = async (req, res) => {
         ac_no,
         booth_no,
         house_no,
-        father_first_name,
-        father_last_name,
+        last_name,
       });
       responseToSave.family_id = newFamily._id;
     } else if (family_id) {

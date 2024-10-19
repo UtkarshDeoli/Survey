@@ -15,6 +15,10 @@ const responseSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Family99'
         },
+        name:{
+            type:String,
+            required:true
+        },
         ac_no:{
             type:String,
             required:true
@@ -27,11 +31,7 @@ const responseSchema = new Schema(
             type:String,
             required:true
         },
-        father_first_name:{
-            type:String,
-            required:true
-        },
-        father_last_name:{
+        last_name:{
             type:String,
             required:true
         },

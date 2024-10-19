@@ -18,11 +18,7 @@ const familySchema = new Schema({
         type:String,
         required:true
     },
-    father_first_name:{
-        type:String,
-        required:true
-    },
-    father_last_name:{
+    last_name:{
         type:String,
         required:true
     }
