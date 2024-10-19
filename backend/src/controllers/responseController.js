@@ -17,7 +17,7 @@ exports.saveResponse = async (req, res) => {
       father_first_name,
       father_last_name,
       family_id,
-      save_mode
+      save_mode,
     } = req.body;
 
     if (media_responses) {
@@ -48,12 +48,19 @@ exports.saveResponse = async (req, res) => {
       house_no,
       father_first_name,
       father_last_name,
-    }
-    if(save_mode === "new_family"){
-      const newFamily = await Family.create({survey_id,ac_no,booth_no,house_no,father_first_name,father_last_name})
+    };
+    if (save_mode === "new_family") {
+      const newFamily = await Family.create({
+        survey_id,
+        ac_no,
+        booth_no,
+        house_no,
+        father_first_name,
+        father_last_name,
+      });
       responseToSave.family_id = newFamily._id;
-    }else if(family_id){
-      responseToSave.family_id = family_id
+    } else if (family_id) {
+      responseToSave.family_id = family_id;
     }
     const response = new Responses(responseToSave);
     await response.save();
@@ -183,15 +190,20 @@ exports.getAllResponses = async (req, res) => {
         $match: matchStage,
       },
       {
-        $unwind: "$responses", 
+        $unwind: "$responses",
       },
       {
         $project: {
           _id: 1,
           user_id: 1,
           survey_id: 1,
-          other_details: 1,
-          createdAt: 1, 
+          ac_no: 1,
+          booth_no: 1,
+          house_no: 1,
+          father_first_name: 1,
+          father_last_name: 1,
+          location_data: 1,
+          createdAt: 1,
           "responses.question_id": 1,
           "responses.question_type": 1,
           "responses.question": 1,
@@ -200,27 +212,32 @@ exports.getAllResponses = async (req, res) => {
               if: {
                 $regexMatch: {
                   input: { $toString: "$responses.response" },
-                  regex: /^\d+(\.\d+)?$/, 
+                  regex: /^\d+(\.\d+)?$/,
                 },
               },
-              then: { $toDouble: "$responses.response" }, 
-              else: "$responses.response", 
+              then: { $toDouble: "$responses.response" },
+              else: "$responses.response",
             },
           },
         },
       },
       {
         $group: {
-          _id: "$_id", 
-          user_id: { $first: "$user_id" }, 
+          _id: "$_id",
+          user_id: { $first: "$user_id" },
+          ac_no: { $first: "$ac_no" },
+          booth_no: { $first: "$booth_no" },
+          house_no: { $first: "$house_no" },
+          father_first_name: { $first: "$father_first_name" },
+          father_last_name: { $first: "$father_last_name" },
+          location_data: { $first: "$location_data" },
           survey_id: { $first: "$survey_id" },
-          other_details: { $first: "$other_details" },
           createdAt: { $first: "$createdAt" },
-          responses: { $push: "$responses" }, 
+          responses: { $push: "$responses" },
         },
       },
     ];
-    
+
     if (responseFilters && responseFilters.length > 0) {
       aggregationPipeline2.push({
         $match: {
@@ -244,6 +261,7 @@ exports.getAllResponses = async (req, res) => {
         .status(404)
         .json({ success: "false", message: "Response not found" });
     } else {
+      console.log(filteredResponse);
       return res.status(200).json({ success: "true", data: filteredResponse });
     }
   } catch (error) {
