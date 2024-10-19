@@ -3,26 +3,26 @@ const Response = require("../models/response");
 
 exports.getFamily = async (req, res) => {
   try {
-    const { searchText,survey_id } = req.query;
-    const regex = new RegExp(searchText, 'i');
-    const filterOptions = {survey_id}
-    if(searchText) {
-      filterOptions.$or = [
-        { house_no: { $regex: regex } },
-        { father_first_name: { $regex: regex } },
-        { father_last_name: { $regex: regex } }
-      ]
-    }
+    const { house_no, father_first_name, father_last_name, survey_id } = req.query;
+
+    const filterOptions = { survey_id };
+    
+    if (house_no) filterOptions.house_no = { $regex: new RegExp(`^${house_no}$`, 'i') };
+    if (father_first_name) filterOptions.father_first_name = { $regex: new RegExp(`^${father_first_name}$`, 'i') };
+    if (father_last_name) filterOptions.father_last_name = { $regex: new RegExp(`^${father_last_name}$`, 'i') };
+
     const families = await Family.find(filterOptions);
+
     res.status(200).json({
-        success:true,
-        data:families
+      success: true,
+      data: families
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success:false,message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 exports.updateFamily = async (req,res)=>{
     try{
