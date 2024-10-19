@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const familySchema = new Schema({
+    survey_id:{
+        type: Schema.Types.ObjectId,
+        ref: 'Survey99'
+    },
     ac_no:{
         type:String,
         required:true

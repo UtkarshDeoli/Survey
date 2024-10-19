@@ -50,7 +50,7 @@ exports.saveResponse = async (req, res) => {
       father_last_name,
     }
     if(save_mode === "new_family"){
-      const newFamily = await Family.create({ac_no,booth_no,house_no,father_first_name,father_last_name})
+      const newFamily = await Family.create({survey_id,ac_no,booth_no,house_no,father_first_name,father_last_name})
       responseToSave.family_id = newFamily._id;
     }else if(family_id){
       responseToSave.family_id = family_id

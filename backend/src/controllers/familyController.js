@@ -3,9 +3,10 @@ const Response = require("../models/response");
 
 exports.getFamily = async (req, res) => {
   try {
-    const { searchText } = req.query;
+    const { searchText,survey_id } = req.query;
     const regex = new RegExp(searchText, 'i');
     const families = await Family.find({
+      survey_id,
       $or: [
         { house_no: { $regex: regex } },
         { father_first_name: { $regex: regex } },
