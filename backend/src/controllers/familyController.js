@@ -5,14 +5,15 @@ exports.getFamily = async (req, res) => {
   try {
     const { searchText,survey_id } = req.query;
     const regex = new RegExp(searchText, 'i');
-    const families = await Family.find({
-      survey_id,
-      $or: [
+    const filterOptions = {survey_id}
+    if(searchText) {
+      filterOptions.$or = [
         { house_no: { $regex: regex } },
         { father_first_name: { $regex: regex } },
         { father_last_name: { $regex: regex } }
       ]
-    });
+    }
+    const families = await Family.find(filterOptions);
     res.status(200).json({
         success:true,
         data:families
