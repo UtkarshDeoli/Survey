@@ -10,6 +10,13 @@ export const update_user = "api/user/updateUser";
 export const update_users = "api/user/updateUsers";
 export const get_all_chats_data = "api/chatroom/getAllChatsData";
 
+// karyakartas
+export const get_all_karyakartas = "api/user/getAllKaryakarta"
+export const create_karyakarta = "api/user/createKaryakarta"
+export const get_panna_pramukh = "api/user/getPannaPramukh"
+export const get_booth_adhyaksh = "api/user/getBoothAdhyaksh"
+
+
 // surveys
 export const create_survey = "api/survey/saveSurvey";
 export const update_survey = "api/survey/updateSurvey";

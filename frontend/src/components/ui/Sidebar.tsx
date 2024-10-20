@@ -52,6 +52,12 @@ function Sidebar({ sidebarOpen }: any) {
       tooltip: "Users",
     },
     {
+      icon: <ImUser size={18} />,
+      name: "Karyakarta",
+      path: "/admin/karyakarta",
+      tooltip: "Karyakarta",
+    },
+    {
       icon: <BsLifePreserver size={18} />,
       name: "Support",
       path: "/admin/support",

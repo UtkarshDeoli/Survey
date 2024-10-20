@@ -130,8 +130,6 @@ exports.getSurvey = async (req, res) => {
 
 exports.getAllSurvey = async (req, res) => {
   try {
-    console.log("route getAll hitting");
-
     const {
       filter = "", // Default filter to an empty string
       page = 1,
@@ -175,6 +173,84 @@ exports.getAllSurvey = async (req, res) => {
     const findOptions =
       searchConditions.length > 0 ? { $and: searchConditions } : {};
 
+    const total = await Survey.countDocuments(findOptions);
+
+    const surveys = await Survey.find(findOptions)
+      .skip(skip)
+      .limit(Number(limit))
+      .sort(sortOptions)
+      .collation({ locale: "en", strength: 2 });
+
+    if (surveys.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No surveys found" });
+    }
+    return res.status(200).json({
+      success: true,
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / limit),
+      surveys,
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+exports.getSurveysByAcAndBooth = async (req, res) => {
+  try {
+    const {
+      filter = "", 
+      page = 1,
+      limit = 10,
+      ac_no,
+      booth_no,
+      sortBy = "name",
+      sortOrder = "asc",
+      created_by,
+      published,
+      user_id,
+    } = req.query;
+
+    if(!booth_no || !ac_no){
+      return res.status(400).json({
+        success:false,
+        message: "Both ac_no and booth_no are required."
+      })
+    }
+    const findOptions = {booth_no,ac_no};
+    const order = sortOrder === "asc" ? 1 : -1;
+    const skip = (page - 1) * limit;
+    const sortOptions = {};
+
+    if (sortBy === "name") {
+      sortOptions.name = order;
+    } else if (sortBy === "createdAt") {
+      sortOptions.createdAt = order;
+    }
+
+    const searchConditions = [];
+
+    if (filter && filter.trim()) {
+      searchConditions.push({ name: { $regex: filter, $options: "i" } });
+    }
+
+    if (created_by) {
+      searchConditions.push({ created_by });
+    }
+
+    if (
+      published !== undefined &&
+      published !== "" &&
+      published !== "undefined"
+    ) {
+      searchConditions.push({ published: published === "true" });
+    }
+    if(searchConditions.length > 0 ){
+      findOptions.$and = searchConditions
+    }
+    console.log(findOptions)
     const total = await Survey.countDocuments(findOptions);
 
     const surveys = await Survey.find(findOptions)

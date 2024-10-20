@@ -1,5 +1,6 @@
 
 export interface IUser{
+  created_by?:string;
   username: string;
   name: string;
   email: string;

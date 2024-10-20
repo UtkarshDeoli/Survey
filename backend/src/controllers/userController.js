@@ -174,8 +174,10 @@ exports.getAllUsers = async (req, res) => {
       $and: [{ $or: searchConditions }, { created_by: created_by }],
     };
 
-    if (validRoles.includes(role)) {
+    if (role && validRoles.includes(role)) {
       query.$and.push({ role: { $in: [role] } });
+    }else{
+      query.$and.push({ role: { $in: validRoles } });
     }
 
     let users;
@@ -245,3 +247,145 @@ exports.getProfilePicture = async (req, res) => {
     });
   }
 };
+
+// karyakarta API'S
+
+exports.createKaryakarta = async(req,res)=>{
+  try{
+    const {email,username,created_by,name,ac_no,booth_no,password,role} = req.body;
+    const validRoles = ["Panna Pramukh","Booth Adhyaksh","Mandal Adhyaksh"];
+    if(!validRoles.includes(role)){
+      return res.status(400).json({
+        success:false,
+        message:"Invalid role"
+      })
+    }
+    const newKaryakarta = await User.create({email,username,created_by,name,ac_no,booth_no,password,role:[role]})
+    return res.status(200).json({
+      success:true,
+      message:"Karyakarta created successfully",
+      data:newKaryakarta
+    })
+  }catch(e){
+    return res.status(400).json({
+      success:false,
+      message:"Error creating Karyakarta"
+    })
+  }
+}
+exports.getAllKaryakarta = async(req,res)=>{
+  try{
+    let filter = req.query.filter || "";
+
+    const role = req.query.role;
+    const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;
+    const limit = req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
+    const validRoles = ["Panna Pramukh","Booth Adhyaksh","Mandal Adhyaksh"];
+
+    const skip = (page - 1) * limit;
+
+    const searchConditions = [];
+    searchConditions.push({ name: { $regex: filter, $options: "i" } });
+    searchConditions.push({ username: { $regex: filter, $options: "i" } });
+
+    let query = {$and: [{ $or: searchConditions }]};
+
+    if (role && validRoles.includes(role)) {
+      query.$and.push({ role: { $in: [role] } });
+    }else{
+      query.$and.push({ role: { $in: validRoles } });
+    }
+
+    const karyakartas = await User.find(query).skip(skip).limit(limit).sort({createdAt:-1})
+    return res.status(200).json({
+      success:true,
+      message:"Karyakarta fetched",
+      count:karyakartas.length,
+      data:karyakartas
+    })
+  }catch(e){
+    return res.status(400).json({
+      success:false,
+      message:"Error creating Karyakarta"
+    })
+  }
+}
+
+exports.getPannaPramukh = async(req,res)=>{
+  try{
+    const {ac_no,booth_no} = req.query;
+    let filter = req.query.filter || ""
+    const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;
+    const limit = req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
+
+    const skip = (page-1)*limit;
+
+
+    if(!ac_no || !booth_no){
+      return res.status(400).json({
+        success:false,
+        message:"Invalid ac_no or booth_no"
+      })
+    }
+
+    const query = {ac_no,booth_no,role:{$in:["Panna Pramukh"]}}
+
+    const searchConditions = [];
+    searchConditions.push({ name: { $regex: filter, $options: "i" } });
+    searchConditions.push({ username: { $regex: filter, $options: "i" } });
+
+    query.$and = [{ $or: searchConditions }]
+
+    
+    const users = await User.find(query).skip(skip).limit(limit);
+    return res.status(200).json({
+      success:true,
+      message:"Panna Pramukh fetched",
+      data:users
+    })
+  }catch(e){
+    return res.status(400).json({
+      success:false,
+      message:"Error fetching Panna Pramukh"
+    })
+  }
+}
+exports.getBoothAdhyaksh = async(req,res)=>{
+  try{
+    const {ac_no,booth_no} = req.query;
+    let filter = req.query.filter || ""
+    const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;
+    const limit = req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
+
+    const skip = (page-1)*limit;
+
+
+    if(!ac_no || !booth_no){
+      return res.status(400).json({
+        success:false,
+        message:"Invalid ac_no or booth_no"
+      })
+    }
+
+    const query = {ac_no,booth_no,role:{$in:["Booth Adhyaksh"]}}
+
+    const searchConditions = [];
+    searchConditions.push({ name: { $regex: filter, $options: "i" } });
+    searchConditions.push({ username: { $regex: filter, $options: "i" } });
+
+    query.$and = [{ $or: searchConditions }]
+
+    
+    const users = await User.find(query).skip(skip).limit(limit);
+    return res.status(200).json({
+      success:true,
+      message:"Booth adhyaksh fetched",
+      data:users
+    })
+  }catch(e){
+    return res.status(400).json({
+      success:false,
+      message:"Error fetching Panna Pramukh"
+    })
+  }
+}

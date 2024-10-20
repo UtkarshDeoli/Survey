@@ -15,6 +15,8 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  ac_no:String,
+  booth_no:String,
   email: {
     type: String,
     required: true,
@@ -35,6 +37,9 @@ const userSchema = new Schema({
       "Survey Collector",
       "Support Executive",
       "Survey Manager",
+      "Panna Pramukh",
+      "Booth Adhyaksh",
+      "Mandal Adhyaksh"
     ],
     required: true,
   },
@@ -82,7 +87,7 @@ const userSchema = new Schema({
     ref: "profilepictures99",
   },
   isOnline: { type: Boolean, default: false },
-});
+},{timestamps:true});
 userSchema.plugin(uniqueValidator);
 const User = mongoose.model("User99", userSchema);
 

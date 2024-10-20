@@ -8,6 +8,8 @@ import {
   add_users,
   get_all_chats_data,
   update_users,
+  get_all_karyakartas,
+  create_karyakarta,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -93,6 +95,7 @@ export const getAllUsers = async (params: {
   }
 };
 
+
 export const addUsers = async (params: any) => {
   try {
     // const bearerToken =localStorage.getItem('token');
@@ -163,5 +166,53 @@ export const getAllChatsData = async (params: {
       message: "Something Went Wrong while getting all chats data",
       error,
     };
+  }
+};
+
+
+// karyakartas
+
+export const getAllKaryakarta = async (params: {
+  searchBarInput?: string;
+  selectedRole?: string;
+  page?: number;
+  limit?: number;
+}) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "GET",
+      url: `${SERVER_URI}/${get_all_karyakartas}`,
+      params: {
+        filter: params.searchBarInput || "",
+        role: params.selectedRole || "",
+        page: params.page,
+        limit: params.limit,
+      },
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    };
+    const response = await axios.request(options);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+export const createKaryakarta = async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "POST",
+      url: `${SERVER_URI}/${create_karyakarta}`,
+      data:params,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    };
+    const response = await axios.request(options);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
   }
 };
