@@ -1,7 +1,7 @@
 "use client";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
-import { getAllKaryakarta, getAllUsers } from "@/networks/user_networks";
+import { getAllKaryakarta, getAllUsers, getKaryakarta, updateKaryakarta } from "@/networks/user_networks";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
@@ -17,10 +17,11 @@ function page() {
   const [page,setPage] = useState <number> (1);
   const [totalPages,setTotalPages] = useState <number>(0);
   const [loading,setLoading] = useState<boolean>(false);
+  const [reset,setReset] = useState<boolean>(false)
 
   useEffect(() => {
     getData();
-  }, [limit,page]);
+  }, [limit,page,reset]);
 
   async function getData() {
     const params = {searchBarInput,page,limit}
@@ -54,7 +55,12 @@ function page() {
       setPage(page-1)
     }
   };
-  const doNothing = () => {}
+  const doNothing = async({id,status}:{id:string,status:string}) => {
+    const params = {id,status}
+    await updateKaryakarta(params)
+    getData()
+  }
+
   return (
     <div className="w-full bg-[#ECF0FA] text-sm h-full">
       <nav className="h-16 w-full py-3 px-8 flex justify-between">
@@ -62,7 +68,7 @@ function page() {
           <h1 className="text-2xl">All Karyakarta</h1>
         </div>
         <div className="flex justify-end space-x-3 text-xs">
-          <ButtonFilled className="bg-my-blue-600">Help</ButtonFilled>
+          {/* <ButtonFilled className="bg-my-blue-600">Help</ButtonFilled> */}
           <ButtonFilled
             onClick={() => {
               router.push("./karyakarta/add-karyakarta");
@@ -91,7 +97,10 @@ function page() {
               Search
             </ButtonFilled>
             <div className="flex space-x-3">
-              <ButtonBordered>Reset</ButtonBordered>
+              <ButtonBordered onClick={()=>{
+                setSearchBarInput("")
+                setReset(!reset)
+              }}>Reset</ButtonBordered>
             </div>
           </div>
         </div>
@@ -140,7 +149,7 @@ function page() {
               <div className="flex justify-center gap-12 items-center">
                 {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
                 <Switch
-                  onChange={() => doNothing()}
+                  onChange={() => doNothing({id:user._id,status:user.status === "active" ? "inactive" :"active"})}
                   checked={user.status === "active" ? true : false}
                   onColor="#4CAF50"
                   offColor="#DDDDDD"

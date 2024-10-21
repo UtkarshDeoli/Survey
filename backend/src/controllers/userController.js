@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const ProfilePicture = require("../models/profilePicture");
 const User = require("../models/user");
+const bcrypt = require("bcrypt")
 
 exports.addUsers = async (req, res) => {
   try {
@@ -260,7 +261,8 @@ exports.createKaryakarta = async(req,res)=>{
         message:"Invalid role"
       })
     }
-    const newKaryakarta = await User.create({email,username,created_by,name,ac_no,booth_no,password,role:[role]})
+    const hashedPass = await bcrypt.hash(password,12)
+    const newKaryakarta = await User.create({email,username,created_by,name,ac_no,booth_no,password:hashedPass,role:[role]})
     return res.status(200).json({
       success:true,
       message:"Karyakarta created successfully",
@@ -273,6 +275,56 @@ exports.createKaryakarta = async(req,res)=>{
     })
   }
 }
+
+exports.updateKaryakarta = async (req, res) => {
+  try {
+    const {id, email, username, created_by, name, ac_no, booth_no, password, role, status } = req.body;
+    console.log(req.body);
+    const validRoles = ["Panna Pramukh", "Booth Adhyaksh", "Mandal Adhyaksh"];
+    if (role && !validRoles.includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role",
+      });
+    }
+
+    const karyakarta = await User.findById(id);
+    if (!karyakarta) {
+      return res.status(404).json({
+        success: false,
+        message: "Karyakarta not found",
+      });
+    }
+    karyakarta.email = email || karyakarta.email;
+    karyakarta.username = username || karyakarta.username;
+    karyakarta.created_by = created_by || karyakarta.created_by;
+    karyakarta.name = name || karyakarta.name;
+    karyakarta.ac_no = ac_no || karyakarta.ac_no;
+    karyakarta.booth_no = booth_no || karyakarta.booth_no;
+    karyakarta.status = status || karyakarta.status;
+    if(password){
+      const hashedPass = await bcrypt.hash(password,12)
+      karyakarta.password = hashedPass
+    }
+    if (role) {
+      karyakarta.role = [role];
+    }
+
+    await karyakarta.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Karyakarta updated successfully",
+      data: karyakarta,
+    });
+  } catch (e) {
+    return res.status(400).json({
+      success: false,
+      message: "Error updating Karyakarta",
+    });
+  }
+};
+
 exports.getAllKaryakarta = async(req,res)=>{
   try{
     let filter = req.query.filter || "";
@@ -297,17 +349,30 @@ exports.getAllKaryakarta = async(req,res)=>{
     }
 
     const karyakartas = await User.find(query).skip(skip).limit(limit).sort({createdAt:-1})
+    const total = await User.countDocuments(query);
+    console.log("total is -- >",total)
     return res.status(200).json({
       success:true,
       message:"Karyakarta fetched",
       count:karyakartas.length,
-      data:karyakartas
+      totalPages: Math.ceil(total / limit),
+      data:karyakartas,
     })
   }catch(e){
     return res.status(400).json({
       success:false,
       message:"Error creating Karyakarta"
     })
+  }
+}
+
+exports.getKaryakarta = async(req,res)=>{
+  try{
+    const {id} = req.query;
+    const karyakarta = await User.findById(id);
+    return res.status(200).json({success:true,data:karyakarta})
+  }catch(err){
+    res.status(500).json({success:false,message:"Error fetching karyakarta"})
   }
 }
 

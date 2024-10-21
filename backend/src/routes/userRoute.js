@@ -12,7 +12,9 @@ router.post("/uploadProfilePicture", userController.uploadProfilePicture);
 
 // karyakarta
 router.post("/createKaryakarta", userController.createKaryakarta);
+router.post("/updateKaryakarta", userController.updateKaryakarta);
 router.get("/getAllKaryakarta", userController.getAllKaryakarta);
+router.get("/getKaryakarta", userController.getKaryakarta);
 router.get("/getPannaPramukh", userController.getPannaPramukh);
 router.get("/getBoothAdhyaksh", userController.getBoothAdhyaksh);
 

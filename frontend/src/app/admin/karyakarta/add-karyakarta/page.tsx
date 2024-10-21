@@ -3,11 +3,12 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FaQuestionCircle } from "react-icons/fa";
 import { IUser } from "@/types/user_interfaces";
-import { addUsers, createKaryakarta } from "@/networks/user_networks";
+import { addUsers, createKaryakarta, getKaryakarta, updateKaryakarta } from "@/networks/user_networks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getAllSurveys } from "@/networks/survey_networks";
 import { getUser } from "@/networks/user_networks";
 import { checkToken } from "@/utils/common_functions";
+import toast from "react-hot-toast";
 
 const inputs =[
     {
@@ -61,7 +62,7 @@ function Page() {
   const [filter, setFilter] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [user,setUser] = useState<any>(null);
-  console.log("user------------",userId)
+  
   const {
     register,
     watch,
@@ -90,13 +91,27 @@ function Page() {
   },[])
 
   const router = useRouter();
-  const onSubmit: SubmitHandler<IUser> = async (data: IUser) => {
+  const onSubmit = async (data: any) => {
+    if(data.password.trim().length > 0){
+      if(data.password !== data.confirm_password){
+        toast.error("Passwords donot match!")
+        return
+      }
+    }
     delete data.confirm_password;
     if(user){
         data.created_by = user.email
     }
     const params = data;
-    const res = await createKaryakarta(params);
+    let res;
+    if(userId){
+      params.id = userId
+      if(params.password.trim().length  === 0) delete params.password;
+      res = await updateKaryakarta(params)
+    }
+    else{
+      res = await createKaryakarta(params);
+    }
     if (res) {
       router.replace("/admin/karyakarta");
     }
@@ -132,11 +147,15 @@ function Page() {
       Object.keys(userData).forEach((key: any) => {
         setValue(key, userData[key]);
       });
+      setValue("role",userData.role[0])
+      setValue("password","")
+      setValue("confirm_password","")
+      
     }
   }, [userData]);
 
   async function getUserData() {
-    const response = await getUser(userId);
+    const response = await getKaryakarta(userId);
     console.log("ressese:://", response);
     if (response) {
       setUserData(response);
@@ -175,7 +194,7 @@ function Page() {
                           type={field.type}
                           placeholder={field.placeholder}
                           {...register(field.name as keyof IUser, {
-                            required: true,
+                            required: userId ? false : true,
                           })}
                           className="border border-gray-300 rounded-md p-2 w-full"
                         />
@@ -192,7 +211,7 @@ function Page() {
                   <div className=" w-1/2 font-medium">User Status</div>
                   <div className="w-1/2">
                     <select
-                      {...register("status", { required: true })}
+                      {...register("status", { required: userId ? false : true })}
                       className="border border-gray-300 w-full text-center rounded-md p-2"
                     >
                       <option value="active">Active</option>
@@ -218,7 +237,7 @@ function Page() {
                         type="radio"
                         id={role.name} // Set the id to match the label's htmlFor
                         value={role.name}
-                        {...register("role", { required: true })}
+                        {...register("role", { required: userId ? false : true })}
                         className="text-blue-500 h-5 w-5"
                         />
                         <label

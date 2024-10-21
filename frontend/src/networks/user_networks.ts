@@ -10,6 +10,8 @@ import {
   update_users,
   get_all_karyakartas,
   create_karyakarta,
+  update_karyakarta,
+  get_karyakarta,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -212,6 +214,39 @@ export const createKaryakarta = async (params: any) => {
     };
     const response = await axios.request(options);
     return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+export const updateKaryakarta = async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "POST",
+      url: `${SERVER_URI}/${update_karyakarta}`,
+      data:params,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    };
+    const response = await axios.request(options);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+export const getKaryakarta = async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "GET",
+      url: `${SERVER_URI}/${get_karyakarta}?id=${params}`,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    };
+    const response = await axios.request(options);
+    return response.data.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }
