@@ -285,6 +285,41 @@ exports.getResponse = async (req, res) => {
   }
 };
 
+exports.getResponsesGroupedByFamily = async (req, res) => {
+  try {
+    const surveyId = req.query.surveyId;
+    const groupedResponses = await Responses.aggregate([
+      {
+        $match: {
+          survey_id: new mongoose.Types.ObjectId(surveyId),
+        },
+      },
+      {
+        $group: {
+          _id: "$family_id",
+          family_id: { $first: "$family_id" },
+          survey_id: { $first: "$survey_id" },
+          ac_no: { $first: "$ac_no" },
+          booth_no: { $first: "$booth_no" },
+          last_name: { $first: "$last_name" },
+          responses: {
+            $push: {
+              _id: "$_id",
+              user_id: "$user_id",
+              name: "$name",
+              responses: "$responses",
+              location_data: "$location_data",
+            },
+          },
+        },
+      },
+    ]);
+    return res.status(201).json({ success: true, data: groupedResponses });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 exports.getSurveyResponses = async (req, res) => {
   try {
     const { search, sortOrder = "desc" } = req.query;
