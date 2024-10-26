@@ -4,6 +4,7 @@ import {
   delete_survey,
   get_all_surveys,
   get_survey,
+  get_survey_by_booth_ac,
   get_survey_responses_stats,
   update_survey,
 } from "@/utils/constants";
@@ -126,3 +127,18 @@ export const deleteSurvey = async (params: any) => {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
+export const getSurveyByAcAndBooth = async (params: any) => {
+  try {
+    const options = {
+      method: "GET",
+      url: `${SERVER_URI}/${get_survey_by_booth_ac}`,
+      params:params
+    };
+    const response = await axios.request(options);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+

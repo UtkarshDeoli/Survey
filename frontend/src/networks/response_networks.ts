@@ -1,4 +1,4 @@
-import { get_all_survey_responses, get_survey_responses, save_responses, SERVER_URI } from "@/utils/constants";
+import { get_all_survey_responses, get_survey_responses, get_survey_responses_by_family, save_responses, SERVER_URI } from "@/utils/constants";
 import axios from "axios";
 
 export const saveResponses = async (params: any) => {
@@ -33,6 +33,20 @@ export const getSurveyResponses = async (params:any) => {
       const options = {
         method: "GET",
         url: `${SERVER_URI}/${get_survey_responses}`,
+        params
+      };
+      const response = await axios.request(options);
+      console.log("response --->",response)
+      return response.data;
+    } catch (error) {
+      return { success: false, message: "Something Went Wrong", error };
+    }
+  };
+export const getSurveyResponsesByFamily = async (params:any) => {
+    try {
+      const options = {
+        method: "GET",
+        url: `${SERVER_URI}/${get_survey_responses_by_family}`,
         params
       };
       const response = await axios.request(options);

@@ -88,7 +88,7 @@ function page() {
             onChange={(e) => setSearchBarInput(e.target.value)}
           />
           <div className="flex space-x-3">
-            <ButtonFilled
+            <ButtonFilled 
               onClick={() => {
                 getData();
               }}
@@ -105,6 +105,7 @@ function page() {
           </div>
         </div>
       </div>
+      
 
       <div className="w-full px-5 py-5 text-sm">
         <div className="grid grid-cols-5 text-white bg-blue-500 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">

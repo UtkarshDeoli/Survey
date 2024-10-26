@@ -5,10 +5,13 @@ import { FaQuestionCircle } from "react-icons/fa";
 import { IUser } from "@/types/user_interfaces";
 import { addUsers, createKaryakarta, getKaryakarta, updateKaryakarta } from "@/networks/user_networks";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getAllSurveys } from "@/networks/survey_networks";
+import { getAllSurveys, getSurveyByAcAndBooth } from "@/networks/survey_networks";
 import { getUser } from "@/networks/user_networks";
 import { checkToken } from "@/utils/common_functions";
 import toast from "react-hot-toast";
+import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
+import CustomModal from "@/components/ui/Modal";
+import { getSurveyResponsesByFamily } from "@/networks/response_networks";
 
 const inputs =[
     {
@@ -58,10 +61,13 @@ function Page() {
   const [surveys, setSurveys] = useState<{ name: string }[]>([]);
   const [pageNo, setPageNo] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [dataModal,setDataModal] = useState<boolean>(false);
   const [userData, setUserData] = useState<any>();
   const [filter, setFilter] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [user,setUser] = useState<any>(null);
+  const [step,setStep] = useState<number>(1);
+  
   
   const {
     register,
@@ -71,13 +77,9 @@ function Page() {
     formState: { errors },
   } = useForm<IUser>({ defaultValues: userData });
   const searchParams = useSearchParams();
-  const assignedSurveys = watch("assigned_survey") || [];
 
-  const isAllSelected = assignedSurveys.length === surveys?.length;
-
-  useEffect(() => {
-    setValue("selectAll", isAllSelected);
-  }, [assignedSurveys, setValue, isAllSelected]);
+  const ac_no = watch("ac_no")
+  const booth_no = watch("booth_no")
 
   useEffect(() => {
     const user_Id = searchParams.get("_id");
@@ -119,15 +121,15 @@ function Page() {
   };
 
   async function getSurveys(page: number = 1) {
-    const res = await getAllSurveys({
+    const res = await getSurveyByAcAndBooth({
       page: page,
       filter: filter,
-      created_by: "rohitchand490@gmail.com",
+      ac_no,
+      booth_no
     });
-    // console.log(res.survey);
+    console.log("response ------>",res);
     setTotalPages(res.totalPages);
-    console.log("res::", res);
-    setSurveys(res.survey);
+    setSurveys(res.surveys);
   }
 
   useEffect(() => {
@@ -161,6 +163,42 @@ function Page() {
       setUserData(response);
     } else {
       // toast.error("something went wrong")
+    }
+  }
+
+  function handleAddData(e:any){
+    e.preventDefault()
+    setDataModal(true);
+    getSurveys()
+  }
+  async function getResponses(survey_id:string){
+    setStep(2);
+    const response = await getSurveyResponsesByFamily({survey_id})
+  }
+  function showModalData(){
+    if(step === 1){
+      return (
+        <div className="flex flex-col p-5 items-center gap-10 h-[60vh] w-[70vw]">
+        <h1 className="text-xl font-bold ">Surveys with AC no. {ac_no} and Booth no. {booth_no}</h1>
+          {surveys && surveys.map((survey:any,index)=>(
+            <div onClick={()=>getResponses(survey._id)} className={`flex gap-2 w-full cursor-pointer ${index%2 === 0 ? "bg-blue-50" : "bg-blue-100"} py-4`}>
+              <p className="w-1/3">{survey._id}</p>
+              <p className="w-1/3">{survey.name}</p>
+              <p className="w-1/3">{survey.created_by}</p>
+            </div>
+          ))}
+      </div>
+      ) 
+    }else if(step === 2){
+      return (
+        <div className="relative flex flex-col p-5 items-center gap-10 h-[60vh] w-[70vw]">
+          <ButtonFilled className="absolute top-2 right-2 " onClick={()=>{
+            setStep(1)
+          }}>Back</ButtonFilled>
+        <h1 className="text-xl font-bold ">Responses show up here</h1>
+          
+      </div>
+      )   
     }
   }
 
@@ -222,6 +260,15 @@ function Page() {
                     )}
                   </div>
                 </div>
+                <div className="flex w-full space-y-2">
+                      <div className="w-1/2 py-2">
+                        <label className="block  font-medium">
+                          Add data                         
+                        </label>
+                      </div>
+                      <ButtonFilled onClick={handleAddData}>Add data</ButtonFilled>
+                    </div>
+                
 
                 {/* Roles */}
                 <div className="flex space-x-3 mt-5 w-full">
@@ -254,165 +301,10 @@ function Page() {
                     )}
                 </div>
                 </div>
-
-
-                {/* Permissions */}
-                {/* <div className="space-y-2 mt-3 w-full">
-                  {[
-                    { label: "Auto Assign Survey", name: "auto_assign_survey" },
-                    {
-                      label: "View Own Collected Data",
-                      name: "view_own_collected_data",
-                    },
-                    {
-                      label: "Prevent Data Download",
-                      name: "prevent_data_download",
-                    },
-                    {
-                      label: "Prevent Data Analytics",
-                      name: "prevent_data_analytics",
-                    },
-                    {
-                      label: "Prevent Spatial Report",
-                      name: "prevent_spatial_report",
-                    },
-                    {
-                      label: "Remove Audio Recording Access",
-                      name: "remove_audio_recording_access",
-                    },
-                    { label: "View Pending Data", name: "view_pending_data" },
-                  ].map((permission) => (
-                    <div
-                      key={permission.name}
-                      className="flex items-center w-full"
-                    >
-                      <div className="flex space-x-2 items-center w-1/2">
-                        <label
-                          htmlFor={permission.name}
-                          className=" font-medium"
-                        >
-                          {permission.label}
-                        </label>
-                        <FaQuestionCircle className="text-[#477BFF]" />
-                      </div>
-                      <input
-                        type="checkbox"
-                        {...register(`${permission.name as keyof IUser}`, {
-                          required: false,
-                        })}
-                        className="rounded text-blue-500 float-end"
-                      />
-                    </div>
-                  ))}
-                </div> */}
               </div>
-
-              {/* Right Section -> Assign Surveys */}
-              {/* <div className="w-1/2">
-                <div className="space-y-4 p-2 rounded-lg border border-[#939393] max-h-fit">
-                  <p className="text-gray-700 font-medium">Assign Survey</p>
-
-                  <div className="flex justify-between">
-                    <input
-                      type="text"
-                      onChange={(e) => setFilter(e.target.value)}
-                      placeholder="Search survey"
-                      className="border border-gray-300 rounded-md px-2 py-1 w-4/5"
-                    />
-                    <button
-                      type="button"
-                      className="text-white bg-blue-500 p-1 px-4 rounded-md"
-                      onClick={() => {
-                        setPageNo(1);
-                        getSurveys();
-                      }}
-                    >
-                      Search
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="selectAllUsers"
-                        checked={isAllSelected}
-                        onChange={(e) => {
-                          const isChecked = e.target.checked;
-                          setValue(
-                            "assigned_survey",
-                            isChecked ? surveys.map((s: any) => s._id) : []
-                          );
-                        }}
-                        className="rounded text-blue-500"
-                      />
-                      <label
-                        htmlFor="selectAllUsers"
-                        className="text-gray-700 font-semibold"
-                      >
-                        Select All
-                      </label>
-                    </div>
-
-                    
-                    {surveys?.map((survey: any) => (
-                      <div
-                        key={survey._id}
-                        className="flex items-center space-x-2"
-                      >
-                        <input
-                          type="checkbox"
-                          {...register("assigned_survey")}
-                          value={survey._id}
-                          checked={assignedSurveys.includes(survey._id)} // Manage checked state
-                          onChange={(e) => {
-                            const selected = e.target.checked;
-                            if (selected) {
-                              setValue("assigned_survey", [
-                                ...assignedSurveys,
-                                survey._id,
-                              ]);
-                            } else {
-                              setValue(
-                                "assigned_survey",
-                                assignedSurveys.filter((s) => s !== survey._id)
-                              );
-                            }
-                          }}
-                          className="rounded text-blue-500"
-                        />
-                        <label className="text-gray-700">{survey.name}</label>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (pageNo > 1) setPageNo(pageNo - 1);
-                      }}
-                      className="text-white bg-blue-500 p-1 px-4 rounded-md"
-                    >
-                      Previous
-                    </button>
-                    <p className="text-xs">
-                      {pageNo} of {totalPages} Pages
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (pageNo < totalPages) setPageNo(pageNo + 1);
-                      }}
-                      className="text-white bg-blue-500 p-1 px-4 rounded-md"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              </div> */}
+              
             </div>
-
+            
             {/* save, cancel button */}
           </form>
         </div>
@@ -432,6 +324,12 @@ function Page() {
             </button>
         </div>
       </div>
+      <CustomModal open={dataModal} closeModal={()=>{
+        setDataModal(false)
+        setStep(1)
+      }}>
+          {showModalData()}
+      </CustomModal>
     </div>
   );
 }

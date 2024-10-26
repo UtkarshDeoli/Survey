@@ -5,6 +5,8 @@ export interface IUser{
   name: string;
   email: string;
   password: string;
+  ac_no:string;
+  booth_no:string;
   confirm_password?: string;
   role: ['Admin', 'Booth Karyakarta', 'Survey Collector', 'Support Executive', 'Survey Manager'];
   auto_assign_survey?: boolean;
