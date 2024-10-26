@@ -8,7 +8,14 @@ router.post("/saveResponse", responseController.saveResponse);
 router.post("/saveResponses", responseController.saveResponses);
 router.get("/getCount", responseController.getCount);
 router.get("/getAllSurveyResponses", responseController.getSurveyResponses);
-router.get("/getSurveyResponseStats", responseController.getSurveyResponseStats);
+router.get(
+  "/getSurveyResponseStats",
+  responseController.getSurveyResponseStats,
+);
 router.get("/getMediaResource", responseController.getMediaResource);
+router.get(
+  "/getGroupedByFamily",
+  responseController.getResponsesGroupedByFamily,
+);
 
 module.exports = router;
