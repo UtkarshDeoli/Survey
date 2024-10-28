@@ -50,14 +50,28 @@ exports.saveResponse = async (req, res) => {
       last_name,
     };
     if (save_mode === "new_family") {
-      const newFamily = await Family.create({
+      const alreadyExists = await Family.findOne({
         survey_id,
         ac_no,
         booth_no,
         house_no,
         last_name,
       });
-      responseToSave.family_id = newFamily._id;
+
+      console.log("already exists", alreadyExists);
+
+      if (alreadyExists) {
+        responseToSave.family_id = alreadyExists._id;
+      } else {
+        const newFamily = await Family.create({
+          survey_id,
+          ac_no,
+          booth_no,
+          house_no,
+          last_name,
+        });
+        responseToSave.family_id = newFamily._id;
+      }
     } else if (family_id) {
       responseToSave.family_id = family_id;
     }
@@ -289,7 +303,7 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
   try {
     const surveyId = req.query.surveyId;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10; 
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     const groupedResponses = await Responses.aggregate([
@@ -306,7 +320,7 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
           ac_no: { $first: "$ac_no" },
           booth_no: { $first: "$booth_no" },
           last_name: { $first: "$last_name" },
-          createdAt: {$first:"$createdAt"},
+          createdAt: { $first: "$createdAt" },
           responses: {
             $push: {
               _id: "$_id",
@@ -323,11 +337,11 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
           path: "$responses",
         },
       },
-      { 
-        $sort: { createdAt: -1 }
+      {
+        $sort: { createdAt: -1 },
       },
       { $skip: skip },
-      { $limit: limit }  
+      { $limit: limit },
     ]);
 
     const totalItems = await Responses.countDocuments({ survey_id: surveyId });
@@ -340,14 +354,13 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
         totalItems,
         totalPages,
         currentPage: page,
-        pageSize: groupedResponses.length
+        pageSize: groupedResponses.length,
       },
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
   }
 };
-
 
 exports.getSurveyResponses = async (req, res) => {
   try {
@@ -499,5 +512,76 @@ exports.getMediaResource = async (req, res) => {
     }
   } catch (error) {
     return res.status(400).json({ success: "false", message: error.message });
+  }
+};
+
+exports.updateResponse = async (req, res) => {
+  console.log("updating response");
+  try {
+    const {
+      response_id,
+      survey_id,
+      user_id,
+      responses,
+      media_responses,
+      location_data,
+      name,
+      ac_no,
+      booth_no,
+      house_no,
+      last_name,
+      family_id,
+      save_mode,
+    } = req.body;
+
+    if (media_responses) {
+      Object.entries(media_responses).map(([key, value]) => {
+        const mediaBuffer = Buffer.from(value.data, "base64");
+        const mediaResponse = new MediaResponse({
+          userId: user_id,
+          surveyId: survey_id,
+          type: value.type,
+          data: mediaBuffer,
+        });
+        mediaResponse.save();
+
+        for (let response of responses) {
+          if (response.question_id == key) {
+            response.response = mediaResponse._id;
+          }
+        }
+      });
+    }
+    let responseToUpdate = {
+      survey_id,
+      user_id,
+      responses,
+      location_data,
+      ac_no,
+      booth_no,
+      house_no,
+      name,
+      last_name,
+    };
+    const response = await Responses.findByIdAndUpdate(
+      response_id,
+      responseToUpdate,
+      {
+        new: true,
+      },
+    );
+
+    if (!response) {
+      return res
+        .status(404)
+        .json({ success: "false", message: "Response not found" });
+    }
+
+    return res
+      .status(201)
+      .json({ success: true, message: "Response Updated successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ success: false, message: error.message });
   }
 };

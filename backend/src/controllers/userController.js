@@ -260,6 +260,7 @@ exports.createKaryakarta = async (req, res) => {
       name,
       ac_no,
       booth_no,
+      district,
       survey_id,
       responses,
       password,
@@ -280,19 +281,22 @@ exports.createKaryakarta = async (req, res) => {
       name,
       ac_no,
       booth_no,
+      district,
       password: hashedPass,
       role: [role],
     });
 
     const userId = newKaryakarta._id;
-    let responseIds
+    let responseIds;
     if (responses) {
-       responseIds = responses.map((responseId) => new mongoose.Types.ObjectId(String(responseId)));
+      responseIds = responses.map(
+        (responseId) => new mongoose.Types.ObjectId(String(responseId)),
+      );
     }
 
     let savedData;
-    if(responseIds){
-       savedData = await Data.create({
+    if (responseIds) {
+      savedData = await Data.create({
         survey_id: new mongoose.Types.ObjectId(String(survey_id)),
         user_id: userId,
         responses: responses,
@@ -303,7 +307,6 @@ exports.createKaryakarta = async (req, res) => {
       success: true,
       message: "Karyakarta created successfully",
       data: newKaryakarta,
-      
     });
   } catch (e) {
     console.log(e);
@@ -324,6 +327,7 @@ exports.updateKaryakarta = async (req, res) => {
       name,
       ac_no,
       booth_no,
+      district,
       password,
       survey_id,
       responses,
@@ -353,6 +357,7 @@ exports.updateKaryakarta = async (req, res) => {
     karyakarta.name = name || karyakarta.name;
     karyakarta.ac_no = ac_no || karyakarta.ac_no;
     karyakarta.booth_no = booth_no || karyakarta.booth_no;
+    karyakarta.district = district || karyakarta.district;
     karyakarta.status = status || karyakarta.status;
     if (password) {
       const hashedPass = await bcrypt.hash(password, 12);

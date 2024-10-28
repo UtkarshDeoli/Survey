@@ -17,5 +17,6 @@ router.get(
   "/getGroupedByFamily",
   responseController.getResponsesGroupedByFamily,
 );
+router.post("/updateResponse", responseController.updateResponse);
 
 module.exports = router;
