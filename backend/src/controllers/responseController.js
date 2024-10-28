@@ -288,6 +288,10 @@ exports.getResponse = async (req, res) => {
 exports.getResponsesGroupedByFamily = async (req, res) => {
   try {
     const surveyId = req.query.surveyId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; 
+    const skip = (page - 1) * limit;
+
     const groupedResponses = await Responses.aggregate([
       {
         $match: {
@@ -302,6 +306,7 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
           ac_no: { $first: "$ac_no" },
           booth_no: { $first: "$booth_no" },
           last_name: { $first: "$last_name" },
+          createdAt: {$first:"$createdAt"},
           responses: {
             $push: {
               _id: "$_id",
@@ -313,12 +318,36 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
           },
         },
       },
+      {
+        $unwind: {
+          path: "$responses",
+        },
+      },
+      { 
+        $sort: { createdAt: -1 }
+      },
+      { $skip: skip },
+      { $limit: limit }  
     ]);
-    return res.status(201).json({ success: true, data: groupedResponses });
+
+    const totalItems = await Responses.countDocuments({ survey_id: surveyId });
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return res.status(200).json({
+      success: true,
+      data: groupedResponses,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        pageSize: groupedResponses.length
+      },
+    });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 exports.getSurveyResponses = async (req, res) => {
   try {

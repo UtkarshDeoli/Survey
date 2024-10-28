@@ -285,22 +285,25 @@ exports.createKaryakarta = async (req, res) => {
     });
 
     const userId = newKaryakarta._id;
+    let responseIds
     if (responses) {
-      responses.map((responseId) => {
-        new mongoose.Types.ObjectId(responseId);
-      });
+       responseIds = responses.map((responseId) => new mongoose.Types.ObjectId(String(responseId)));
     }
 
-    const savedData = await Data.create({
-      survey_id: new mongoose.Types.ObjectId(survey_id),
-      user_id: userId,
-      responses: responses,
-    });
+    let savedData;
+    if(responseIds){
+       savedData = await Data.create({
+        survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+        user_id: userId,
+        responses: responses,
+      });
+    }
 
     return res.status(200).json({
       success: true,
       message: "Karyakarta created successfully",
       data: newKaryakarta,
+      
     });
   } catch (e) {
     console.log(e);
