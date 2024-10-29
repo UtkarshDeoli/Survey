@@ -10,6 +10,7 @@ const chatRoomRoutes = require("./src/routes/chatRoomRoute");
 const responseRoutes = require("./src/routes/responseRoute");
 const familyRoutes = require("./src/routes/familyRoutes")
 const roleRoutes = require("./src/routes/roleRoutes")
+const dataRoutes = require("./src/routes/dataRoutes");
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use("/api/chatroom", chatRoomRoutes);
 app.use("/api/response", responseRoutes);
 app.use("/api/family",familyRoutes);
 app.use("/api/role",roleRoutes);
-
+app.use("/api/data", dataRoutes);
 
 app.use(express.static(path.join(__dirname, "../frontend/out/")));
 app.get("*", (req, res) =>
