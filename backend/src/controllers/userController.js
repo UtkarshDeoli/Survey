@@ -3,6 +3,7 @@ const Data = require("../models/data");
 const ProfilePicture = require("../models/profilePicture");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const Role = require("../models/role")
 
 exports.addUsers = async (req, res) => {
   try {
@@ -151,42 +152,43 @@ exports.getAllUsers = async (req, res) => {
   try {
     console.log(req.query);
     let filter = req.query.filter || "";
-    let created_by = req.query.created_by;
+    // let created_by = req.query.created_by;
     const getWithProfilePicture = Boolean(req.query.getWithProfilePicture);
     const role = req.query.role;
     const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;
     const limit =
-      req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
-    const validRoles = [
-      "Admin",
-      "Booth Karyakarta",
-      "Survey Collector",
-      "Support Executive",
-      "Survey Manager",
-    ];
+    req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
+
+    const userRoles = await Role.find({category:'user'});
+    const validUserRoleIds = userRoles.map((role=>role._id))
 
     const skip = (page - 1) * limit;
-
+    
+    
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });
     searchConditions.push({ username: { $regex: filter, $options: "i" } });
-
+    
     let query = {
-      $and: [{ $or: searchConditions }, { created_by: created_by }],
+      $and: [{ $or: searchConditions }],//{ created_by: created_by }
     };
-
-    if (role && validRoles.includes(role)) {
+    let roleExists = [];
+    if(role){
+      roleExists = validUserRoleIds.filter(ro => ro.toString() === role.toString());
+    }
+    if (role && roleExists.length > 0) {
+      
       query.$and.push({ role: { $in: [role] } });
     } else {
-      query.$and.push({ role: { $in: validRoles } });
+      query.$and.push({ role: { $in: validUserRoleIds} });
     }
 
     let users;
-
+    
     if (getWithProfilePicture === "true") {
       users = await User.find(query).populate("profile_picture");
     } else {
-      users = await User.find(query).skip(skip).limit(limit);
+      users = await User.find(query).populate("role").skip(skip).limit(limit);
     }
 
     const total = await User.countDocuments(query);
@@ -200,6 +202,7 @@ exports.getAllUsers = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
+    console.log(error)
     return res
       .status(400)
       .json({ success: false, message: "something went wrong" });
@@ -265,8 +268,11 @@ exports.createKaryakarta = async (req, res) => {
       password,
       role,
     } = req.body;
-    const validRoles = ["Panna Pramukh", "Booth Adhyaksh", "Mandal Adhyaksh"];
-    if (!validRoles.includes(role)) {
+    const karyakartaRoles = await Role.find({category:"karyakarta"})
+    const validRoles = karyakartaRoles.map(el=>el._id);
+    const roleExists = validRoles.filter(el=>el.toString() === role.toString());
+
+    if (roleExists.length === 0){
       return res.status(400).json({
         success: false,
         message: "Invalid role",
@@ -363,26 +369,28 @@ exports.updateKaryakarta = async (req, res) => {
     }
 
     await karyakarta.save();
-
+    let updatedResponses;
     if (responses) {
-      responses.map((responseId) => {
-        new mongoose.Types.ObjectId(responseId);
+      updatedResponses = responses.map((responseId) => {
+        new mongoose.Types.ObjectId(String(responseId));
       });
     }
 
-    const savedData = await Data.findOneAndUpdate(
-      {
-        survey_id: new mongoose.Types.ObjectId(survey_id),
-        user_id: karyakarta._id,
-      },
-      {
-        $set: {
-          survey_id: new mongoose.Types.ObjectId(survey_id),
-          user_id: karyakarta._id,
-          responses: responses,
-        },
-      },
-    );
+    if(updatedResponses){
+      await Data.findOneAndUpdate(
+       {
+         survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+         user_id: karyakarta._id,
+       },
+       {
+         $set: {
+           survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+           user_id: karyakarta._id,
+           responses: responses,
+         },
+       },
+     );
+    }
 
     return res.status(200).json({
       success: true,

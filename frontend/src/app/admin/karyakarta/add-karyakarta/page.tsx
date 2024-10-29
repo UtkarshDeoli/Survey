@@ -1,7 +1,7 @@
 "use client";
 import React, { Suspense, useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { FaQuestionCircle } from "react-icons/fa";
+import { FaCheckCircle, FaCircle, FaQuestionCircle } from "react-icons/fa";
 import { IUser } from "@/types/user_interfaces";
 import { addUsers, createKaryakarta, getKaryakarta, updateKaryakarta } from "@/networks/user_networks";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +15,7 @@ import { getSurveyResponsesByFamily } from "@/networks/response_networks";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import Loader from "@/components/ui/Loader";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { districts } from "@/utils/devData";
 
 const inputs =[
     {
@@ -166,6 +167,7 @@ function Page() {
     if (userId) {
       console.log("user_id::");
       getUserData();
+
     }
   }, [userId]);
 
@@ -315,6 +317,8 @@ function Page() {
           <ButtonFilled className="absolute top-2 right-2 " onClick={()=>{
             setStep(1)
             setResponsePage(1)
+            setSelectedResponses([]);
+            setSelectdSurvey(null)
           }}>Back</ButtonFilled>
         <h1 className="text-xl font-bold mb-10 ">Responses show up here</h1>
         <div className="grid grid-cols-5 w-full  text-xl font-semibold border-b-2 pb-2">
@@ -341,9 +345,12 @@ function Page() {
                   currentColor = currentColor === "bg-blue-50" ? "bg-blue-100" : "bg-blue-50";
                   prevLastName = group.last_name; 
                 }
-                return <div onClick={()=>handleMemberClick(group.responses._id,index)} key={group.responses._id} className={`flex flex-col gap-3 px-4 ${selectedResponses.includes(group.responses._id)? "bg-green-200": currentColor} py-5 w-full`}>
+                return <div onClick={()=>handleMemberClick(group.responses._id,index)} key={group.responses._id} className={`flex flex-col gap-3 px-4 ${currentColor} py-5 w-full`}>
                     <div  className="cursor-pointer grid grid-cols-5">
-                      <p>{index+1}. </p>
+                      <div className="flex gap-2 items-center">
+                        {selectedResponses.includes(group.responses._id) ? <FaCheckCircle className="text-green-500" /> : <FaCircle className="text-gray-300" />}
+                        <p>{index+1}. </p>
+                      </div>
                       <p className="font-semibold col-span-2">{group.last_name}</p>
                       <p className="col-span-2">{group.responses.name}</p>
                     </div>
@@ -357,6 +364,7 @@ function Page() {
             setDataModal(false)
             setStep(1)
             setSelectedResponses([])
+            setSelectdSurvey(null)
           }}>Cancel</ButtonBordered>
           <ButtonFilled onClick={()=>{
             setDataModal(false)
@@ -408,6 +416,26 @@ function Page() {
                     </div>
                   ))}
                 </div>
+
+
+                <div className="flex items-center mt-3 space-x-2 w-full">
+                  <div className=" w-1/2 font-medium">District</div>
+                  <div className="w-1/2">
+                    <select
+                      {...register("district", { required: userId ? false : true })}
+                      className="border border-gray-300 w-full text-center rounded-md p-2"
+                      >
+                        <option value="" selected disabled={true} className="disabled:bg-gray-200">Select Value</option>
+                      {
+                        districts.map(district=><option value={district}>{district}</option>)
+                      }
+                    </select>
+                    {errors.status && (
+                      <p className="text-red-500">User status is required</p>
+                    )}
+                  </div>
+                </div>
+
 
                 {/* user status active/ inactive */}
                 <div className="flex items-center mt-3 space-x-2 w-full">
@@ -496,8 +524,6 @@ function Page() {
       </div>
       <CustomModal open={dataModal} closeModal={()=>{
         setDataModal(false)
-        setStep(1)
-        setSelectedResponses([])
       }}>
           {showModalData()}
       </CustomModal>

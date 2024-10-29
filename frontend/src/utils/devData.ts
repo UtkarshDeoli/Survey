@@ -31,7 +31,7 @@ export const advanceQuestions = [
   "Checkbox Grid",
   "Checkbox Grid With Other",
   "Number Point Grid",
-  "Audio"
+  "Audio",
   // "Contact Form",
   // "Address",
 ];
@@ -48,3 +48,18 @@ export const errorToastStyles = {
   },
 };
 
+export const districts = [
+  "Almora",
+  "Bageshwar",
+  "Chamoli",
+  "Champawat",
+  "Dehradun",
+  "Haridwar",
+  "Nainital",
+  "Pauri Garhwal",
+  "Pithoragarh",
+  "Rudraprayag",
+  "Tehri Garhwal",
+  "Udham Singh Nagar",
+  "Uttarkashi",
+];

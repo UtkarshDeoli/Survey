@@ -11,7 +11,9 @@ const { sendPasswordResetEmail } = require("../services/emailService");
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("role");
+    const roles = user.role.map(el=>el.name);
+    console.log(roles);
     // Check if user exists
     if (!user) {
       return res
@@ -33,7 +35,7 @@ exports.login = async (req, res) => {
         ac_no: user.ac_no,
         booth_no: user.booth_no,
         name: user.name,
-        role: user.role,
+        role: roles
       },
       JWT_SECRET,
     );

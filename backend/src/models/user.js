@@ -31,20 +31,12 @@ const userSchema = new Schema(
       type: Number,
       required: false,
     },
-    role: {
-      type: [String],
-      enum: [
-        "Admin",
-        "Booth Karyakarta",
-        "Survey Collector",
-        "Support Executive",
-        "Survey Manager",
-        "Panna Pramukh",
-        "Booth Adhyaksh",
-        "Mandal Adhyaksh",
-      ],
+    role: [{
+      type:mongoose.Schema.Types.ObjectId,
+      ref: "Role99",
       required: true,
-    },
+      }
+    ],
     auto_assign_survey: {
       type: Boolean,
       default: false,
