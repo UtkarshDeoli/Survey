@@ -49,6 +49,8 @@ exports.saveResponse = async (req, res) => {
       name,
       last_name,
     };
+
+    let createdNewFamily = false;
     if (save_mode === "new_family") {
       const alreadyExists = await Family.findOne({
         survey_id,
@@ -70,6 +72,7 @@ exports.saveResponse = async (req, res) => {
           house_no,
           last_name,
         });
+        createdNewFamily = true;
         responseToSave.family_id = newFamily._id;
       }
     } else if (family_id) {
@@ -77,6 +80,13 @@ exports.saveResponse = async (req, res) => {
     }
     const response = new Responses(responseToSave);
     await response.save();
+
+    if (createdNewFamily) {
+      await Family.updateOne(
+        { _id: responseToSave.family_id },
+        { $set: { family_head: response._id } },
+      );
+    }
     return res
       .status(201)
       .json({ success: true, message: "Response created successfully" });
