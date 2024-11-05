@@ -7,8 +7,15 @@ exports.getData = async (req, res) => {
 
     const dataDoc = await Data.findOne({
       user_id: new mongoose.Types.ObjectId(String(userId)),
-    });
+    }).populate("responses");
+    console.log(userId, dataDoc);
 
+    if (!dataDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "Data not found",
+      });
+    }
     return res.status(200).json({ success: true, data: dataDoc });
   } catch (error) {
     console.log(error);

@@ -3,7 +3,7 @@ const Data = require("../models/data");
 const ProfilePicture = require("../models/profilePicture");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const Role = require("../models/role")
+const Role = require("../models/role");
 
 exports.addUsers = async (req, res) => {
   try {
@@ -157,34 +157,34 @@ exports.getAllUsers = async (req, res) => {
     const role = req.query.role;
     const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;
     const limit =
-    req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
+      req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
 
-    const userRoles = await Role.find({category:'user'});
-    const validUserRoleIds = userRoles.map((role=>role._id))
+    const userRoles = await Role.find({ category: "user" });
+    const validUserRoleIds = userRoles.map((role) => role._id);
 
     const skip = (page - 1) * limit;
-    
-    
+
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });
     searchConditions.push({ username: { $regex: filter, $options: "i" } });
-    
+
     let query = {
-      $and: [{ $or: searchConditions }],//{ created_by: created_by }
+      $and: [{ $or: searchConditions }], //{ created_by: created_by }
     };
     let roleExists = [];
-    if(role){
-      roleExists = validUserRoleIds.filter(ro => ro.toString() === role.toString());
+    if (role) {
+      roleExists = validUserRoleIds.filter(
+        (ro) => ro.toString() === role.toString(),
+      );
     }
     if (role && roleExists.length > 0) {
-      
       query.$and.push({ role: { $in: [role] } });
     } else {
-      query.$and.push({ role: { $in: validUserRoleIds} });
+      query.$and.push({ role: { $in: validUserRoleIds } });
     }
 
     let users;
-    
+
     if (getWithProfilePicture === "true") {
       users = await User.find(query).populate("profile_picture");
     } else {
@@ -202,7 +202,7 @@ exports.getAllUsers = async (req, res) => {
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res
       .status(400)
       .json({ success: false, message: "something went wrong" });
@@ -269,11 +269,13 @@ exports.createKaryakarta = async (req, res) => {
       password,
       role,
     } = req.body;
-    const karyakartaRoles = await Role.find({category:"karyakarta"})
-    const validRoles = karyakartaRoles.map(el=>el._id);
-    const roleExists = validRoles.filter(el=>el.toString() === role.toString());
+    const karyakartaRoles = await Role.find({ category: "karyakarta" });
+    const validRoles = karyakartaRoles.map((el) => el._id);
+    const roleExists = validRoles.filter(
+      (el) => el.toString() === role.toString(),
+    );
 
-    if (roleExists.length === 0){
+    if (roleExists.length === 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid role",
@@ -381,20 +383,20 @@ exports.updateKaryakarta = async (req, res) => {
       });
     }
 
-    if(updatedResponses){
+    if (updatedResponses) {
       await Data.findOneAndUpdate(
-       {
-         survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-         user_id: karyakarta._id,
-       },
-       {
-         $set: {
-           survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-           user_id: karyakarta._id,
-           responses: responses,
-         },
-       },
-     );
+        {
+          survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+          user_id: karyakarta._id,
+        },
+        {
+          $set: {
+            survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+            user_id: karyakarta._id,
+            responses: responses,
+          },
+        },
+      );
     }
 
     return res.status(200).json({
@@ -485,7 +487,11 @@ exports.getPannaPramukh = async (req, res) => {
       });
     }
 
-    const query = { ac_no, booth_no, role: { $in: ["Panna Pramukh"] } };
+    const pannaPramukhRole = await Role.findOne({
+      name: "Panna Pramukh",
+    });
+
+    const query = { ac_no, booth_no, role: { $in: [pannaPramukhRole._id] } };
 
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });
@@ -522,8 +528,11 @@ exports.getBoothAdhyaksh = async (req, res) => {
         message: "Invalid ac_no or booth_no",
       });
     }
+    const BoothAdhyakshRole = await Role.findOne({
+      name: "Booth Adhyaksh",
+    });
 
-    const query = { ac_no, booth_no, role: { $in: ["Booth Adhyaksh"] } };
+    const query = { ac_no, booth_no, role: { $in: [BoothAdhyakshRole._id] } };
 
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });

@@ -18,14 +18,21 @@ exports.getFamily = async (req, res) => {
           _id: last_name,
           total_responses: responses.length,
           house_no: house_no,
-          name: responses.map((response) => response.name),
+          member_data: responses.map((response) => ({
+            name: response.name,
+            response_id: response._id,
+          })),
         },
       ];
+      const paddedResponses = [...transformedResponses];
+      while (paddedResponses.length < families.length) {
+        paddedResponses.push(null);
+      }
 
       return res.status(200).json({
         success: true,
         families,
-        responses: transformedResponses,
+        responses: paddedResponses,
       });
     }
     console.log("no last name");
@@ -41,12 +48,22 @@ exports.getFamily = async (req, res) => {
           _id: "$last_name",
           total_responses: { $sum: 1 },
           house_no: { $first: "$house_no" },
-          name: { $push: "$name" },
+          member_data: { $push: { name: "$name", response_id: "$_id" } },
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
         },
       },
     ];
-    const families = await Family.find(filterOptions);
+    const families = await Family.find(filterOptions).sort({ last_name: 1 });
     const responses = await Response.aggregate(aggregationPipeline);
+
+    while (responses.length < families.length) {
+      responses.push(null);
+    }
+
     return res.status(200).json({
       success: true,
       families,
@@ -104,5 +121,39 @@ exports.updateFamily = async (req, res) => {
     res.status(200).json({ success: true, data: family });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+exports.updateFamilyMemberDetails = async (req, res) => {
+  try {
+    const { name, response_id, family_id, assignAsHead } = req.query;
+    console.log(name, response_id, family_id, assignAsHead);
+
+    if (assignAsHead) {
+      await Family.findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(String(family_id)) },
+        {
+          $set: {
+            family_head: new mongoose.Types.ObjectId(String(response_id)),
+          },
+        },
+      );
+    }
+
+    const response = await Response.findOneAndUpdate(
+      new mongoose.Types.ObjectId(String(response_id)),
+      { $set: { name: name } },
+      { new: true },
+    );
+    res.status(200).json({
+      success: true,
+      message: "Family member details updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while updating family member details",
+    });
   }
 };
