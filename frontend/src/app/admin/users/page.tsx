@@ -11,7 +11,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import Loader from "@/components/ui/Loader";
 
 function page() {
-  const [users, setUsers] = useState<IUser[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [searchBarInput, setSearchBarInput] = useState<string>("");
   const [limit,setLimit] = useState <number> (10);
   const [page,setPage] = useState <number> (1);
@@ -62,7 +62,7 @@ function page() {
           <h1 className="text-2xl">Users</h1>
         </div>
         <div className="flex justify-end space-x-3 text-xs">
-          <ButtonFilled className="bg-my-blue-600">Help</ButtonFilled>
+          <ButtonFilled onClick={()=>router.push("/admin/users/manage-roles")} className="bg-my-blue-600">Manage Roles</ButtonFilled>
           <ButtonFilled
             onClick={() => {
               router.push("./users/add-multiple-users");
@@ -143,9 +143,9 @@ function page() {
               </p>
               <div className="col-span-1 flex justify-center items-center">
                 <div className="flex flex-wrap gap-1 justify-center">
-                  {user.role.map((role, roleIndex) => (
+                  {user.role.map((role:any, roleIndex:number) => (
                     <span key={roleIndex} className="whitespace-nowrap">
-                      {role}
+                      {role.name}
                       {roleIndex < user.role.length - 1 ? "," : ""}
                     </span>
                   ))}
@@ -219,36 +219,6 @@ function page() {
         }
       </div>
 
-      {/* <CustomModal
-        open={publishModal}
-        closeModal={() => {
-          setPublishModal(false);
-          setSurveyToPublish(null);
-          setisSurveyPublished(null);
-        }}
-      >
-        <div className="flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
-          <h1 className="text-xl">
-            Do you want to {isSurveyPublished ? "Unpublish" : "Publish"} this
-            survey?
-          </h1>
-          <div className="flex gap-2">
-            <ButtonFilled onClick={handlePublishSurvey} className="w-40">
-              {isSurveyPublished ? "Unpublish" : "Publish"}
-            </ButtonFilled>
-            <ButtonFilled
-              onClick={() => {
-                setPublishModal(false);
-                setSurveyToPublish(null);
-                setisSurveyPublished(null);
-              }}
-              className="w-40"
-            >
-              No
-            </ButtonFilled>
-          </div>
-        </div>
-      </CustomModal> */}
     </div>
   );
 }

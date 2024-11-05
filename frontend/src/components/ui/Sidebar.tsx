@@ -19,6 +19,7 @@ import Image from "next/image";
 import logo from "../../../public/icons/logo.png";
 import logolg from "../../../public/icons/logo-large.png";
 import { BiTestTube } from "react-icons/bi";
+import { RiCalendarTodoFill } from "react-icons/ri";
 
 // Paths that should have a small sidebar
 
@@ -56,6 +57,12 @@ function Sidebar({ sidebarOpen }: any) {
       name: "Karyakarta",
       path: "/admin/karyakarta",
       tooltip: "Karyakarta",
+    },
+    {
+      icon: <RiCalendarTodoFill size={18} />,
+      name: "To-Do list",
+      path: "/admin/todos",
+      tooltip: "todo-list",
     },
     {
       icon: <BsLifePreserver size={18} />,

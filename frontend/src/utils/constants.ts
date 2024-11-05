@@ -43,3 +43,11 @@ export const login = "api/auth/login";
 export const signup = "api/auth/signup";
 export const forgot_password = "api/auth/forgotPassword";
 export const reset_password = "api/auth/resetPassword";
+
+// roles
+export const get_all_roles = "api/role/allRoles"
+export const get_roles = "api/role/roles"
+export const create_role = "api/role/create"
+export const update_role = "api/role/update"
+export const delete_role = "api/role/delete"
+

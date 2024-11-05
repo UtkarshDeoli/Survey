@@ -18,6 +18,7 @@ exports.createRole = async(req,res)=>{
 }
 exports.updateRole = async (req, res) => {
     const { role_id, name, category, permissionsToAdd, permissionsToRemove } = req.body;
+    console.log(req.body);
 
     try {
         const updateOperations = {};
@@ -59,7 +60,7 @@ exports.updateRole = async (req, res) => {
 exports.getRoles = async(req,res)=>{
     const { category } = req.query;
     try{
-        const roles = await Role.find({category});
+        const roles = await Role.find({category}).sort({createdAt:-1});
         return res.status(200).json({
             success:true,
             roles
@@ -74,7 +75,7 @@ exports.getRoles = async(req,res)=>{
 }
 exports.getAllRoles = async(req,res)=>{
     try{
-        const roles = await Role.find();
+        const roles = await Role.find().sort({createdAt:-1});
         return res.status(200).json({
             success:true,
             roles
@@ -87,3 +88,22 @@ exports.getAllRoles = async(req,res)=>{
         })
     }
 }
+exports.deleteRole = async(req,res)=>{
+    try{
+        console.log(req.body)
+        const {role_id} = req.body
+        await Role.findByIdAndDelete(role_id)
+        return res.status(200).json({
+            success:true,
+            message:"Role successfully deleted"
+        })
+    }catch(err){
+        console.log(err)
+        return res.status(500).json({
+            success:false,
+            message:"Error fetching roles",
+            error:err
+        })
+    }
+}
+
