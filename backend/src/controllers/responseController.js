@@ -2,8 +2,11 @@ const MediaResponse = require("../models/mediaResponse");
 const Responses = require("../models/response");
 const Family = require("../models/family");
 const mongoose = require("mongoose");
+const fs = require('fs');
 
 exports.saveResponse = async (req, res) => {
+  console.log("here it works");
+  console.log(req.file.path);
   try {
     const {
       survey_id,
@@ -19,6 +22,10 @@ exports.saveResponse = async (req, res) => {
       family_id,
       save_mode,
     } = req.body;
+    parsedResponses = JSON.parse(responses);
+    console.log("responses are-->", parsedResponses);
+    parsedLocationData = JSON.parse(location_data);
+    console.log("location data are-->", parsedLocationData);
 
     if (media_responses) {
       Object.entries(media_responses).map(([key, value]) => {
@@ -41,8 +48,8 @@ exports.saveResponse = async (req, res) => {
     let responseToSave = {
       survey_id,
       user_id,
-      responses,
-      location_data,
+      responses: parsedResponses,
+      location_data: parsedLocationData,
       ac_no,
       booth_no,
       house_no,
@@ -78,6 +85,7 @@ exports.saveResponse = async (req, res) => {
     } else if (family_id) {
       responseToSave.family_id = family_id;
     }
+    responseToSave.audio_recording_path = req.file.path;
     const response = new Responses(responseToSave);
     await response.save();
 
@@ -227,6 +235,7 @@ exports.getAllResponses = async (req, res) => {
           last_name: 1,
           location_data: 1,
           createdAt: 1,
+          audio_recording_path: 1,
           "responses.question_id": 1,
           "responses.question_type": 1,
           "responses.question": 1,
@@ -257,6 +266,7 @@ exports.getAllResponses = async (req, res) => {
           survey_id: { $first: "$survey_id" },
           createdAt: { $first: "$createdAt" },
           responses: { $push: "$responses" },
+          audio_recording_path: { $first: "$audio_recording_path" },
         },
       },
     ];
@@ -284,7 +294,8 @@ exports.getAllResponses = async (req, res) => {
         .status(404)
         .json({ success: "false", message: "Response not found" });
     } else {
-      console.log(filteredResponse);
+      // console.log("filtered response is-->", filteredResponse);
+      
       return res.status(200).json({ success: "true", data: filteredResponse });
     }
   } catch (error) {

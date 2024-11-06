@@ -25,7 +25,7 @@ exports.createTodo = async (req, res) => {
       status,
       priority,
       description,
-      reminder: reminder ? new Date(reminder) : null 
+      reminder: reminder ? new Date(reminder) : null,
     });
 
     await newTodo.save();
@@ -121,14 +121,18 @@ exports.getTodosByUserId = async (req, res) => {
     const { userId } = req.query;
 
     const todos = await Todos.find({ assigned_to: userId }).populate(
-      "assigned_by assigned_to"
+      "assigned_by assigned_to",
     );
 
     if (!todos || todos.length === 0) {
       return res.status(404).json({ message: "No todos found for this user" });
     }
 
-    res.status(200).json(todos);
+    res.status(200).json({
+      success: true,
+      message: "Survey updated successfully",
+      data: todos,
+    });
   } catch (error) {
     res
       .status(500)
@@ -168,9 +172,6 @@ exports.deleteTodo = async (req, res) => {
       .status(200)
       .json({success:true, message: "Todo deleted successfully", todo: deletedTodo });
   } catch (error) {
-    console.log(error)
-    res
-      .status(500)
-      .json({ message: "Error deleting todo", error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };

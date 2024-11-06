@@ -40,6 +40,9 @@ const responseSchema = new Schema(
         },
         other_details:{
             type: Schema.Types.Mixed
+        },
+        audio_recording_path:{
+            type: String
         }
     },
     { strict: false ,timestamps: true}
