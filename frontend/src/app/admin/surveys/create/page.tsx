@@ -244,7 +244,8 @@ function Page() {
               disabled={true}
               {...register("ac_no")}
               type="number"
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              value={AC_NO||""}
+              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
           </div>
           <div className="grid grid-cols-3">
@@ -255,7 +256,8 @@ function Page() {
               disabled={true}
               {...register("booth_no")}
               type="number"
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              value={BOOTH_NO||""}
+              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md "
             />
           </div>
         </div>

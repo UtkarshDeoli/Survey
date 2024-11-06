@@ -21,7 +21,7 @@ function Page() {
     const [addRoleModal, setAddRoleModal] = useState<boolean>(false);
     const [role,setRole] = useState<string|null>(null);
     const [selectedPermissions,setSelectedPermissions] = useState<string[]|null>(null);
-    const [category,setCategory] = useState<string|null>(null);
+    const [category,setCategory] = useState<string|null>("user");
     
     //router
     const router = useRouter();
@@ -39,6 +39,7 @@ function Page() {
             permissions:selectedPermissions
         }
         const response = await createRole(params);
+        console.log("response is --->",response)
         if(response.success){
             toast.success("Role added successfully!");
             setAddRoleModal(false);

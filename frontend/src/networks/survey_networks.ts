@@ -15,9 +15,13 @@ export const createSurvey = async (params: any) => {
     const options = {
       method: "POST",
       url: `${SERVER_URI}/${create_survey}`,
+      headers:{
+        "Content-Type": "application/json"
+      },
       data: params,
     };
     const response = await axios.request(options);
+    console.log(response)
     return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };

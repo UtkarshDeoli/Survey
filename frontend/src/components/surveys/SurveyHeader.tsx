@@ -163,7 +163,7 @@ function SurveyHeader({setUpdated}:props) {
                 onChange={(e) => setAcNo(e.target.value)}
                 value={acNo}
                 className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                type="number"
+                type="text"
                 placeholder="AC_NO"
               />
             
@@ -172,7 +172,7 @@ function SurveyHeader({setUpdated}:props) {
                 onChange={(e) => setBoothNo(e.target.value)}
                 value={boothNo}
                 className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                type="number"
+                type="text"
                 placeholder="BOOTH_NO"
               />
           
@@ -221,7 +221,7 @@ function SurveyHeader({setUpdated}:props) {
                 onChange={(e) => setAcNo(e.target.value)}
                 value={acNo}
                 className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                type="number"
+                type="text"
                 placeholder="AC_NO"
               />
             
@@ -230,7 +230,7 @@ function SurveyHeader({setUpdated}:props) {
                 onChange={(e) => setBoothNo(e.target.value)}
                 value={boothNo}
                 className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                type="number"
+                type="text"
                 placeholder="BOOTH_NO"
               />
           

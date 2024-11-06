@@ -163,10 +163,12 @@ exports.getAllResponses = async (req, res) => {
         };
       }
     }
-    
     const responseFilters = [];
     console.log("filters are-->", filters);
     if (filters) {
+      console.log("filteres there");
+      // const filterArray = JSON.parse(filters);
+      // console.log("fa-->", filterArray);
       filters.forEach(({ question, operator, response: answer }) => {
         const filter = {
           question_id: Number(question),
@@ -218,15 +220,21 @@ exports.getAllResponses = async (req, res) => {
         $match: matchStage,
       },
       {
-        $unwind: "$responses", 
+        $unwind: "$responses",
       },
       {
         $project: {
           _id: 1,
           user_id: 1,
           survey_id: 1,
-          other_details: 1,
-          createdAt: 1, 
+          ac_no: 1,
+          booth_no: 1,
+          house_no: 1,
+          name: 1,
+          last_name: 1,
+          location_data: 1,
+          createdAt: 1,
+          audio_recording_path: 1,
           "responses.question_id": 1,
           "responses.question_type": 1,
           "responses.question": 1,
@@ -243,33 +251,36 @@ exports.getAllResponses = async (req, res) => {
                   if: {
                     $regexMatch: {
                       input: { $toString: "$responses.response" },
-                      regex: /^\d+(\.\d+)?$/, 
+                      regex: /^\d+(\.\d+)?$/,
                     },
                   },
-                  then: { $toDouble: "$responses.response" }, 
-                  else: "$responses.response", 
+                  then: { $toDouble: "$responses.response" },
+                  else: "$responses.response",
                 },
               },
-              else: "$responses.response", 
+              else: "$responses.response",
             },
           },
         },
       },
       {
         $group: {
-          _id: "$_id", 
-          user_id: { $first: "$user_id" }, 
+          _id: "$_id",
+          user_id: { $first: "$user_id" },
+          ac_no: { $first: "$ac_no" },
+          booth_no: { $first: "$booth_no" },
+          house_no: { $first: "$house_no" },
+          name: { $first: "$name" },
+          last_name: { $first: "$last_name" },
+          location_data: { $first: "$location_data" },
           survey_id: { $first: "$survey_id" },
-          other_details: { $first: "$other_details" },
           createdAt: { $first: "$createdAt" },
-          responses: { $push: "$responses" }, 
+          responses: { $push: "$responses" },
+          audio_recording_path: { $first: "$audio_recording_path" },
         },
       },
-      {
-        $sort: { createdAt: -1 },
-      },
     ];
-    
+
     if (responseFilters && responseFilters.length > 0) {
       aggregationPipeline2.push({
         $match: {
@@ -293,6 +304,8 @@ exports.getAllResponses = async (req, res) => {
         .status(404)
         .json({ success: "false", message: "Response not found" });
     } else {
+      // console.log("filtered response is-->", filteredResponse);
+
       return res.status(200).json({ success: "true", data: filteredResponse });
     }
   } catch (error) {
@@ -300,174 +313,6 @@ exports.getAllResponses = async (req, res) => {
     return res.status(400).json({ success: "false", message: error.message });
   }
 };
-
-
-// exports.getAllResponses = async (req, res) => {
-//   try {
-//     const { surveyId, userId, startDate, endDate, filters } = req.query;
-//     console.log("query is------>", req.query);
-//     const matchStage = {};
-
-//     matchStage.survey_id = new mongoose.Types.ObjectId(String(surveyId));
-//     if (userId) {
-//       matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
-//     }
-//     if (startDate && endDate) {
-//       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
-//         return res
-//           .status(400)
-//           .json({ success: false, message: "Invalid date range." });
-//       }
-//       if (startDate && endDate) {
-//         matchStage.createdAt = {
-//           $gte: new Date(startDate),
-//           $lte: new Date(endDate),
-//         };
-//       }
-//     }
-//     const responseFilters = [];
-//     console.log("filters are-->", filters);
-//     if (filters) {
-//       console.log("filteres there");
-//       const filterArray = JSON.parse(filters);
-//       console.log("fa-->", filterArray);
-//       filterArray.forEach(({ question, operator, response: answer }) => {
-//         const filter = {
-//           question_id: Number(question),
-//         };
-//         switch (operator) {
-//           case "contains":
-//             filter.response = { $regex: answer, $options: "i" };
-//             break;
-//           case "equals":
-//             filter.response = answer;
-//             break;
-//           case "not equals":
-//             filter.response = { $ne: answer };
-//             break;
-//           case "starts with":
-//             filter.response = { $regex: `^${answer}`, $options: "i" };
-//             break;
-//           case "ends with":
-//             filter.response = { $regex: `${answer}$`, $options: "i" };
-//             break;
-//           case "=":
-//             filter.response = Number(answer);
-//             break;
-//           case "!=":
-//             filter.response = { $ne: Number(answer) };
-//             break;
-//           case "<":
-//             filter.response = { $lt: Number(answer) };
-//             break;
-//           case "<=":
-//             filter.response = { $lte: Number(answer) };
-//             break;
-//           case ">":
-//             filter.response = { $gt: Number(answer) };
-//             break;
-//           case ">=":
-//             filter.response = { $gte: Number(answer) };
-//             break;
-//           case "!=":
-//             filter.response = { $ne: Number(answer) };
-//             break;
-//         }
-//         responseFilters.push(filter);
-//       });
-//     }
-
-//     const aggregationPipeline2 = [
-//       {
-//         $match: matchStage,
-//       },
-//       {
-//         $unwind: "$responses",
-//       },
-//       {
-//         $project: {
-//           _id: 1,
-//           user_id: 1,
-//           survey_id: 1,
-//           ac_no: 1,
-//           booth_no: 1,
-//           house_no: 1,
-//           name: 1,
-//           last_name: 1,
-//           location_data: 1,
-//           createdAt: 1,
-//           audio_recording_path: 1,
-//           "responses.question_id": 1,
-//           "responses.question_type": 1,
-//           "responses.question": 1,
-//           "responses.response": {
-//             $cond: {
-//               if: {
-//                 $regexMatch: {
-//                   input: { $toString: "$responses.response" },
-//                   regex: /^\d+(\.\d+)?$/,
-//                 },
-//               },
-//               then: { $toDouble: "$responses.response" },
-//               else: "$responses.response",
-//             },
-//           },
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: "$_id",
-//           user_id: { $first: "$user_id" },
-//           ac_no: { $first: "$ac_no" },
-//           booth_no: { $first: "$booth_no" },
-//           house_no: { $first: "$house_no" },
-//           name: { $first: "$name" },
-//           last_name: { $first: "$last_name" },
-//           location_data: { $first: "$location_data" },
-//           survey_id: { $first: "$survey_id" },
-//           createdAt: { $first: "$createdAt" },
-//           responses: { $push: "$responses" },
-//           audio_recording_path: { $first: "$audio_recording_path" },
-//         },
-//       },
-//     ];
-
-//     // const filteredResponse1 = await Responses.aggregate(aggregationPipeline2);
-//     // console.log("test----->",filteredResponse1)
-
-
-//     if (responseFilters && responseFilters.length > 0) {
-//       aggregationPipeline2.push({
-//         $match: {
-//           $and: responseFilters.map((response) => ({
-//             responses: {
-//               $elemMatch: {
-//                 question_id: response.question_id,
-//                 response: response.response,
-//               },
-//             },
-//           })),
-//         },
-//       });
-//     }
-
-//     console.log(JSON.stringify(aggregationPipeline2, null, 2));
-//     const filteredResponse = await Responses.aggregate(aggregationPipeline2);
-
-//     if (!filteredResponse) {
-//       return res
-//         .status(404)
-//         .json({ success: "false", message: "Response not found" });
-//     } else {
-//       // console.log("filtered response is-->", filteredResponse);
-      
-//       return res.status(200).json({ success: "true", data: filteredResponse });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(400).json({ success: "false", message: error.message });
-//   }
-// };
 
 exports.getResponse = async (req, res) => {
   try {

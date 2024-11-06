@@ -21,7 +21,8 @@ exports.saveSurvey = async (req, res) => {
       thank_time_duration,
       questions,
     } = req.body;
-    console.log(req.body);
+    
+    console.log("body is----->",req.body);
     let welcome_image, thankyou_image;
     if (req.files && req.files.welcome_image) {
       welcome_image = req.files.welcome_image.data;
@@ -40,8 +41,8 @@ exports.saveSurvey = async (req, res) => {
       name,
       header_text,
       access_pin,
-      ac_no : ac_no.split(","),
-      booth_no :booth_no.split(","),
+      ac_no,
+      booth_no,
       background_location_capture,
       welcome_image,
       thankyou_image,
