@@ -271,6 +271,7 @@ exports.createKaryakarta = async (req, res) => {
     } = req.body;
     const karyakartaRoles = await Role.find({ category: "karyakarta" });
     const validRoles = karyakartaRoles.map((el) => el._id);
+    console.log("ROLE ISS:", role);
     const roleExists = validRoles.filter(
       (el) => el.toString() === role.toString(),
     );
@@ -325,26 +326,27 @@ exports.createKaryakarta = async (req, res) => {
   }
 };
 
-exports.updateMultipleKaryakarta = async(req,res)=>{
-  try{
-    const {ids,surveyId,responses} = req.body;
+exports.updateMultipleKaryakarta = async (req, res) => {
+  try {
+    const { ids, surveyId, responses } = req.body;
     console.log(req.body);
-    ids.forEach(async(id) => {
-      const data = await Data.findOne({user_id:id});
-      if(data){
+    ids.forEach(async (id) => {
+      const data = await Data.findOne({ user_id: id });
+      if (data) {
         data.responses = responses;
         await data.save();
-      }
-      else await Data.create({survey_id:surveyId,user_id:id,responses})
+      } else await Data.create({ survey_id: surveyId, user_id: id, responses });
     });
-    return res.status(200).json({success:true,message:"succeessfuly created data"});
-  }catch(err){
+    return res
+      .status(200)
+      .json({ success: true, message: "succeessfuly created data" });
+  } catch (err) {
     return res.status(500).json({
-      success:false,
+      success: false,
       message: "Error updating data",
-    })
+    });
   }
-}
+};
 
 exports.updateKaryakarta = async (req, res) => {
   try {
@@ -444,9 +446,9 @@ exports.getAllKaryakarta = async (req, res) => {
       req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
     // const validRoles = ["Panna Pramukh", "Booth Adhyaksh", "Mandal Adhyaksh"];
 
-    const validRoles = await Role.find({category:"karyakarta"})
-    const validRoleIds = validRoles.map(r=>r._id);
-    console.log("valid roles are -->",validRoleIds);
+    const validRoles = await Role.find({ category: "karyakarta" });
+    const validRoleIds = validRoles.map((r) => r._id);
+    console.log("valid roles are -->", validRoleIds);
 
     const skip = (page - 1) * limit;
 
@@ -472,7 +474,8 @@ exports.getAllKaryakarta = async (req, res) => {
     const karyakartas = await User.find(query)
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("role");
     const total = await User.countDocuments(query);
     console.log("total is -- >", total);
     return res.status(200).json({
@@ -504,8 +507,8 @@ exports.getKaryakarta = async (req, res) => {
 
 exports.getPannaPramukh = async (req, res) => {
   try {
-    console.log("get panna pramukh")
-    console.log(req.query)
+    console.log("get panna pramukh");
+    console.log(req.query);
     const { ac_no, booth_no } = req.query;
     let filter = req.query.filter || "";
     const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;

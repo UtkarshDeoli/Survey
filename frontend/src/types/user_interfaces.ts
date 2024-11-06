@@ -1,14 +1,13 @@
-
-export interface IUser{
-  created_by?:string;
+export interface IUser {
+  created_by?: string;
   username: string;
   name: string;
   email: string;
   password: string;
-  ac_no:string;
-  booth_no:string;
+  ac_no: string;
+  booth_no: string;
   confirm_password?: string;
-  role: ['Admin', 'Booth Karyakarta', 'Survey Collector', 'Support Executive', 'Survey Manager'];
+  role: any;
   auto_assign_survey?: boolean;
   view_own_collected_data?: boolean;
   prevent_data_download?: boolean;
@@ -18,9 +17,8 @@ export interface IUser{
   view_pending_data?: boolean;
   assigned_survey?: string[];
   selectAll?: boolean;
-  status:"active"|"inactive";
+  status: "active" | "inactive";
   _id: string;
   filter?: string;
   userDetails?: any;
 }
-
