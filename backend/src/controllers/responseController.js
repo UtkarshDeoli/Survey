@@ -280,6 +280,9 @@ exports.getAllResponses = async (req, res) => {
           audio_recording_path: { $first: "$audio_recording_path" },
         },
       },
+      {
+        $sort: { createdAt: -1 },
+      },
     ];
 
     if (responseFilters && responseFilters.length > 0) {
