@@ -7,6 +7,7 @@ import CustomModal from "../ui/Modal";
 import { checkToken } from "@/utils/common_functions";
 import { createSurvey } from "@/networks/survey_networks";
 import * as XLSX from "xlsx";
+import { TbBroadcast } from "react-icons/tb";
 import toast from "react-hot-toast";
 import { saveResponses } from "@/networks/response_networks";
 import { CiImport } from "react-icons/ci";
@@ -19,13 +20,9 @@ function SurveyHeader({setUpdated}:props) {
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [name, setName] = useState<string>("");
   const [acNo, setAcNo] = useState<string>("");
-  const [acNos, setAcNos] = useState<string[]>([""]);
-  const [boothNos, setBoothNos] = useState<string[]>([""]);
   const [boothNo, setBoothNo] = useState<string>("");
   const [user, setUser] = useState<any>(null);
   const [excelData, setExcelData] = useState<any[]>([]);
-  const [acInput, setAcInput] = useState<string>("");
-  const [boothInput, setBoothInput] = useState<string>("");
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   console.log(excelData);
@@ -116,25 +113,6 @@ function SurveyHeader({setUpdated}:props) {
       toast.error("Something went wrong while saving responses");
     }
   }
-
-  const handleAcInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAcInput(value);
-
-    // Split input by commas and update the acNos state
-    const acValues = value.split(",").map((item) => item.trim()).filter(Boolean);
-    setAcNos(acValues);
-  };
-
-  const handleBoothInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setBoothInput(value);
-
-    // Split input by commas and update the boothNos state
-    const boothValues = value.split(",").map((item) => item.trim()).filter(Boolean);
-    setBoothNos(boothValues);
-  };
-
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
   const openImportModal = () => setImportModalOpen(true);
@@ -164,11 +142,11 @@ function SurveyHeader({setUpdated}:props) {
 
       {/* modal */}
       <CustomModal open={modalIsOpen} closeModal={closeModal}>
-        <div className="relative w-[662px] h-[400px] flex flex-col justify-center items-center">
-          <div className="sticky z-10 top-0 left-0 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">
+        <div className="min-w-[662px] h-[400px] flex flex-col justify-center items-center">
+          <div className="relative z-10 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">
             Create surveys
           </div>
-          <form className="relative grid grid-cols-2 h-full w-[90%] p-4 place-items-center">
+          <form className="grid grid-cols-2 h-full w-[90%] place-items-center">
             
               <label className="h-full w-full flex justify-center items-center">Name</label>
               <input
@@ -180,43 +158,25 @@ function SurveyHeader({setUpdated}:props) {
               />
           
            
-          <label className="h-full w-full flex justify-center mt-4">AC Numbers</label>
-            <div className="flex flex-col w-full my-4">
+              <label className="h-full w-full flex justify-center items-center">AC_NO</label>
               <input
-                onChange={handleAcInputChange}
-                value={acInput}
-                className="border border-secondary-200 rounded-md px-8 py-3 focus:ring-1 focus:ring-blue-200 outline-none"
-                type="text"
-                placeholder="Enter comma-separated AC Numbers"
+                onChange={(e) => setAcNo(e.target.value)}
+                value={acNo}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                type="number"
+                placeholder="AC_NO"
               />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {acNos.map((acNo, index) => (
-                  <span key={index} className="px-3 py-1 bg-blue-200 text-blue-700 rounded-md">
-                    {acNo}
-                  </span>
-                ))}
-              </div>
-            </div>
             
-            <label className="h-full w-full flex justify-center mt-4">Booth Numbers</label>
-            <div className="flex flex-col w-full my-4">
+              <label className="h-full w-full flex justify-center items-center">BOOTH_NO</label>
               <input
-                onChange={handleBoothInputChange}
-                value={boothInput}
-                className="border border-secondary-200 rounded-md px-8 py-3 focus:ring-1 focus:ring-blue-200 outline-none"
-                type="text"
-                placeholder="Enter comma-separated Booth Numbers"
+                onChange={(e) => setBoothNo(e.target.value)}
+                value={boothNo}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                type="number"
+                placeholder="BOOTH_NO"
               />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {boothNos.map((boothNo, index) => (
-                  <span key={index} className="px-3 py-1 bg-green-200 text-green-700 rounded-md">
-                    {boothNo}
-                  </span>
-                ))}
-              </div>
-            </div>
           
-            <div className="col-span-2 flex items-center mb-4 gap-10">
+            <div className="col-span-2 flex items-center gap-10">
               <ButtonBordered
                 onClick={closeModal}
                 type="button"
@@ -225,12 +185,12 @@ function SurveyHeader({setUpdated}:props) {
                 Cancel
               </ButtonBordered>
               <button
-                disabled={!name || acNos.length === 0 || boothNos.length === 0}
+                disabled={!name || !acNo || !boothNo}
                 className="px-6 py-2 bg-primary-300 text-white rounded-md disabled:bg-blue-100 disabled:cursor-not-allowed"
                 type="button"
                 onClick={() =>
                   router.push(
-                    `/admin/surveys/create?name=${encodeURIComponent(name)}&ac_no=${encodeURIComponent(JSON.stringify(acNos))}&booth_no=${encodeURIComponent(JSON.stringify(boothNos))}`
+                    `/admin/surveys/create?name=${encodeURIComponent(name)}&ac_no=${encodeURIComponent(acNo)}&booth_no=${encodeURIComponent(boothNo)}`
                   )
                 }
               >
@@ -256,41 +216,23 @@ function SurveyHeader({setUpdated}:props) {
               />
           
            
-            <label className="h-full w-full flex justify-center items-center">AC Numbers</label>
-            <div className="flex flex-col w-full">
+              <label className="h-full w-full flex justify-center items-center">AC_NO</label>
               <input
-                onChange={handleAcInputChange}
-                value={acInput}
-                className="border border-secondary-200 rounded-md px-8 py-3 focus:ring-1 focus:ring-blue-200 outline-none"
-                type="text"
-                placeholder="Enter comma-separated AC Numbers"
+                onChange={(e) => setAcNo(e.target.value)}
+                value={acNo}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                type="number"
+                placeholder="AC_NO"
               />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {acNos.map((acNo, index) => (
-                  <span key={index} className="px-3 py-1 bg-blue-200 text-blue-700 rounded-md">
-                    {acNo}
-                  </span>
-                ))}
-              </div>
-            </div>
             
-            <label className="h-full w-full flex justify-center items-center">Booth Numbers</label>
-            <div className="flex flex-col w-full">
+              <label className="h-full w-full flex justify-center items-center">BOOTH_NO</label>
               <input
-                onChange={handleBoothInputChange}
-                value={boothInput}
-                className="border border-secondary-200 rounded-md px-8 py-3 focus:ring-1 focus:ring-blue-200 outline-none"
-                type="text"
-                placeholder="Enter comma-separated Booth Numbers"
+                onChange={(e) => setBoothNo(e.target.value)}
+                value={boothNo}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 h-3/4 w-full focus:ring-1 focus:ring-blue-200 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                type="number"
+                placeholder="BOOTH_NO"
               />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {boothNos.map((boothNo, index) => (
-                  <span key={index} className="px-3 py-1 bg-green-200 text-green-700 rounded-md">
-                    {boothNo}
-                  </span>
-                ))}
-              </div>
-            </div>
           
             <div className="flex items-center gap-10 col-span-2">
               <ButtonBordered

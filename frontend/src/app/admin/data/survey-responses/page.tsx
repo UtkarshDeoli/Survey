@@ -7,7 +7,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { getSurveyResponses } from "@/networks/response_networks";
 import { useSearchParams } from "next/navigation";
 import { FaEye } from "react-icons/fa";
-import { getAllUsers } from "@/networks/user_networks";
+import { getAllKaryakarta, getAllUsers, getPannaPramukh, updateKaryakartas } from "@/networks/user_networks";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import { useRouter } from "next/navigation"; // For routing
 import CustomModal from "@/components/ui/Modal";
@@ -50,9 +50,22 @@ function Page() {
   const [mapModalIsOpen, setMapModalIsOpen] = useState<boolean>(false);
   const [questions, setQuestions] = useState<any[] | null>(null);
   const [gmap, setGmap] = useState(null);
+  const [assignMode,setAssignMode] = useState<boolean>(false);
+  const [userModal,setUserModal] = useState<boolean>(false);
+  const [userSearch,setUserSearch] = useState<string|null>(null);
+  const [pannaPramukh,setPannaPramukh] = useState<any>(null);
+  const [selectedPanna,setSelectedPanna] = useState<string[]|null>(null);
+   //response selection states
+   const [startIndex,setStartIndex] = useState<number|null>(null)
+   const [endIndex,setEndIndex] = useState<number|null>(null)
+   const [selectedResponses,setSelectedResponses] = useState<string[]>([])
+
+  console.log("selected Responses ------>",selectedResponses)
 
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
+  const ac_no = searchParams.get("ac_no");
+  const booth_no = searchParams.get("booth_no");
   const router = useRouter();
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -63,6 +76,11 @@ function Page() {
     getUserResponses();
     getUsers();
   }, [reset]);
+
+  useEffect(()=>{
+    handleGetPannaPramukh();
+  },[userSearch])
+
   async function getUserResponses() {
     let nStartDate, nEndDate;
     if (startDate && endDate) {
@@ -81,6 +99,7 @@ function Page() {
     setLoading(true);
     const response = await getSurveyResponses(params);
     setResponses(response.data);
+    console.log("responses ------>",response.data)
     if (response.data && response.data.length > 0) {
       setQuestions(
         response.data[0].responses.map((res: any) => ({
@@ -92,11 +111,94 @@ function Page() {
     setLoading(false);
   }
 
+  // selection logic
+
+  function handleMemberClick(responseId: string, index: number) {
+    // If no start index is set, set the current index as the start index
+    if (startIndex === null) {
+      setStartIndex(index);
+      setSelectedResponses([responseId]);
+    } else {
+      // If the clicked index is the same as the start index, reset all states
+      if (index === startIndex) {
+        setStartIndex(null);
+        setEndIndex(null);
+        setSelectedResponses([]);
+        return; // Early return since we've reset everything
+      }
+  
+      // If clicking before the start index, update the start index to the current index
+      if (index < startIndex) {
+        setStartIndex(index);
+        setEndIndex(null)
+        setSelectedResponses([responseId]);
+        return; // Early return after resetting states
+      }
+  
+      // Handle the case where the index is greater than the start index
+      if (index > startIndex) {
+        // Set the end index
+        setEndIndex(index);
+  
+        // Calculate the range of selections
+        const range = Math.abs(index - startIndex) + 1;
+  
+        // Check if the selected range exceeds the maximum allowed
+        if (range > 60) {
+          toast.error("Maximum of 60 responses are allowed");
+          return;
+        }
+  
+        // Create an array to hold selected responses
+        const selected: string[] = [];
+        for (let i = startIndex; i <= index; i++) {
+          selected.push(responses[i]._id); // Use `_id` from the `responses` array
+        }
+  
+        // Update selected responses state
+        setSelectedResponses(selected);
+      }
+  
+      // Handle case where a user clicks on an index lower than the current end index
+      if (endIndex !== null && index < endIndex) {
+        setEndIndex(index);
+  
+        // Create a new selected array up to the new end index
+        const selected: string[] = [];
+        for (let i = startIndex; i <= index; i++) {
+          selected.push(responses[i]._id);
+        }
+  
+        // Update selected responses state
+        setSelectedResponses(selected);
+      }
+    }
+  }
+
+  async function updatePannaPramukhs(){
+    const response = await updateKaryakartas({ids:selectedPanna,responses:selectedResponses,surveyId})
+    if(response.success){
+      toast.success("Data assigned successfully")
+      setAssignMode(false);
+      setSelectedResponses([])
+      setSelectedPanna(null);
+    }else{
+      toast.error("Error assigning data")
+    }
+  }
+
   async function getUsers() {
     setLoading(true);
     const response = await getAllUsers({});
-    console.log(response.data);
+    console.log("users-------->",response.data);
     setUsers(response.data);
+    setLoading(false);
+  }
+  async function handleGetPannaPramukh() {
+    setLoading(true);
+    const response = await getPannaPramukh({ac_no,booth_no,filter:userSearch});
+    console.log("panna below-------->",response);
+    setPannaPramukh(response);
     setLoading(false);
   }
 
@@ -358,6 +460,11 @@ function Page() {
                 Apply
               </ButtonFilled>
             </div>
+
+            <div>
+              <ButtonFilled onClick={()=>setUserModal(true)}>Assign Data</ButtonFilled>
+            </div>
+
           </div>
         </div>
       </div>
@@ -365,9 +472,9 @@ function Page() {
         <Loader className="h-[30vh] w-full flex justify-center items-center" />
       )}
       {!loading && responses && responses.length > 0 ? (
-        <div className="overflow-x-auto rounded-t-2xl border border-secondary-200 mx-4">
-          <table className="min-w-full table-auto">
-            <thead>
+        <div className="h-[70vh] overflow-y-auto overflow-x-auto rounded-t-2xl border border-secondary-200 mx-4">
+          <table className="relative min-w-full table-auto">
+            <thead className="sticky top-0 left-0">
               <tr className="bg-secondary-100">
                 <td className="min-w-24 px-4 py-2 border-b text-center"></td>
                 <td className="min-w-24 px-4 py-2 border-b text-center"></td>
@@ -420,6 +527,12 @@ function Page() {
                     className="cursor-pointer"
                     key={rowIndex}
                   >
+                    {assignMode && 
+                      <td onClick ={(e)=>e.stopPropagation()} className="min-w-24 px-4 py-2 border-b text-center">
+                        <input onChange={()=>handleMemberClick(response._id,rowIndex)} checked={selectedResponses.includes(response._id)} className="h-5 w-5" type="checkbox"/>
+                      </td>
+
+                    }
                     <td className="min-w-24 px-4 py-2 border-b text-center">
                       <ButtonFilled
                         onClick={(e) => {
@@ -453,6 +566,7 @@ function Page() {
                 ))}
             </tbody>
           </table>
+          {assignMode && <ButtonFilled className="mt-5" onClick={updatePannaPramukhs}>Assign</ButtonFilled>}
         </div>
       ) : (
         !loading && (
@@ -639,6 +753,38 @@ function Page() {
             )}
           </div>
         </div>
+      </CustomModal>
+
+      <CustomModal open={userModal} closeModal={()=>{
+          setUserModal(false)
+          setSelectedPanna(null)
+        }}>
+            <div className="relative flex flex-col h-[60vh] w-[30vw] p-4">
+                <input placeholder="Search by name" className="sticky top-5 left-0 px-4 py-2 border-2 outline-none rounded-md" value={userSearch||""} onChange={(e)=>setUserSearch(e.target.value)} type="text"/>
+                <div className="flex mt-5 flex-col gap-2">
+                  {
+                    pannaPramukh && pannaPramukh.map((us:any)=>(
+                      <label className="flex gap-5">
+                        <input onChange={() =>
+                            setSelectedPanna((prev) => {
+                              const currentSelection = prev || []; // Fallback to empty array if prev is null
+                              if (currentSelection.includes(us._id)) {
+                                return currentSelection.filter((id) => id !== us._id);
+                              } else {
+                                return [...currentSelection, us._id];
+                              }
+                            })
+                          } type="checkbox" className="h-5 w-5"/>
+                        <p>{us.name}</p>
+                      </label>
+                    ))
+                  }
+                </div>
+                <ButtonFilled onClick={()=>{
+                  setAssignMode(true)
+                  setUserModal(false)
+                  }} className="mt-auto disabled:bg-blue-100 disabled:cursor-not-allowed" disabled={!selectedPanna || (selectedPanna && selectedPanna.length === 0)}>Proceed</ButtonFilled>
+            </div>
       </CustomModal>
     </div>
   );

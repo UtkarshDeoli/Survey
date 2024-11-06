@@ -17,6 +17,7 @@ export const create_karyakarta = "api/user/createKaryakarta"
 export const update_karyakarta = "api/user/updateKaryakarta"
 export const get_panna_pramukh = "api/user/getPannaPramukh"
 export const get_booth_adhyaksh = "api/user/getBoothAdhyaksh"
+export const updateMultipleKaryakarta = "api/user/updateMultipleKaryakarta"
 
 
 // surveys

@@ -20,11 +20,8 @@ function Page() {
 
   const params = useSearchParams();
   const name = params.get("name");
-  const AC_NO = JSON.parse(params.get("ac_no")||"")
-  const BOOTH_NO = JSON.parse(params.get("booth_no")||"")
-  console.log(AC_NO)
-  console.log(BOOTH_NO)
-
+  const AC_NO = params.get("ac_no")
+  const BOOTH_NO = params.get("booth_no")
 
   const router = useRouter();
 
@@ -239,7 +236,7 @@ function Page() {
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
           </div> */}
-          {/* <div className="grid grid-cols-3">
+          <div className="grid grid-cols-3">
             <label className="text-secondary-300 font-medium">
               AC_NO
             </label>
@@ -249,31 +246,18 @@ function Page() {
               type="number"
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
-          </div> */}
-          <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">
-              AC_NO
-            </label>
-            <div className="flex flex-wrap gap-2 mt-2">
-                {AC_NO.map((acNo:any, index:number) => (
-                    <span key={index} className="px-3 py-1 bg-green-200 text-green-700 rounded-md">
-                      {acNo}
-                    </span>
-                ))}
-                </div>
-              </div>
+          </div>
           <div className="grid grid-cols-3">
             <label className="text-secondary-300 font-medium">
               BOOTH_NO
             </label>
-            <div className="flex flex-wrap gap-2 mt-2">
-                {BOOTH_NO.map((boothNo:any, index:number) => (
-                    <span key={index} className="px-3 py-1 bg-green-200 text-green-700 rounded-md">
-                      {boothNo}
-                    </span>
-                ))}
-                </div>
-              </div>
+            <input
+              disabled={true}
+              {...register("booth_no")}
+              type="number"
+              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
         </div>
 
         {/* right */}

@@ -113,7 +113,7 @@ function page() {
         {!loading &&
           data.map((el: any, index: number) => (
             <div
-              onClick={()=>router.push(`/admin/data/survey-responses?survey_id=${el.survey_id}`)}
+              onClick={()=>router.push(`/admin/data/survey-responses?survey_id=${el.survey_id}&ac_no=${el.ac_no}&booth_no=${el.booth_no}`)}
               key={index}
               className="grid cursor-pointer grid-cols-7 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-white"
             >

@@ -132,8 +132,8 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
 
   async function getUsers() {
     setLoading(true);
-    const response = await getAllUsers({selectedRole:"Survey Collector"});
-    console.log(response.data)
+    const response = await getAllUsers({selectedRole:"671f997d38863c2bfc859e76"});
+    console.log("users are ------ >",response.data)
     setUsers(response.data);
     setLoading(false);
   }
@@ -413,26 +413,34 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       </CustomModal>
        {/* Assign Survey to Users Modal */}
        <CustomModal open={assignModal} closeModal={() => {setAssignModal(false); setSelectedUsers([]);}}>
-        <div className="flex flex-col h-[50vh] w-[40vw]  justify-center items-center gap-5 p-4">
-          <h1 className="text-xl w-full text-center">Select users to assign the survey</h1>
-          <div className="flex flex-col gap-4 h-full w-full overflow-y-auto justify-center items-center ">
-            {users && user && users.map(({_id,email,name,assigned_survey}) => {
-              if(user.id === _id){
-                return null
-              }
-              return(
-                  <label key={user._id} className="cursor-pointer flex items-center gap-10 min-w-[50%] justify-between">
-                    {name || email}
-                    <input className="h-5 w-5 disabled:cursor-not-allowed" type="checkbox" defaultChecked = {assigned_survey.includes(surveyToAssign)} onChange={() => handleUserSelection(_id)} />
-                  </label>
-                )
-              })}
-          </div>
-          <ButtonFilled onClick={handleAssignSurvey} className="whitespace-nowrap">
-            Updated Assigned Surveys
-          </ButtonFilled>
-        </div>
-      </CustomModal>
+  <div className="flex flex-col h-[70vh] w-[40vw] justify-center items-center gap-5 p-4">
+    <h1 className="text-xl w-full text-center">Select users to assign the survey</h1>
+    <div className="grid grid-cols-2 gap-4 h-full w-full overflow-y-auto max-h-[60vh] justify-center items-center">
+      {users && users.length > 0 ? (
+        users.map(({ _id, email, name, assigned_survey }, index) => {
+          if (user.id === _id) return null;
+          return (
+            <label key={_id} className="cursor-pointer flex items-center gap-10 min-w-[50%] justify-between">
+              <div>{index + 1}. {name || email}</div>
+              <input
+                className="h-5 w-5 disabled:cursor-not-allowed"
+                type="checkbox"
+                defaultChecked={assigned_survey.includes(surveyToAssign)}
+                onChange={() => handleUserSelection(_id)}
+              />
+            </label>
+          );
+        })
+      ) : (
+        <div>No users available</div>
+      )}
+    </div>
+    <ButtonFilled onClick={handleAssignSurvey} className="whitespace-nowrap">
+      Update Assigned Surveys
+    </ButtonFilled>
+  </div>
+</CustomModal>
+
     </div>
   );
 }

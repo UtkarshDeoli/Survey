@@ -325,6 +325,27 @@ exports.createKaryakarta = async (req, res) => {
   }
 };
 
+exports.updateMultipleKaryakarta = async(req,res)=>{
+  try{
+    const {ids,surveyId,responses} = req.body;
+    console.log(req.body);
+    ids.forEach(async(id) => {
+      const data = await Data.findOne({user_id:id});
+      if(data){
+        data.responses = responses;
+        await data.save();
+      }
+      else await Data.create({survey_id:surveyId,user_id:id,responses})
+    });
+    return res.status(200).json({success:true,message:"succeessfuly created data"});
+  }catch(err){
+    return res.status(500).json({
+      success:false,
+      message: "Error updating data",
+    })
+  }
+}
+
 exports.updateKaryakarta = async (req, res) => {
   try {
     const {
@@ -421,7 +442,11 @@ exports.getAllKaryakarta = async (req, res) => {
     const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;
     const limit =
       req.query.limit !== "undefined" ? Number(req.query.limit) : 10;
-    const validRoles = ["Panna Pramukh", "Booth Adhyaksh", "Mandal Adhyaksh"];
+    // const validRoles = ["Panna Pramukh", "Booth Adhyaksh", "Mandal Adhyaksh"];
+
+    const validRoles = await Role.find({category:"karyakarta"})
+    const validRoleIds = validRoles.map(r=>r._id);
+    console.log("valid roles are -->",validRoleIds);
 
     const skip = (page - 1) * limit;
 
@@ -431,7 +456,14 @@ exports.getAllKaryakarta = async (req, res) => {
 
     let query = { $and: [{ $or: searchConditions }] };
 
-    if (role && validRoles.includes(role)) {
+    let roleExists = [];
+    if (role) {
+      roleExists = validRoleIds.filter(
+        (ro) => ro.toString() === role.toString(),
+      );
+    }
+
+    if (role && roleExists.length > 0) {
       query.$and.push({ role: { $in: [role] } });
     } else {
       query.$and.push({ role: { $in: validRoles } });
@@ -472,6 +504,8 @@ exports.getKaryakarta = async (req, res) => {
 
 exports.getPannaPramukh = async (req, res) => {
   try {
+    console.log("get panna pramukh")
+    console.log(req.query)
     const { ac_no, booth_no } = req.query;
     let filter = req.query.filter || "";
     const page = req.query.page !== "undefined" ? Number(req.query.page) : 1;

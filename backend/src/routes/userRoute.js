@@ -17,6 +17,7 @@ router.get("/getAllKaryakarta", userController.getAllKaryakarta);
 router.get("/getKaryakarta", userController.getKaryakarta);
 router.get("/getPannaPramukh", userController.getPannaPramukh);
 router.get("/getBoothAdhyaksh", userController.getBoothAdhyaksh);
+router.post('/updateMultipleKaryakarta',userController.updateMultipleKaryakarta)
 
 
 

@@ -12,6 +12,8 @@ import {
   create_karyakarta,
   update_karyakarta,
   get_karyakarta,
+  get_panna_pramukh,
+  updateMultipleKaryakarta,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -176,7 +178,7 @@ export const getAllChatsData = async (params: {
 
 export const getAllKaryakarta = async (params: {
   searchBarInput?: string;
-  selectedRole?: string;
+  role?: string;
   page?: number;
   limit?: number;
 }) => {
@@ -187,7 +189,7 @@ export const getAllKaryakarta = async (params: {
       url: `${SERVER_URI}/${get_all_karyakartas}`,
       params: {
         filter: params.searchBarInput || "",
-        role: params.selectedRole || "",
+        role: params.role || "",
         page: params.page,
         limit: params.limit,
       },
@@ -235,6 +237,23 @@ export const updateKaryakarta = async (params: any) => {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
+export const updateKaryakartas = async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "POST",
+      url: `${SERVER_URI}/${updateMultipleKaryakarta}`,
+      data:params,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    };
+    const response = await axios.request(options);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
 export const getKaryakarta = async (params: any) => {
   try {
     const bearerToken = localStorage.getItem("token");
@@ -251,3 +270,21 @@ export const getKaryakarta = async (params: any) => {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
+export const getPannaPramukh= async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "GET",
+      url: `${SERVER_URI}/${get_panna_pramukh}`,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+      params
+    };
+    const response = await axios.request(options);
+    return response.data.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+
