@@ -413,9 +413,9 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       </CustomModal>
        {/* Assign Survey to Users Modal */}
        <CustomModal open={assignModal} closeModal={() => {setAssignModal(false); setSelectedUsers([]);}}>
-        <div className="flex flex-col h-[40vh] w-[40vw]  justify-center items-center gap-5">
+        <div className="flex flex-col h-[50vh] w-[40vw]  justify-center items-center gap-5 p-4">
           <h1 className="text-xl w-full text-center">Select users to assign the survey</h1>
-          <div className="flex flex-col gap-4 max-h-60 w-full overflow-y-auto justify-center items-center">
+          <div className="flex flex-col gap-4 h-full w-full overflow-y-auto justify-center items-center ">
             {users && user && users.map(({_id,email,name,assigned_survey}) => {
               if(user.id === _id){
                 return null

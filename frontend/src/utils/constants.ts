@@ -51,3 +51,11 @@ export const create_role = "api/role/create"
 export const update_role = "api/role/update"
 export const delete_role = "api/role/delete"
 
+// todos
+export const create_todo = "api/todo/create"
+export const get_todo = "api/todo/todo"
+export const get_all_todos = "api/todo/todos"
+export const update_todo = "api/todo/update"
+export const delete_todo = "api/todo/delete"
+
+
