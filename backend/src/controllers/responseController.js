@@ -2,7 +2,7 @@ const MediaResponse = require("../models/mediaResponse");
 const Responses = require("../models/response");
 const Family = require("../models/family");
 const mongoose = require("mongoose");
-const fs = require('fs');
+const fs = require("fs");
 
 exports.saveResponse = async (req, res) => {
   console.log("here it works");
@@ -242,12 +242,23 @@ exports.getAllResponses = async (req, res) => {
           "responses.response": {
             $cond: {
               if: {
-                $regexMatch: {
-                  input: { $toString: "$responses.response" },
-                  regex: /^\d+(\.\d+)?$/,
+                $in: [
+                  "$responses.question_type",
+                  ["Number Input", "Phone Number"],
+                ],
+              },
+              then: {
+                $cond: {
+                  if: {
+                    $regexMatch: {
+                      input: { $toString: "$responses.response" },
+                      regex: /^\d+(\.\d+)?$/,
+                    },
+                  },
+                  then: { $toDouble: "$responses.response" },
+                  else: "$responses.response",
                 },
               },
-              then: { $toDouble: "$responses.response" },
               else: "$responses.response",
             },
           },
@@ -295,7 +306,7 @@ exports.getAllResponses = async (req, res) => {
         .json({ success: "false", message: "Response not found" });
     } else {
       // console.log("filtered response is-->", filteredResponse);
-      
+
       return res.status(200).json({ success: "true", data: filteredResponse });
     }
   } catch (error) {
