@@ -40,8 +40,8 @@ exports.saveSurvey = async (req, res) => {
       name,
       header_text,
       access_pin,
-      ac_no,
-      booth_no,
+      ac_no : ac_no.split(","),
+      booth_no :booth_no.split(","),
       background_location_capture,
       welcome_image,
       thankyou_image,
@@ -198,6 +198,7 @@ exports.getAllSurvey = async (req, res) => {
     return res.status(400).json({ success: false, message: error.message });
   }
 };
+
 exports.getSurveysByAcAndBooth = async (req, res) => {
   try {
     const {

@@ -8,6 +8,10 @@ const todoSchema = new mongoose.Schema({
         type:Date,
         required:true
     },
+    end_date:{
+        type:Date,
+        required:true
+    },
     activity:{
         type:String,
         enum:['Call','Task'],

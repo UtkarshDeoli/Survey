@@ -10,14 +10,16 @@ const surveySchema = new Schema({
         type: String,
         required: true
     },
-    ac_no:{
+    ac_no:[
+        {
+            type:String,
+            required: true
+        }
+    ],
+    booth_no:[{
         type:String,
         required: true
-    },
-    booth_no:{
-        type:String,
-        required: true
-    },
+    }],
     // header_text: {
     //     type: String,
     // },
