@@ -2,7 +2,7 @@ const MediaResponse = require("../models/mediaResponse");
 const Responses = require("../models/response");
 const Family = require("../models/family");
 const mongoose = require("mongoose");
-const fs = require('fs');
+const fs = require("fs");
 
 exports.saveResponse = async (req, res) => {
   console.log("here it works");
@@ -235,7 +235,7 @@ exports.getAllResponses = async (req, res) => {
               if: {
                 $in: [
                   "$responses.question_type",
-                  ["Number Input", "Phone Number"], 
+                  ["Number Input", "Phone Number"],
                 ],
               },
               then: {
@@ -264,6 +264,9 @@ exports.getAllResponses = async (req, res) => {
           createdAt: { $first: "$createdAt" },
           responses: { $push: "$responses" }, 
         },
+      },
+      {
+        $sort: { createdAt: -1 },
       },
     ];
     
