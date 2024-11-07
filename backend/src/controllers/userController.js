@@ -366,8 +366,13 @@ exports.updateKaryakarta = async (req, res) => {
       status,
     } = req.body;
     console.log(req.body);
-    const validRoles = ["Panna Pramukh", "Booth Adhyaksh", "Mandal Adhyaksh"];
-    if (role && !validRoles.includes(role)) {
+    const karyakartaRoles = await Role.find({ category: "karyakarta" });
+    const validRoles = karyakartaRoles.map((el) => el._id);
+    const roleExists = validRoles.filter(
+      (el) => el.toString() === role.toString(),
+    );
+
+    if (roleExists.length === 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid role",
