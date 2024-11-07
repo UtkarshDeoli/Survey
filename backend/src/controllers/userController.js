@@ -188,7 +188,7 @@ exports.getAllUsers = async (req, res) => {
     if (getWithProfilePicture === "true") {
       users = await User.find(query).populate("profile_picture");
     } else {
-      users = await User.find(query).populate("role").skip(skip).limit(limit);
+      users = await User.find(query).populate("role").skip(skip).limit(limit).sort({createdAt:-1});
     }
 
     const total = await User.countDocuments(query);
