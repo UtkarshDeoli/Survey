@@ -57,7 +57,6 @@ function Page() {
   const router = useRouter();
   const onSubmit: SubmitHandler<IUser> = async (data: any) => {
     delete data.confirm_password;
-    delete data.password
     if(userId) delete data._id;
     const params:any = data;
     console.log("datatata::::", params)
@@ -66,6 +65,8 @@ function Page() {
       params.user_id = userId
       res= await updateUsers(params)
     }else{
+      console.log("add user calling");
+
        res = await addUsers(params);
     }
     if (res) {
