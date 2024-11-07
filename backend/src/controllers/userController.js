@@ -57,19 +57,22 @@ exports.addMultipleUsers = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const user = req.body;
-    if (!user || !user.user_id) {
+    const { user_id, ...userData } = req.body;
+    console.log(req.body)
+    if (!user_id) {
       return res.status(400).json({ error: "Username is required" });
     }
+    console.log("usrData is --->",userData)
     const dbRes = await User.findOneAndUpdate(
-      { _id: user.user_id },
-      { $set: user },
+      { _id: user_id },
+      { $set: userData },
       { new: true, runValidators: true },
     );
     return res
       .status(200)
       .json({ success: true, message: "User updated successfully" });
   } catch (error) {
+    console.log(error)
     return res
       .status(400)
       .json({ success: false, message: "something went wrong" });

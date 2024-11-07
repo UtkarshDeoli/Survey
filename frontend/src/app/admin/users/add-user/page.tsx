@@ -3,7 +3,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FaQuestionCircle } from "react-icons/fa";
 import { IUser } from "@/types/user_interfaces";
-import { addUsers } from "@/networks/user_networks";
+import { addUsers, updateUsers } from "@/networks/user_networks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getAllSurveys } from "@/networks/survey_networks";
 import { getUser } from "@/networks/user_networks";
@@ -55,13 +55,24 @@ function Page() {
   }, []);
 
   const router = useRouter();
-  const onSubmit: SubmitHandler<IUser> = async (data: IUser) => {
+  const onSubmit: SubmitHandler<IUser> = async (data: any) => {
     delete data.confirm_password;
-    const params = data;
-    // console.log("datatata::::", params)
-    const res = await addUsers(params);
+    delete data.password
+    if(userId) delete data._id;
+    const params:any = data;
+    console.log("datatata::::", params)
+    let res;
+    if(userId){
+      params.user_id = userId
+      res= await updateUsers(params)
+    }else{
+       res = await addUsers(params);
+    }
     if (res) {
+      toast.success("Success")
       router.replace("/admin/users");
+    }else{
+      toast.error("Failed")
     }
   };
 
@@ -166,10 +177,11 @@ function Page() {
                       </div>
                       <div className="w-1/2">
                         <input
+                          disabled={userId ? field.name === "confirm_password" || field.name === "password" :false}
                           type={field.type}
                           placeholder={field.placeholder}
                           {...register(field.name as keyof IUser, {
-                            required: true,
+                            required: userId ? field.name !== "confirm_password" :true,
                           })}
                           className="border border-gray-300 rounded-md p-2 w-full"
                         />

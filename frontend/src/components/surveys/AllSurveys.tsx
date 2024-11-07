@@ -418,7 +418,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
        {/* Assign Survey to Users Modal */}
        <CustomModal open={assignModal} closeModal={() => {setAssignModal(false); setSelectedUsers([]);}}>
   <div className="flex flex-col h-[70vh] w-[40vw] items-center gap-5 p-4">
-    <h1 className="text-xl w-full text-center">Select users to assign the survey</h1>
+    <h1 className="text-xl w-full text-center">Select survey collectors to assign the survey</h1>
     <input value={userSearch} onChange={(e)=>setUserSearch(e.target.value)} placeholder ="Search user" className="px-4 py-2 rounded-md border outline-none w-full"/>
     <div className="grid grid-cols-2 gap-4  w-full overflow-y-auto max-h-[60vh]">
       {users && users.length > 0 ? (

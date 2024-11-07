@@ -17,7 +17,7 @@ import {
 } from "@/utils/constants";
 import axios from "axios";
 
-export const updateUsers = async (params: IUser) => {
+export const updateUsers = async (params: any) => {
   try {
     const bearerToken = localStorage.getItem("token");
     const options = {
