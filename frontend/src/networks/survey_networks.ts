@@ -33,6 +33,9 @@ export const updateSurvey = async (params: any) => {
     const options = {
       method: "POST",
       url: `${SERVER_URI}/${update_survey}?_id=${params._id}`,
+      headers:{
+        "Content-Type": "application/json"
+      },
       data: params.formData,
     };
     const response = await axios.request(options);

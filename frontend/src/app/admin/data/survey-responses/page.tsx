@@ -61,6 +61,7 @@ function Page() {
    const [selectedResponses,setSelectedResponses] = useState<string[]>([])
 
   console.log("selected Responses ------>",selectedResponses)
+  console.log("applied filters------>",appliedFilters)
 
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
@@ -362,9 +363,7 @@ function Page() {
                         setAppliedFilters((prev) =>
                           prev.filter(
                             (fil) =>
-                              fil.question !== el.question &&
-                              fil.operator !== el.operator &&
-                              fil.response !== el.response
+                              !(fil.question === el.question && fil.operator === el.operator && fil.response === el.response)
                           )
                         )
                       }
@@ -559,7 +558,13 @@ function Page() {
                         key={colIndex}
                         className="px-4 py-2 border-b min-w-44 whitespace-nowrap text-center"
                       >
-                        {truncateText(res.response, 20) || "-"}
+                        {res.question_type === "Radio Grid" ? (
+                          res.response.split('\n').slice(0, 2).map((line: string, index: number) => (
+                            <p key={index}>{line}</p>
+                          )).concat(res.response.split('\n').length > 2 ? <p key="ellipsis">...</p> : null)
+                        ) : (
+                          truncateText(res.response, 20) || "-"
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -709,7 +714,12 @@ function Page() {
                           index % 2 === 0 ? "bg-blue-50" : "bg-blue-100"
                         }`}
                       >
-                        {response.response}
+                        {response.question_type==="Radio Grid" ?
+                          response.response.split('\n').map((line: string, index: number) => (
+                            <p key={index}>{line}</p>
+                          ))
+                        
+                        : response.response}
                       </p>
                     </div>
                   )
@@ -761,7 +771,7 @@ function Page() {
         }}>
             <div className="relative flex flex-col h-[60vh] w-[30vw] p-4">
                 <input placeholder="Search by name" className="sticky top-5 left-0 px-4 py-2 border-2 outline-none rounded-md" value={userSearch||""} onChange={(e)=>setUserSearch(e.target.value)} type="text"/>
-                <div className="flex mt-5 flex-col gap-2">
+                <div className="grid mt-5 grid-cols-2 gap-3">
                   {
                     pannaPramukh && pannaPramukh.map((us:any)=>(
                       <label className="flex gap-5">
