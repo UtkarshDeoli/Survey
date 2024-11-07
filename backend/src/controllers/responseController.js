@@ -140,9 +140,10 @@ exports.getCount = async (req, res) => {
     return res.status(400).json({ success: "false", message: error.message });
   }
 };
+
 exports.getAllResponses = async (req, res) => {
   try {
-    const { surveyId, userId, startDate, endDate, filters } = req.query;
+    const { surveyId, userId, startDate, endDate, filters, page = 1, limit = 10 } = req.query;
     console.log("query is------>", req.query);
     const matchStage = {};
 
@@ -156,19 +157,15 @@ exports.getAllResponses = async (req, res) => {
           .status(400)
           .json({ success: false, message: "Invalid date range." });
       }
-      if (startDate && endDate) {
-        matchStage.createdAt = {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate),
-        };
-      }
+      matchStage.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
     }
+
     const responseFilters = [];
     console.log("filters are-->", filters);
     if (filters) {
-      console.log("filteres there");
-      // const filterArray = JSON.parse(filters);
-      // console.log("fa-->", filterArray);
       filters.forEach(({ question, operator, response: answer }) => {
         const filter = {
           question_id: Number(question),
@@ -207,21 +204,14 @@ exports.getAllResponses = async (req, res) => {
           case ">=":
             filter.response = { $gte: Number(answer) };
             break;
-          case "!=":
-            filter.response = { $ne: Number(answer) };
-            break;
         }
         responseFilters.push(filter);
       });
     }
 
-    const aggregationPipeline2 = [
-      {
-        $match: matchStage,
-      },
-      {
-        $unwind: "$responses",
-      },
+    const aggregationPipeline = [
+      { $match: matchStage },
+      { $unwind: "$responses" },
       {
         $project: {
           _id: 1,
@@ -281,8 +271,8 @@ exports.getAllResponses = async (req, res) => {
       },
     ];
 
-    if (responseFilters && responseFilters.length > 0) {
-      aggregationPipeline2.push({
+    if (responseFilters.length > 0) {
+      aggregationPipeline.push({
         $match: {
           $and: responseFilters.map((response) => ({
             responses: {
@@ -296,23 +286,47 @@ exports.getAllResponses = async (req, res) => {
       });
     }
 
-    console.log(JSON.stringify(aggregationPipeline2, null, 2));
-    const filteredResponse = await Responses.aggregate(aggregationPipeline2);
+    // Sorting by createdAt in descending order
+    aggregationPipeline.push({ $sort: { createdAt: -1 } });
+
+    // Calculate total responses count
+    const totalResponses = await Responses.aggregate([
+      ...aggregationPipeline,
+      { $count: "totalResponses" },
+    ]);
+    const totalCount = totalResponses.length > 0 ? totalResponses[0].totalResponses : 0;
+
+    // Pagination logic
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    aggregationPipeline.push({ $skip: skip }, { $limit: limitNum });
+
+    const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
     if (!filteredResponse) {
       return res
         .status(404)
         .json({ success: "false", message: "Response not found" });
     } else {
-      // console.log("filtered response is-->", filteredResponse);
+      // Calculate total pages
+      const totalPages = Math.ceil(totalCount / limitNum);
 
-      return res.status(200).json({ success: "true", data: filteredResponse });
+      return res.status(200).json({
+        success: "true",
+        data: filteredResponse,
+        totalResponses: totalCount,
+        totalPages: totalPages,
+      });
     }
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success: "false", message: error.message });
   }
 };
+
+
 
 exports.getResponse = async (req, res) => {
   try {

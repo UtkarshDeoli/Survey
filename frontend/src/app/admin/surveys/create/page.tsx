@@ -35,10 +35,14 @@ function Page() {
   useEffect(() => {
     if (name) {
       setValue("name", name);
+    }
+    if (AC_NO) {
       setValue("ac_no", AC_NO);
+    }
+    if (BOOTH_NO) {
       setValue("booth_no", BOOTH_NO);
     }
-  }, []);
+  }, [name, AC_NO, BOOTH_NO]);
 
   function handleImageChange(e: any, type: string) {
     const file = e.target.files[0];
@@ -243,8 +247,8 @@ function Page() {
             <input
               disabled={true}
               {...register("ac_no")}
-              type="number"
-              value={AC_NO||""}
+              type="text"
+              // value={AC_NO||""}
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
             />
           </div>
@@ -255,8 +259,8 @@ function Page() {
             <input
               disabled={true}
               {...register("booth_no")}
-              type="number"
-              value={BOOTH_NO||""}
+              type="text"
+              // value={BOOTH_NO||""}
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md "
             />
           </div>

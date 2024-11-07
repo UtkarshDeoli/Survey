@@ -17,6 +17,7 @@ import Loader from "@/components/ui/Loader";
 import { FaLocationDot } from "react-icons/fa6";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { RxCross2 } from "react-icons/rx";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const operatorOptions = {
   text: ["contains", "equals", "starts with", "ends with"],
@@ -60,6 +61,10 @@ function Page() {
    const [endIndex,setEndIndex] = useState<number|null>(null)
    const [selectedResponses,setSelectedResponses] = useState<string[]>([])
 
+  //  infinite scroll
+   const [responsePage, setResponsePage] = useState<number>(1);
+   const [totalResponsePages,setTotalResponsePages] = useState<number>(1)
+
   console.log("selected Responses ------>",selectedResponses)
   console.log("applied filters------>",appliedFilters)
 
@@ -95,11 +100,14 @@ function Page() {
       startDate: nStartDate,
       endDate: nEndDate,
       userId,
-      filters: appliedFilters
+      filters: appliedFilters,
+      page: responsePage,
+      limit: 5
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
     setResponses(response.data);
+    setTotalResponsePages(response.totalPages);
     console.log("responses ------>",response.data)
     if (response.data && response.data.length > 0) {
       setQuestions(
@@ -108,6 +116,37 @@ function Page() {
           question_id: res.question_id,
         }))
       );
+    }
+    setLoading(false);
+  }
+  async function getMoreUserResponses() {
+    let nStartDate, nEndDate;
+    if (startDate && endDate) {
+      nStartDate = new Date(startDate || "");
+      nEndDate = new Date(endDate || "");
+      nStartDate.setDate(nStartDate.getDate() + 1);
+      nEndDate.setDate(nEndDate.getDate() + 1);
+    }
+    const params = {
+      surveyId,
+      startDate: nStartDate,
+      endDate: nEndDate,
+      userId,
+      filters: appliedFilters,
+      page: responsePage+1,
+      limit: 5
+    };
+    setLoading(true);
+    const response = await getSurveyResponses(params);
+    setResponses((prev)=>[...prev,response.data]);
+    console.log("responses ------>",response.data)
+    setResponsePage(prev=>prev+1)
+    if (response.data && response.data.length > 0) {
+      const questions = response.data[0].responses.map((res: any) => ({
+        question: res.question,
+        question_id: res.question_id,
+      }))
+      setQuestions((prev)=>prev ? [...prev, ...questions] : [])
     }
     setLoading(false);
   }
@@ -471,9 +510,10 @@ function Page() {
         <Loader className="h-[30vh] w-full flex justify-center items-center" />
       )}
       {!loading && responses && responses.length > 0 ? (
-        <div className="h-[70vh] overflow-y-auto overflow-x-auto rounded-t-2xl border border-secondary-200 mx-4">
-          <table className="relative min-w-full table-auto">
-            <thead className="sticky top-0 left-0">
+        <div id="scrollableDiv" className="w-[1250px] overflow-scroll rounded-t-2xl border border-secondary-200 mx-4">
+          
+          <table className="w-full table-auto">
+            <thead className="">
               <tr className="bg-secondary-100">
                 <td className="min-w-24 px-4 py-2 border-b text-center"></td>
                 <td className="min-w-24 px-4 py-2 border-b text-center"></td>
@@ -516,6 +556,20 @@ function Page() {
               </tr>
             </thead>
             <tbody className="bg-white">
+            {/* <InfiniteScroll
+              dataLength={responses.length}
+              next={getMoreUserResponses}
+              hasMore={responsePage <= totalResponsePages}
+              loader={
+                <Loader className="flex justify-center items-center w-full h-[20vh]" />
+              }
+              scrollableTarget="scrollableDiv"
+              endMessage={
+                <p className="flex justify-center items-center h-[10vh] ">
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }
+            > */}
               {responses &&
                 responses.map((response, rowIndex) => (
                   <tr
@@ -569,6 +623,7 @@ function Page() {
                     ))}
                   </tr>
                 ))}
+              {/* </InfiniteScroll> */}
             </tbody>
           </table>
           {assignMode && <ButtonFilled className="mt-5" onClick={updatePannaPramukhs}>Assign</ButtonFilled>}
@@ -770,6 +825,7 @@ function Page() {
           setSelectedPanna(null)
         }}>
             <div className="relative flex flex-col h-[60vh] w-[30vw] p-4">
+              <h1 className="self-center text-lg font-semibold mb-5">Assign to Panna Pramukh</h1>
                 <input placeholder="Search by name" className="sticky top-5 left-0 px-4 py-2 border-2 outline-none rounded-md" value={userSearch||""} onChange={(e)=>setUserSearch(e.target.value)} type="text"/>
                 <div className="grid mt-5 grid-cols-2 gap-3">
                   {

@@ -4,21 +4,21 @@ import EditSurveysHeader from "@/components/surveys/EditSurveysHeader";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import Loader from "@/components/ui/Loader";
-import {
-  getSurvey,
-  updateSurvey,
-} from "@/networks/survey_networks";
+import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-
 function Page() {
   const [surveyData, setSurveyData] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [welcomeImagePreview, setWelcomeImagePreview] = useState<string | null>(null);
-  const [thankyouImagePreview, setThankyouImagePreview] = useState<string | null>(null);
+  const [welcomeImagePreview, setWelcomeImagePreview] = useState<string | null>(
+    null
+  );
+  const [thankyouImagePreview, setThankyouImagePreview] = useState<
+    string | null
+  >(null);
 
   const params = useSearchParams();
   const surveyId = params.get("survey_id");
@@ -41,25 +41,33 @@ function Page() {
   useEffect(() => {
     if (surveyData) {
       Object.keys(surveyData).forEach((key) => {
-        if (key !== "questions" && key !== "welcome_image" && key !== "thankyou_image") {
+        console.log("setting- ",key," to ",surveyData[key])
+        if (
+          key !== "questions" &&
+          key !== "welcome_image" &&
+          key !== "thankyou_image"
+        ) {
           setValue(key, surveyData[key]);
         }
       });
-  
+
       if (surveyData?.welcome_image) {
-        const welcomeImageBase64 = Buffer.from(surveyData.welcome_image.data).toString('base64');
+        const welcomeImageBase64 = Buffer.from(
+          surveyData.welcome_image.data
+        ).toString("base64");
         const welcomeImageUrl = `data:image/jpeg;base64,${welcomeImageBase64}`;
         setWelcomeImagePreview(welcomeImageUrl);
       }
-  
+
       if (surveyData?.thankyou_image) {
-        const thankyouImageBase64 = Buffer.from(surveyData.thankyou_image.data).toString('base64');
+        const thankyouImageBase64 = Buffer.from(
+          surveyData.thankyou_image.data
+        ).toString("base64");
         const thankyouImageUrl = `data:image/jpeg;base64,${thankyouImageBase64}`;
         setThankyouImagePreview(thankyouImageUrl);
       }
     }
   }, [surveyData, setValue]);
-  
 
   async function getSurveyData() {
     const params = { _id: surveyId };
@@ -67,6 +75,7 @@ function Page() {
     const response = await getSurvey(params);
     setLoading(false);
     if (response.success) {
+      console.log("res=======",response)
       setSurveyData(response.data);
     } else {
       toast.error("Something went wrong");
@@ -77,39 +86,38 @@ function Page() {
     const file = e.target.files[0];
     if (file) {
       const previewUrl = URL.createObjectURL(file);
-      
+
       // Update preview
       if (type === "welcome_image") {
         setWelcomeImagePreview(previewUrl);
       } else if (type === "thankyou_image") {
         setThankyouImagePreview(previewUrl);
       }
-      console.log("setting type - ", type , " to ", e.target.files[0])
+      console.log("setting type - ", type, " to ", e.target.files[0]);
       setValue(type, [file]);
     }
   }
-  
 
   async function submitHandler(data: any) {
     const formData = new FormData();
-    console.log("dataaaaa------------>.",data.welcome_image[0])
+    console.log("dataaaaa------------>.", data.welcome_image[0]);
     for (const key in data) {
       if (key !== "welcome_image" && key !== "thankyou_image") {
         formData.append(key, data[key] == null ? "" : data[key]);
       }
     }
-   
+
     if (data.welcome_image && data.welcome_image.length > 0) {
       formData.append("welcome_image", data.welcome_image[0]);
     } else if (welcomeImagePreview === null) {
-      formData.append("welcome_image", '');
+      formData.append("welcome_image", "");
     }
-  
+
     // Handle thankyou image
     if (data.thankyou_image && data.thankyou_image.length > 0) {
       formData.append("thankyou_image", data.thankyou_image[0]);
     } else if (thankyouImagePreview === null) {
-      formData.append("thankyou_image", '');
+      formData.append("thankyou_image", "");
     }
 
     formData.append("created_by", "rohitchand490@gmail.com");
@@ -134,13 +142,13 @@ function Page() {
   }
 
   function handleImageDelete(type: string) {
-    console.log("deleted",type)
+    console.log("deleted", type);
     if (type === "welcome_image") {
       setWelcomeImagePreview(null);
     } else if (type === "thankyou_image") {
       setThankyouImagePreview(null);
     }
-    setValue(type, []); 
+    setValue(type, []);
   }
 
   return (
@@ -156,9 +164,7 @@ function Page() {
           <Loader className="h-[50vh] w-full flex justify-center items-center" />
         )}
         {!loading && (
-          <form
-            className="grid grid-cols-2 m-10"
-          >
+          <form className="grid grid-cols-2 m-10">
             {/* left */}
             <div className="flex flex-col gap-5 w-full">
               <div className="grid grid-cols-3">
@@ -170,17 +176,17 @@ function Page() {
                   className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
                 />
               </div>
-              <div className="grid grid-cols-3">
+              {/* <div className="grid grid-cols-3">
                 <label className="text-secondary-300 font-medium">Header text</label>
                 <input
                   value={surveyData?.header_text || ""}
                   {...register("header_text")}
                   className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
                 />
-              </div>
+              </div> */}
 
               {/* Welcome Image */}
-              <div className="grid grid-cols-3">
+              {/* <div className="grid grid-cols-3">
                 <label className="text-secondary-300 font-medium">
                   Welcome image
                 </label>
@@ -219,10 +225,10 @@ function Page() {
                     )
                   }
                 </div>
-              </div>
+              </div> */}
 
               {/* Thank You Image */}
-              <div className="grid grid-cols-3">
+              {/* <div className="grid grid-cols-3">
                 <label className="text-secondary-300 font-medium">
                   Thank you image
                 </label>
@@ -264,6 +270,29 @@ function Page() {
                     )
                   }
                 </div>
+              </div> */}
+
+              <div className="grid grid-cols-3">
+                <label className="text-secondary-300 font-medium">AC_NO</label>
+                <input
+                  disabled={true}
+                  {...register("ac_no")}
+                  type="text"
+                  value={surveyData?.ac_no || ""}
+                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
+                />
+              </div>
+              <div className="grid grid-cols-3">
+                <label className="text-secondary-300 font-medium">
+                  BOOTH_NO
+                </label>
+                <input
+                  disabled={true}
+                  {...register("booth_no")}
+                  type="text"
+                  value={surveyData?.booth_no || ""}
+                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md "
+                />
               </div>
             </div>
 
@@ -290,14 +319,18 @@ function Page() {
                 />
               </div>
             </div>
-
           </form>
         )}
       </div>
       <div className="sticky bottom-0 left-0 py-2 px-5 bg-white col-span-2 flex gap-4 justify-end mt-[10%] border-t border-gray-200">
-        <ButtonFilled onClick={handleSubmit(submitHandler)} className="px-4 py-[10px] w-[95px]">Update</ButtonFilled>
+        <ButtonFilled
+          onClick={handleSubmit(submitHandler)}
+          className="px-4 py-[10px] w-[95px]"
+        >
+          Update
+        </ButtonFilled>
         <button
-          onClick={()=>router.back()}
+          onClick={() => router.back()}
           type="button"
           className="px-4 py-[10px] w-[95px] border border-secondary-200 rounded-md"
         >
