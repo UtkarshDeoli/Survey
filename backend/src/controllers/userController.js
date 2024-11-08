@@ -8,8 +8,10 @@ const Role = require("../models/role");
 exports.addUsers = async (req, res) => {
   try {
     console.log("add user Request");
-
-    const user = new User(req.body);
+    const hashedPass = await bcrypt.hash(req.body.password,10);
+    const data = {...req.body}
+    data.password = hashedPass;
+    const user = new User(data);
     const result = await user.save();
 
     return res.status(201).json({
