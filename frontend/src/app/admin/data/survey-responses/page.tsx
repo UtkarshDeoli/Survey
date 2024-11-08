@@ -101,8 +101,6 @@ function Page() {
       endDate: nEndDate,
       userId,
       filters: appliedFilters,
-      page: responsePage,
-      limit: 5
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
