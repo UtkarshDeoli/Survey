@@ -1,4 +1,5 @@
 const Survey = require("../models/survey");
+const Responses = require("../models/response");
 
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -21,8 +22,8 @@ exports.saveSurvey = async (req, res) => {
       thank_time_duration,
       questions,
     } = req.body;
-    
-    console.log("body is----->",req.body);
+
+    console.log("body is----->", req.body);
     let welcome_image, thankyou_image;
     if (req.files && req.files.welcome_image) {
       welcome_image = req.files.welcome_image.data;
@@ -47,6 +48,7 @@ exports.saveSurvey = async (req, res) => {
       welcome_image,
       thankyou_image,
       thank_time_duration,
+      response_count: 0,
     });
     if (questions && Array.isArray(questions) && questions.length > 0) {
       survey.questions = questions;
@@ -187,6 +189,7 @@ exports.getAllSurvey = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No surveys found" });
     }
+
     return res.status(200).json({
       success: true,
       total,
@@ -203,7 +206,7 @@ exports.getAllSurvey = async (req, res) => {
 exports.getSurveysByAcAndBooth = async (req, res) => {
   try {
     const {
-      filter = "", 
+      filter = "",
       page = 1,
       limit = 10,
       ac_no,
@@ -215,13 +218,13 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
       user_id,
     } = req.query;
 
-    if(!booth_no || !ac_no){
+    if (!booth_no || !ac_no) {
       return res.status(400).json({
-        success:false,
-        message: "Both ac_no and booth_no are required."
-      })
+        success: false,
+        message: "Both ac_no and booth_no are required.",
+      });
     }
-    const findOptions = {booth_no,ac_no};
+    const findOptions = { booth_no, ac_no };
     const order = sortOrder === "asc" ? 1 : -1;
     const skip = (page - 1) * limit;
     const sortOptions = {};
@@ -249,10 +252,10 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
     ) {
       searchConditions.push({ published: published === "true" });
     }
-    if(searchConditions.length > 0 ){
-      findOptions.$and = searchConditions
+    if (searchConditions.length > 0) {
+      findOptions.$and = searchConditions;
     }
-    console.log(findOptions)
+    console.log(findOptions);
     const total = await Survey.countDocuments(findOptions);
 
     const surveys = await Survey.find(findOptions)
@@ -266,6 +269,7 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No surveys found" });
     }
+
     return res.status(200).json({
       success: true,
       total,
@@ -275,6 +279,7 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
       surveys,
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ success: false, message: error.message });
   }
 };

@@ -3,6 +3,7 @@ const Responses = require("../models/response");
 const Family = require("../models/family");
 const mongoose = require("mongoose");
 const fs = require("fs");
+const Survey = require("../models/survey");
 
 exports.saveResponse = async (req, res) => {
   console.log("here it works");
@@ -45,6 +46,19 @@ exports.saveResponse = async (req, res) => {
         }
       });
     }
+
+    const survey = await Survey.findOneAndUpdate(
+      { _id: survey_id },
+      {
+        $inc: { response_count: 1 },
+      },
+    );
+    if (!survey) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Survey not found" });
+    }
+
     let responseToSave = {
       survey_id,
       user_id,
@@ -143,7 +157,15 @@ exports.getCount = async (req, res) => {
 
 exports.getAllResponses = async (req, res) => {
   try {
-    const { surveyId, userId, startDate, endDate, filters, page = 1, limit = 10 } = req.query;
+    const {
+      surveyId,
+      userId,
+      startDate,
+      endDate,
+      filters,
+      page = 1,
+      limit = 10,
+    } = req.query;
     console.log("query is------>", req.query);
     const matchStage = {};
 
@@ -217,6 +239,7 @@ exports.getAllResponses = async (req, res) => {
           _id: 1,
           user_id: 1,
           survey_id: 1,
+          family_id: 1,
           ac_no: 1,
           booth_no: 1,
           house_no: 1,
@@ -257,6 +280,7 @@ exports.getAllResponses = async (req, res) => {
         $group: {
           _id: "$_id",
           user_id: { $first: "$user_id" },
+          family_id: { $first: "$family_id" },
           ac_no: { $first: "$ac_no" },
           booth_no: { $first: "$booth_no" },
           house_no: { $first: "$house_no" },
@@ -294,7 +318,8 @@ exports.getAllResponses = async (req, res) => {
       ...aggregationPipeline,
       { $count: "totalResponses" },
     ]);
-    const totalCount = totalResponses.length > 0 ? totalResponses[0].totalResponses : 0;
+    const totalCount =
+      totalResponses.length > 0 ? totalResponses[0].totalResponses : 0;
 
     // Pagination logic
     const pageNum = parseInt(page, 10);
@@ -325,8 +350,6 @@ exports.getAllResponses = async (req, res) => {
     return res.status(400).json({ success: "false", message: error.message });
   }
 };
-
-
 
 exports.getResponse = async (req, res) => {
   try {
@@ -435,8 +458,8 @@ exports.getSurveyResponses = async (req, res) => {
           _id: 0,
           survey_id: "$_id",
           surveyName: "$surveyDetails.name",
-          ac_no:"$surveyDetails.ac_no",
-          booth_no:"$surveyDetails.booth_no",
+          ac_no: "$surveyDetails.ac_no",
+          booth_no: "$surveyDetails.booth_no",
           responseCount: 1,
           latestResponseCreatedAt: 1,
           surveyCreatedAt: "$surveyDetails.createdAt",
