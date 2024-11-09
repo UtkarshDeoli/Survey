@@ -35,6 +35,6 @@ router.get(
   responseController.getResponsesGroupedByFamily,
 );
 router.post("/updateResponse", responseController.updateResponse);
-
+router.post("/markAsContacted", responseController.markAsContacted);
 
 module.exports = router;

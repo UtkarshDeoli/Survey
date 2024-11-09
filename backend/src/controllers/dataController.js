@@ -5,52 +5,60 @@ exports.getData = async (req, res) => {
   try {
     const { userId } = req.query;
 
-    const dataDoc = await Data.findOne({
-      user_id: new mongoose.Types.ObjectId(String(userId)),
-    }).populate("responses");
-    console.log(userId, dataDoc);
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required",
+      });
+    }
 
-    // [
-    //   {
-    //     $match: {
-    //       user_id:ObjectId('672c2d3fe4b067ef21b6a778')
-    //     }
-    //   },
-    //   {
-    //     $group:{
-    //       _id:"$survey_id",
-    //       responses:{$last:"$responses"}
-    //     }
-    //   },
-    //    {
-    //     $lookup: {
-    //       from: "survey99",           
-    //       localField: "_id",          
-    //       foreignField: "_id",         
-    //       as: "surveyDetails"          
-    //     }
-    //   },
-    //   {
-    //     $unwind: "$surveyDetails"    
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "response99",   
-    //       localField: "responses",     
-    //       foreignField: "_id",         
-    //       as: "responseDetails"        
-    //     }
-    //   },
-      
-    // ]
+    const aggregationPipeline = [
+      {
+        $match: {
+          user_id: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $group: {
+          _id: "$survey_id",
+          responses: { $last: "$responses" },
+        },
+      },
+      {
+        $lookup: {
+          from: "survey99",
+          localField: "_id",
+          foreignField: "_id",
+          as: "surveyDetails",
+        },
+      },
+      {
+        $unwind: "$surveyDetails",
+      },
+      {
+        $lookup: {
+          from: "response99",
+          localField: "responses",
+          foreignField: "_id",
+          as: "responseDetails",
+        },
+      },
+      {
+        $addFields: {
+          assigned_response_count: { $size: "$responseDetails" },
+        },
+      },
+    ];
 
-    if (!dataDoc) {
+    const SurveyData = await Data.aggregate(aggregationPipeline);
+
+    if (!SurveyData) {
       return res.status(404).json({
         success: false,
         message: "Data not found",
       });
     }
-    return res.status(200).json({ success: true, data: dataDoc });
+    return res.status(200).json({ success: true, data: SurveyData });
   } catch (error) {
     console.log(error);
     return res.status(400).json({

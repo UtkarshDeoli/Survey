@@ -70,7 +70,7 @@ exports.saveResponse = async (req, res) => {
       name,
       last_name,
     };
-    
+
     let createdNewFamily = false;
     if (save_mode === "new_family") {
       const alreadyExists = await Family.findOne({
@@ -189,19 +189,21 @@ exports.getAllResponses = async (req, res) => {
     if (startDate && endDate) {
       // Validate if the dates are valid
       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
-        return res.status(400).json({ success: false, message: "Invalid date range." });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid date range." });
       }
-    
+
       // Convert startDate and endDate to Date objects
       const startUtcDate = new Date(startDate);
       startUtcDate.setUTCHours(0, 0, 0, 0); // Start of the day at 12:00 AM UTC
-    
+
       const endUtcDate = new Date(endDate);
       endUtcDate.setUTCHours(23, 59, 59, 999); // End of the day at 11:59 PM UTC
 
-      console.log(startUtcDate)
-      console.log(endUtcDate)
-    
+      console.log(startUtcDate);
+      console.log(endUtcDate);
+
       // Filter based on createdAt being within the range
       matchStage.createdAt = {
         $gte: startUtcDate,
@@ -273,7 +275,7 @@ exports.getAllResponses = async (req, res) => {
           audio_recording_path: 1,
           "responses.question_id": 1,
           "responses.question_type": 1,
-          "responses.pranna_pramukh_assigned":1,
+          "responses.pranna_pramukh_assigned": 1,
           "responses.question": 1,
           "responses.response": {
             $cond: {
@@ -335,13 +337,11 @@ exports.getAllResponses = async (req, res) => {
       });
     }
 
-
-
     // Sorting by createdAt in descending order
     aggregationPipeline.push({ $sort: { createdAt: -1 } });
 
     // Calculate total responses count
-    console.log(JSON.stringify(aggregationPipeline,null,2))
+    console.log(JSON.stringify(aggregationPipeline, null, 2));
     const totalResponses = await Responses.aggregate([
       ...aggregationPipeline,
       { $count: "totalResponses" },
@@ -357,11 +357,13 @@ exports.getAllResponses = async (req, res) => {
     aggregationPipeline.push({ $skip: skip }, { $limit: limitNum });
 
     const filteredResponse = await Responses.aggregate(aggregationPipeline);
-   
-    const fin = filteredResponse.map((f)=>Responses.findById(f._id).populate('panna_pramukh_assigned'))  
-    const re =  await Promise.all(fin)
+
+    const fin = filteredResponse.map((f) =>
+      Responses.findById(f._id).populate("panna_pramukh_assigned"),
+    );
+    const re = await Promise.all(fin);
     // console.log("res-->",re)
-    
+
     if (!filteredResponse) {
       return res
         .status(404)
@@ -686,5 +688,24 @@ exports.updateResponse = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+exports.markAsContacted = async (req, res) => {
+  try {
+    const { responsesIdsList } = req.body;
+    for (let responseId of responsesIdsList) {
+      const responseToUpdate = {
+        contacted: true,
+      };
+      await Responses.findByIdAndUpdate(responseId, responseToUpdate, {
+        new: true,
+      });
+    }
+    return res
+      .status(201)
+      .json({ success: "true", message: "Response marked as contacted" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
   }
 };
