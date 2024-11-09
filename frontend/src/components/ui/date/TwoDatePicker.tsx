@@ -30,7 +30,7 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
   };
 
   return (
-    <div className={twMerge("w-fit flex font-medium text-lg px-4 py-2 items-center space-x-2 rounded-lg focus:outline-none cursor-pointer", className)}>
+    <div className={twMerge("w-fit flex font-medium text-lg px-4 py-2 items-center space-x-2 rounded-md focus:outline-none cursor-pointer", className)}>
       <div className="">
         <Image src={survey_analytics_calender.src} alt="calender" height={24} width={24} />
       </div>
@@ -51,7 +51,7 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
                   console.log("inside input");
                 }}
                 placeholder={`Select start`}
-                className="my-2 w-[120px] text-center"
+                className="my-2 w-[120px] text-center outline-none font-normal text-sm"
               />
             </div>
           }
@@ -72,7 +72,7 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
                   console.log("inside input");
                 }}
                 placeholder={`Select end`}
-                className="my-2 w-[120px] text-center"
+                className="my-2 w-[120px] text-center outline-none font-normal text-sm"
               />
             </div>
           }

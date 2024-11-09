@@ -37,7 +37,7 @@ function Navbar({ onSidebarToggle }: any) {
         <ButtonBordered
             onClick={() => {
               localStorage.removeItem("jwt_token");
-              router.push("/login");
+              router.push("/");
             }}
             className="text-[14px] flex gap-2 font-semibold text-red-500 border-red-500 hover:bg-red-500 survitems-center whitespace-nowrap"
           >

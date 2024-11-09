@@ -4,12 +4,13 @@ const ProfilePicture = require("../models/profilePicture");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const Role = require("../models/role");
+const Response = require("../models/response");
 
 exports.addUsers = async (req, res) => {
   try {
     console.log("add user Request");
-    const hashedPass = await bcrypt.hash(req.body.password,10);
-    const data = {...req.body}
+    const hashedPass = await bcrypt.hash(req.body.password, 10);
+    const data = { ...req.body };
     data.password = hashedPass;
     const user = new User(data);
     const result = await user.save();
@@ -60,21 +61,21 @@ exports.addMultipleUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { user_id, ...userData } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     if (!user_id) {
       return res.status(400).json({ error: "Username is required" });
     }
-    console.log("usrData is --->",userData)
+    console.log("usrData is --->", userData);
     const dbRes = await User.findOneAndUpdate(
       { _id: user_id },
       { $set: userData },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
     return res
       .status(200)
       .json({ success: true, message: "User updated successfully" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res
       .status(400)
       .json({ success: false, message: "something went wrong" });
@@ -179,7 +180,7 @@ exports.getAllUsers = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validUserRoleIds.filter(
-        (ro) => ro.toString() === role.toString(),
+        (ro) => ro.toString() === role.toString()
       );
     }
     if (role && roleExists.length > 0) {
@@ -193,7 +194,11 @@ exports.getAllUsers = async (req, res) => {
     if (getWithProfilePicture === "true") {
       users = await User.find(query).populate("profile_picture");
     } else {
-      users = await User.find(query).populate("role").skip(skip).limit(limit).sort({createdAt:-1});
+      users = await User.find(query)
+        .populate("role")
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 });
     }
 
     const total = await User.countDocuments(query);
@@ -229,7 +234,7 @@ exports.uploadProfilePicture = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { profile_picture: profilePicture._id } },
-      { new: true },
+      { new: true }
     );
 
     return res.status(200).json({
@@ -278,7 +283,7 @@ exports.createKaryakarta = async (req, res) => {
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("ROLE ISS:", role);
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString(),
+      (el) => el.toString() === role.toString()
     );
 
     if (roleExists.length === 0) {
@@ -304,7 +309,7 @@ exports.createKaryakarta = async (req, res) => {
     let responseIds;
     if (responses) {
       responseIds = responses.map(
-        (responseId) => new mongoose.Types.ObjectId(String(responseId)),
+        (responseId) => new mongoose.Types.ObjectId(String(responseId))
       );
     }
 
@@ -333,19 +338,27 @@ exports.createKaryakarta = async (req, res) => {
 
 exports.updateMultipleKaryakarta = async (req, res) => {
   try {
-    const { ids, surveyId, responses } = req.body;
+    const { id, surveyId, responses } = req.body;
     console.log(req.body);
-    ids.forEach(async (id) => {
-      const data = await Data.findOne({ user_id: id });
-      if (data) {
-        data.responses = responses;
-        await data.save();
-      } else await Data.create({ survey_id: surveyId, user_id: id, responses });
+    const data = await Data.findOne({ user_id: id });
+    if (data) {
+      data.responses = responses;
+      await data.save();
+    } else {
+      await Data.create({ survey_id: surveyId, user_id: id, responses });
+    } // logic to be removed due to history
+
+    responses.forEach(async (response) => {
+      await Response.findOneAndUpdate(
+        { _id: response },
+        { panna_pramukh_assigned: id }
+      );
     });
     return res
       .status(200)
       .json({ success: true, message: "succeessfuly created data" });
   } catch (err) {
+    console.log(err)
     return res.status(500).json({
       success: false,
       message: "Error updating data",
@@ -374,7 +387,7 @@ exports.updateKaryakarta = async (req, res) => {
     const karyakartaRoles = await Role.find({ category: "karyakarta" });
     const validRoles = karyakartaRoles.map((el) => el._id);
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString(),
+      (el) => el.toString() === role.toString()
     );
 
     if (roleExists.length === 0) {
@@ -428,7 +441,7 @@ exports.updateKaryakarta = async (req, res) => {
             user_id: karyakarta._id,
             responses: responses,
           },
-        },
+        }
       );
     }
 
@@ -471,7 +484,7 @@ exports.getAllKaryakarta = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validRoleIds.filter(
-        (ro) => ro.toString() === role.toString(),
+        (ro) => ro.toString() === role.toString()
       );
     }
 

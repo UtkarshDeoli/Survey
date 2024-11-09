@@ -7,7 +7,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { getSurveyResponses } from "@/networks/response_networks";
 import { useSearchParams } from "next/navigation";
 import { FaEye } from "react-icons/fa";
-import { getAllKaryakarta, getAllUsers, getPannaPramukh, updateKaryakartas } from "@/networks/user_networks";
+import { getAllKaryakarta, getAllUsers, getPannaPramukh, getUser, updateKaryakartas } from "@/networks/user_networks";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import { useRouter } from "next/navigation"; // For routing
 import CustomModal from "@/components/ui/Modal";
@@ -18,6 +18,8 @@ import { FaLocationDot } from "react-icons/fa6";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { RxCross2 } from "react-icons/rx";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Select from 'react-select';
+import { getSurvey } from "@/networks/survey_networks";
 
 const operatorOptions = {
   text: ["contains", "equals", "starts with", "ends with"],
@@ -55,11 +57,13 @@ function Page() {
   const [userModal,setUserModal] = useState<boolean>(false);
   const [userSearch,setUserSearch] = useState<string|null>(null);
   const [pannaPramukh,setPannaPramukh] = useState<any>(null);
-  const [selectedPanna,setSelectedPanna] = useState<string[]|null>(null);
+  const [selectedPanna,setSelectedPanna] = useState<string|null>(null);
+  const [surveyQuestions,setSurveyQuestions] = useState<any>(null);
    //response selection states
    const [startIndex,setStartIndex] = useState<number|null>(null)
    const [endIndex,setEndIndex] = useState<number|null>(null)
    const [selectedResponses,setSelectedResponses] = useState<string[]>([])
+  
 
   //  infinite scroll
    const [responsePage, setResponsePage] = useState<number>(1);
@@ -67,6 +71,8 @@ function Page() {
 
   console.log("selected Responses ------>",selectedResponses)
   console.log("applied filters------>",appliedFilters)
+  console.log("dates-------->",startDate,endDate)
+  console.log("survey questions ----->",surveyQuestions);
 
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
@@ -79,6 +85,7 @@ function Page() {
   });
 
   useEffect(() => {
+    getQuestions()
     getUserResponses();
     getUsers();
   }, [reset]);
@@ -106,7 +113,7 @@ function Page() {
     const response = await getSurveyResponses(params);
     setResponses(response.data);
     setTotalResponsePages(response.totalPages);
-    console.log("responses ------>",response.data)
+    console.log("responses of responses ------>",response.data)
     if (response.data && response.data.length > 0) {
       setQuestions(
         response.data[0].responses.map((res: any) => ({
@@ -149,6 +156,12 @@ function Page() {
     setLoading(false);
   }
 
+  async function getQuestions(){
+    const response = await getSurvey({_id:surveyId})
+    console.log("res--------------------------------->",response)
+    const questions = response.data.questions.map((el:any)=>el);
+    setSurveyQuestions(questions);
+  }
   // selection logic
 
   function handleMemberClick(responseId: string, index: number) {
@@ -214,12 +227,13 @@ function Page() {
   }
 
   async function updatePannaPramukhs(){
-    const response = await updateKaryakartas({ids:selectedPanna,responses:selectedResponses,surveyId})
+    const response = await updateKaryakartas({id:selectedPanna,responses:selectedResponses,surveyId})
     if(response.success){
       toast.success("Data assigned successfully")
       setAssignMode(false);
       setSelectedResponses([])
       setSelectedPanna(null);
+      getUserResponses()
     }else{
       toast.error("Error assigning data")
     }
@@ -268,6 +282,7 @@ function Page() {
         "Phone Number",
         "Checkbox List",
         "Checkbox List With Other",
+        "Radio Grid"
       ].includes(questionType)
     ) {
       return operatorOptions.text;
@@ -289,17 +304,20 @@ function Page() {
   };
 
   const handleQuestionChange = (value: string) => {
-    const selectedResponse = responses[0]?.responses.find(
-      (res: any) => res.question_id === Number(value)
-    );
-    if (selectedResponse) {
+    const selectedQuestion = surveyQuestions.find((q:any)=>Number(q.question_id) === Number(value))
+    if (selectedQuestion) {
       setQuestion(value);
-      setQuestionType(selectedResponse.question_type);
-      setOperator(getDefaultOperator(selectedResponse.question_type));
+      setQuestionType(selectedQuestion.type);
+      setOperator(getDefaultOperator(selectedQuestion.type));
     } else {
       setQuestionType("");
     }
   };
+
+  const options = users?.map((user) => ({
+    value: user._id,
+    label: user.name,
+  }));
 
   return (
     <div className="w-full bg-my-gray-100 font-medium">
@@ -361,12 +379,12 @@ function Page() {
                   filters.map((filter) => {
                     let questionText = "";
                     if (responses && responses.length > 0) {
-                      const questionResponse = responses[0].responses.find(
+                      const questionResponse = surveyQuestions?.find(
                         (res: any) =>
                           Number(res.question_id) === Number(filter.question)
                       );
                       if (questionResponse) {
-                        questionText = questionResponse.question;
+                        questionText = questionResponse.parameters.question;
                       }
                     }
                     const value = JSON.stringify({
@@ -384,13 +402,13 @@ function Page() {
             </div>
             <div className="flex flex-col gap-2">
               {appliedFilters.map((el) => {
-                const questionResponse = responses[0]?.responses.find(
+                const questionResponse = surveyQuestions?.find(
                   (res: any) =>
                     Number(res.question_id) === Number(el.question)
                 );
                 let questionText
                 if (questionResponse) {
-                  questionText = questionResponse.question;
+                  questionText = questionResponse.parameters.question;
                 }
                 return (
                   <div className="flex justify-between w-full border border-secondary-200 rounded-sm px-4 py-2">
@@ -406,7 +424,6 @@ function Page() {
                       }
                     >
                      <RxCross2 />
-
                     </button>
                   </div>
                 );
@@ -431,7 +448,7 @@ function Page() {
               {/* Selected User */}
               <div className="flex flex-col space-y-2 w-[352px]">
                 <h1 className="text-my-gray-200">Selected User</h1>
-                <select
+                {/* <select
                   onChange={(e) => setUserId(e.target.value)}
                   value={userId}
                   name="selected-user"
@@ -448,7 +465,16 @@ function Page() {
                         {user.name}
                       </option>
                     ))}
-                </select>
+                </select> */}
+                 <Select
+                    value={options.find((option) => option.value === userId)}
+                    onChange={(selectedOption) => setUserId(selectedOption?.value || '')}
+                    options={options}
+                    placeholder="Select user"
+                    // className="border h-10 w-[352px] border-my-gray-200 rounded-lg px-4 py-2"
+                    classNamePrefix="react-select"
+                    isSearchable={true} // Enables search
+                  />
               </div>
             </div>
 
@@ -515,6 +541,10 @@ function Page() {
               <tr className="bg-secondary-100">
                 <td className="min-w-24 px-4 py-2 border-b text-center"></td>
                 <td className="min-w-24 px-4 py-2 border-b text-center"></td>
+                
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">
+                  Panna pramukh
+                </td>
                 <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">
                   Response date
                 </td>
@@ -598,6 +628,9 @@ function Page() {
                       <FaEye />
                     </td>
                     <td className="min-w-24 px-4 py-2 border-b text-center">
+                      {response.panna_pramukh_assigned ? response.panna_pramukh_assigned.name : "--" }
+                    </td>
+                    <td className="min-w-24 px-4 py-2 border-b text-center">
                       {formatDate(response.createdAt)}
                     </td>
                     <td className="min-w-44 whitespace-nowrap px-4 py-2 border-b text-center">
@@ -624,7 +657,9 @@ function Page() {
               {/* </InfiniteScroll> */}
             </tbody>
           </table>
-          {assignMode && <ButtonFilled className="mt-5" onClick={updatePannaPramukhs}>Assign</ButtonFilled>}
+          {assignMode && <ButtonFilled className="mt-5" onClick={()=>{
+            updatePannaPramukhs()
+          }}>Assign</ButtonFilled>}
         </div>
       ) : (
         !loading && (
@@ -638,7 +673,7 @@ function Page() {
       <CustomModal open={modalIsOpen} closeModal={closeModal}>
         <div className="min-w-[500px] h-[270px] flex flex-col">
           <div className="relative z-10 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">
-            Create surveys
+            Add filters
           </div>
           <form className="w-full h-full p-4 flex gap-10 justify-center items-center">
             {/* Question Select */}
@@ -652,15 +687,13 @@ function Page() {
                 <option value="" disabled selected>
                   Select question
                 </option>
-                {responses &&
-                  responses.length > 0 &&
-                  responses[0].responses.map((response: any, index: number) => (
+                {surveyQuestions && surveyQuestions.map((response: any, index: number) => (
                     <option
                       key={index}
                       value={response.question_id}
                       className="text-secondary-300 px-4 py-2 text-left border-b min-w-24 whitespace-nowrap"
                     >
-                      {response.question}
+                      {response.parameters.question}
                     </option>
                   ))}
               </select>
@@ -830,15 +863,8 @@ function Page() {
                     pannaPramukh && pannaPramukh.map((us:any)=>(
                       <label className="flex gap-5">
                         <input onChange={() =>
-                            setSelectedPanna((prev) => {
-                              const currentSelection = prev || []; // Fallback to empty array if prev is null
-                              if (currentSelection.includes(us._id)) {
-                                return currentSelection.filter((id) => id !== us._id);
-                              } else {
-                                return [...currentSelection, us._id];
-                              }
-                            })
-                          } type="checkbox" className="h-5 w-5"/>
+                            setSelectedPanna(us._id)
+                          } type="radio" name="panna" className="h-5 w-5"/>
                         <p>{us.name}</p>
                       </label>
                     ))
@@ -847,7 +873,7 @@ function Page() {
                 <ButtonFilled onClick={()=>{
                   setAssignMode(true)
                   setUserModal(false)
-                  }} className="mt-auto disabled:bg-blue-100 disabled:cursor-not-allowed" disabled={!selectedPanna || (selectedPanna && selectedPanna.length === 0)}>Proceed</ButtonFilled>
+                  }} className="mt-auto disabled:bg-blue-100 disabled:cursor-not-allowed" disabled={!selectedPanna}>Proceed</ButtonFilled>
             </div>
       </CustomModal>
     </div>

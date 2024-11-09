@@ -43,6 +43,10 @@ const responseSchema = new Schema(
         },
         audio_recording_path:{
             type: String
+        },
+        panna_pramukh_assigned:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"User99"
         }
     },
     { strict: false ,timestamps: true}

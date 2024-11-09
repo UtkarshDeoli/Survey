@@ -277,12 +277,13 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                         <FaRegEdit /> Edit
                       </button>
                       <button
+                      disabled={el.published === false}
                       onClick={()=>{
                         setSurveyToAssign(el._id);
                         setActiveDropdown(null)
                         setAssignModal(true);
                       }}
-                      className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
+                      className="flex gap-2 items-center disabled:cursor-not-allowed disabled:bg-gray-100 px-4 py-2 hover:bg-gray-100 cursor-pointer w-full">
                         <FaRegUser /> Assign to user
                       </button>
                       <button
