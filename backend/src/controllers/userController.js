@@ -336,7 +336,7 @@ exports.createKaryakarta = async (req, res) => {
   }
 };
 
-exports.updateMultipleKaryakarta = async (req, res) => {
+exports.updateMultipleKaryakarta = async (req, res) => { //for assigining data
   try {
     const { id, surveyId, responses } = req.body;
     console.log(req.body);
@@ -344,9 +344,13 @@ exports.updateMultipleKaryakarta = async (req, res) => {
     if (data) {
       data.responses = responses;
       await data.save();
-    } else {
+    } 
+    else {
       await Data.create({ survey_id: surveyId, user_id: id, responses });
-    } // logic to be removed due to history
+    } 
+    // const data = await Data.findOne({ survey_id: id });
+    
+    // await Data.create({ survey_id: surveyId, user_id: id, responses });
 
     responses.forEach(async (response) => {
       await Response.findOneAndUpdate(

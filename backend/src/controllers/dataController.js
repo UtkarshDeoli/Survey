@@ -10,6 +10,40 @@ exports.getData = async (req, res) => {
     }).populate("responses");
     console.log(userId, dataDoc);
 
+    // [
+    //   {
+    //     $match: {
+    //       user_id:ObjectId('672c2d3fe4b067ef21b6a778')
+    //     }
+    //   },
+    //   {
+    //     $group:{
+    //       _id:"$survey_id",
+    //       responses:{$last:"$responses"}
+    //     }
+    //   },
+    //    {
+    //     $lookup: {
+    //       from: "survey99",           
+    //       localField: "_id",          
+    //       foreignField: "_id",         
+    //       as: "surveyDetails"          
+    //     }
+    //   },
+    //   {
+    //     $unwind: "$surveyDetails"    
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "response99",   
+    //       localField: "responses",     
+    //       foreignField: "_id",         
+    //       as: "responseDetails"        
+    //     }
+    //   },
+      
+    // ]
+
     if (!dataDoc) {
       return res.status(404).json({
         success: false,

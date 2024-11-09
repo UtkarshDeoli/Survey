@@ -111,7 +111,7 @@ function page() {
           <Loader className="h-[50vh] w-full flex justify-center items-center text-primary-300" />
         )}
         {!loading &&
-          data.map((el: any, index: number) => (
+          data.length > 0 ? data.map((el: any, index: number) => (
             <div
               onClick={()=>router.push(`/admin/data/survey-responses?survey_id=${el.survey_id}&ac_no=${el.ac_no}&booth_no=${el.booth_no}`)}
               key={index}
@@ -147,7 +147,11 @@ function page() {
                 <BsClipboardPlus size={24} />
               </p>
             </div>
-          ))}
+          )) : (
+            <div className="flex justify-center items-center h-[30vh] w-full">
+              <p>No survey with responses</p>
+            </div>
+          )}
       </div>
     </div>
   );

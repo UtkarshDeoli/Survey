@@ -242,7 +242,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
               >
                 {el.name}
               </p>
-              <p className="col-span-2 pl-8">0</p>
+              <p className="col-span-2 pl-8">{el.response_count || 0}</p>
               <p className="col-span-2">{formatDate(el.createdAt)}</p>
               <div className="col-span-2 flex items-center justify-between w-full relative">
                 <Switch
