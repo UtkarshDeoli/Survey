@@ -669,6 +669,7 @@ function Page() {
                         className="min-w-32 px-4 py-2 border-b text-center"
                       >
                         <input
+                         disabled={response.panna_pramukh_assigned}
                           onChange={() =>
                             handleMemberClick(response._id, rowIndex)
                           }

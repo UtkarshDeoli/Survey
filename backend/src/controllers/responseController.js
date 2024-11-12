@@ -578,17 +578,115 @@ exports.getSurveyResponses = async (req, res) => {
   }
 };
 
+// exports.getSurveyResponseStats = async (req, res) => {
+//   try {
+//     const { survey_id,startDate,endDate,filters } = req.query;
+
+
+//     if (!survey_id) {
+//       return res.status(400).json({ message: "Survey ID is required." });
+//     }
+//     const matchStage = {
+//       survey_id: new mongoose.Types.ObjectId(String(survey_id))
+//     }
+//     if (startDate && endDate) {
+//       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
+//         return res
+//           .status(400)
+//           .json({ success: false, message: "Invalid date range." });
+//       }
+//       const startUtcDate = new Date(startDate);
+//       startUtcDate.setUTCHours(0, 0, 0, 0); // Start of the day at 12:00 AM UTC
+
+//       const endUtcDate = new Date(endDate);
+//       endUtcDate.setUTCHours(23, 59, 59, 999); // End of the day at 11:59 PM UTC
+
+//       console.log(startUtcDate);
+//       console.log(endUtcDate);
+//       matchStage.createdAt = {
+//         $gte: startUtcDate,
+//         $lte: endUtcDate,
+//       };
+//     }
+
+//     const stats = await Responses.aggregate([
+//       {
+//         $match: matchStage
+//       },
+//       {
+//         $unwind: "$responses",
+//       },
+//       {
+//         $group: {
+//           _id: "$responses.question_id",
+//           question: { $first: "$responses.question" },
+//           responses: {
+//             $push: {
+//               response: "$responses.response",
+//               question_type: "$responses.question_type",
+//             },
+//           },
+//           total_responses: { $sum: 1 },
+//         },
+//       },
+
+//       {
+//         $unwind: "$responses",
+//       },
+//       {
+//         $group: {
+//           _id: {
+//             question_id: "$_id",
+//             response_value: "$responses.response",
+//           },
+//           question: { $first: "$question" },
+//           response_count: { $sum: 1 },
+//           total_responses: { $first: "$total_responses" },
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: "$_id.question_id",
+//           question: { $first: "$question" },
+//           total_responses: { $first: "$total_responses" },
+//           responses: {
+//             $push: {
+//               response_value: "$_id.response_value",
+//               count: "$response_count",
+//             },
+//           },
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 0,
+//           question_id: "$_id",
+//           question: 1,
+//           total_responses: 1,
+//           responses: 1,
+//         },
+//       },
+//     ]);
+//     return res.status(200).json({ success: true, data: stats });
+//   } catch (error) {
+//     console.error("Error fetching survey response stats:", error);
+//     return res.status(500).json({ message: "Internal server error." });
+//   }
+// };
+
 exports.getSurveyResponseStats = async (req, res) => {
   try {
-    const { survey_id,startDate,endDate,filters } = req.query;
-
+    const { survey_id, startDate, endDate, filters } = req.query;
 
     if (!survey_id) {
       return res.status(400).json({ message: "Survey ID is required." });
     }
+
+    // Basic match stage for survey and date filtering
     const matchStage = {
       survey_id: new mongoose.Types.ObjectId(String(survey_id))
-    }
+    };
+    
     if (startDate && endDate) {
       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
         return res
@@ -596,77 +694,116 @@ exports.getSurveyResponseStats = async (req, res) => {
           .json({ success: false, message: "Invalid date range." });
       }
       const startUtcDate = new Date(startDate);
-      startUtcDate.setUTCHours(0, 0, 0, 0); // Start of the day at 12:00 AM UTC
-
+      startUtcDate.setUTCHours(0, 0, 0, 0);
       const endUtcDate = new Date(endDate);
-      endUtcDate.setUTCHours(23, 59, 59, 999); // End of the day at 11:59 PM UTC
-
-      console.log(startUtcDate);
-      console.log(endUtcDate);
-      matchStage.createdAt = {
-        $gte: startUtcDate,
-        $lte: endUtcDate,
-      };
+      endUtcDate.setUTCHours(23, 59, 59, 999);
+      matchStage.createdAt = { $gte: startUtcDate, $lte: endUtcDate };
     }
 
-    const stats = await Responses.aggregate([
+    // Create filters for the response questions if provided
+    const responseFilters = [];
+    if (filters) {
+      filters.forEach(({ question, operator, response }) => {
+        const filter = { question_id: Number(question) };
+        switch (operator) {
+          case "contains":
+            filter.response = { $regex: response, $options: "i" };
+            break;
+          case "equals":
+            filter.response = response;
+            break;
+          case "not equals":
+            filter.response = { $ne: response };
+            break;
+          case "starts with":
+            filter.response = { $regex: `^${response}`, $options: "i" };
+            break;
+          case "ends with":
+            filter.response = { $regex: `${response}$`, $options: "i" };
+            break;
+          default:
+            filter.response = response;
+        }
+        responseFilters.push(filter);
+      });
+    }
+
+    const aggregationPipeline = [
+      { $match: matchStage },
+      { $unwind: "$responses" },
       {
-        $match: matchStage
-      },
-      {
-        $unwind: "$responses",
+        $project: {
+          _id: 1,
+          survey_id: 1,
+          createdAt: 1,
+          "responses.question_id": 1,
+          "responses.question": 1,
+          "responses.response": 1,
+          "responses.question_type": 1
+        }
       },
       {
         $group: {
           _id: "$responses.question_id",
           question: { $first: "$responses.question" },
-          responses: {
-            $push: {
-              response: "$responses.response",
-              question_type: "$responses.question_type",
-            },
-          },
-          total_responses: { $sum: 1 },
-        },
+          question_type: { $first: "$responses.question_type" },
+          responses: { $push: "$responses.response" },
+          total_responses: { $sum: 1 }
+        }
       },
-
-      {
-        $unwind: "$responses",
-      },
+      { $unwind: "$responses" },
       {
         $group: {
-          _id: {
-            question_id: "$_id",
-            response_value: "$responses.response",
-          },
+          _id: { question_id: "$_id", response_value: "$responses" },
           question: { $first: "$question" },
+          question_type: { $first: "$question_type" },
           response_count: { $sum: 1 },
-          total_responses: { $first: "$total_responses" },
-        },
+          total_responses: { $first: "$total_responses" }
+        }
       },
       {
         $group: {
           _id: "$_id.question_id",
           question: { $first: "$question" },
+          question_type: { $first: "$question_type" },
           total_responses: { $first: "$total_responses" },
           responses: {
             $push: {
               response_value: "$_id.response_value",
-              count: "$response_count",
-            },
-          },
-        },
+              count: "$response_count"
+            }
+          }
+        }
+      },
+      {
+        $sort: { _id: 1 }, // Sort questions by question_id in ascending order
       },
       {
         $project: {
           _id: 0,
           question_id: "$_id",
+          question_type: 1,
           question: 1,
           total_responses: 1,
-          responses: 1,
-        },
-      },
-    ]);
+          responses: 1
+        }
+      }
+    ];
+
+    // Apply response filters if any exist
+    if (responseFilters.length > 0) {
+      aggregationPipeline.push({
+        $match: {
+          $and: responseFilters.map(filter => ({
+            responses: { $elemMatch: filter }
+          }))
+        }
+      });
+    }
+
+    console.log(JSON.stringify(aggregationPipeline,null,2))
+
+    const stats = await Responses.aggregate(aggregationPipeline);
     return res.status(200).json({ success: true, data: stats });
   } catch (error) {
     console.error("Error fetching survey response stats:", error);

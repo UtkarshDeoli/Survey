@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import QuestionChart from "@/components/data/QuestionChart";
 import CustomModal from "@/components/ui/Modal";
+import { RxCross2 } from "react-icons/rx";
 
 const operatorOptions = {
   text: ["contains", "equals", "starts with", "ends with"],
@@ -95,7 +96,7 @@ function Page() {
 
   // api calls
   async function fetchSurveyData() {
-    const response = await getSurveyResponseStats({ survey_id: surveyID });
+    const response = await getSurveyResponseStats({ survey_id: surveyID,filters });
     console.log("response stats data--->", response.data)
     if(response.success){
       setResponseStats(response.data)
@@ -163,21 +164,96 @@ function Page() {
         showFilters && (
           <div className="p-4 w-full ">
              <div className="flex flex-col justify-center-center gap-3">
-              <ButtonFilled
-                className=" flex justify-center items-center w-fit"
-                onClick={()=>setModal(true)}
+              <div className="flex items-center gap-3">
+                <ButtonFilled
+                  className=" flex justify-center items-center w-fit"
+                  onClick={()=>setModal(true)}
+                  >
+                  Data filter +
+                </ButtonFilled>
+                <ButtonFilled onClick={()=>fetchSurveyData()} className="w-fit">Apply</ButtonFilled>
+              </div>
+              <select
+                onChange={(e) => {
+                  const filt = JSON.parse(e.target.value);
+                  const obj = appliedFilters.find(
+                    (el) =>
+                      el.question === filt.question &&
+                      el.operator === filt.operator &&
+                      el.response === filt.response
+                  );
+                  if (obj) return;
+                  else
+                    setAppliedFilters((prev) => [
+                      ...prev,
+                      JSON.parse(e.target.value),
+                    ]);
+                }}
+                value={selectedFilter}
+                name="filters"
+                id="filters"
+                className="outline-none shadow-lg rounded-lg p-2 w-1/2"
               >
-                Data filter +
-              </ButtonFilled>
-              <select className="w-1/2 p-2 rounded-md outline-none">
-                <option disabled selected>Select filters</option>
-                {
-                  filters.map(filter=>(
-                    <option>{filter.question}{filter.operator} {filter.response}</option>
-                  ))
-                }
+                <option value="" disabled selected>
+                  Select filter
+                </option>
+                {filters &&
+                  filters.length > 0 &&
+                  filters.map((filter) => {
+                    let questionText = "";
+                    if (surveyQuestions) {
+                      const questionResponse = surveyQuestions?.find(
+                        (res: any) =>
+                          Number(res.question_id) === Number(filter.question)
+                      );
+                      if (questionResponse) {
+                        questionText = questionResponse.parameters.question;
+                      }
+                    }
+                    const value = JSON.stringify({
+                      question: filter.question,
+                      operator: filter.operator,
+                      response: filter.response,
+                    });
+                    return (
+                      <option value={value} key={filter.question}>
+                        {`${questionText} ${filter.operator} ${filter.response}`}
+                      </option>
+                    );
+                  })}
               </select>
-              
+              <div className="flex flex-col">
+                {appliedFilters.map((el) => {
+                  const questionResponse = surveyQuestions?.find(
+                    (res: any) => Number(res.question_id) === Number(el.question)
+                  );
+                  let questionText;
+                  if (questionResponse) {
+                    questionText = questionResponse.parameters.question;
+                  }
+                  return (
+                    <div className="flex justify-between mt-5 border border-secondary-200 bg-white rounded-sm w-1/2 px-4 py-2">
+                      <h2>{`${questionText} ${el.operator} ${el.response}`}</h2>
+                      <button
+                        onClick={() =>
+                          setAppliedFilters((prev) =>
+                            prev.filter(
+                              (fil) =>
+                                !(
+                                  fil.question === el.question &&
+                                  fil.operator === el.operator &&
+                                  fil.response === el.response
+                                )
+                            )
+                          )
+                        }
+                      >
+                        <RxCross2 />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )
