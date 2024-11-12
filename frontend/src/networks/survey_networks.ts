@@ -68,7 +68,7 @@ export const getAllSurveys = async (params: any) => {
       url: `${SERVER_URI}/${get_all_surveys}?filter=${filter}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&published=${published}&created_by=${created_by}`,
     };
     const response = await axios.request(options);
-    console.log(response);
+    console.log("response from networks---->",response);
     return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };

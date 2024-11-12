@@ -175,9 +175,9 @@ exports.getAllSurvey = async (req, res) => {
 
     const findOptions =
       searchConditions.length > 0 ? { $and: searchConditions } : {};
-
+    console.log("before total")
     const total = await Survey.countDocuments(findOptions);
-
+    console.log("after total");``
     const surveys = await Survey.find(findOptions)
       .skip(skip)
       .limit(Number(limit))

@@ -51,7 +51,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      },
+      }
     );
     if (!survey) {
       return res
@@ -70,7 +70,7 @@ exports.saveResponse = async (req, res) => {
       name,
       last_name,
     };
-    
+
     let createdNewFamily = false;
     if (save_mode === "new_family") {
       const alreadyExists = await Family.findOne({
@@ -106,7 +106,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } },
+        { $set: { family_head: response._id } }
       );
     }
     return res
@@ -167,6 +167,14 @@ exports.getAllResponses = async (req, res) => {
       limit = 10,
     } = req.query;
     console.log("query is------>", req.query);
+    const selectedSurvey = await Survey.findById(surveyId);
+    const question_type_map = {};
+    selectedSurvey.questions.forEach((surv) => {
+      const key = surv.question_id;
+      const val = surv.type;
+      question_type_map[key] = val;
+    });
+    console.log("quesyion map ----->", question_type_map);
     const matchStage = {};
 
     matchStage.survey_id = new mongoose.Types.ObjectId(String(surveyId));
@@ -189,19 +197,21 @@ exports.getAllResponses = async (req, res) => {
     if (startDate && endDate) {
       // Validate if the dates are valid
       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
-        return res.status(400).json({ success: false, message: "Invalid date range." });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid date range." });
       }
-    
+
       // Convert startDate and endDate to Date objects
       const startUtcDate = new Date(startDate);
       startUtcDate.setUTCHours(0, 0, 0, 0); // Start of the day at 12:00 AM UTC
-    
+
       const endUtcDate = new Date(endDate);
       endUtcDate.setUTCHours(23, 59, 59, 999); // End of the day at 11:59 PM UTC
 
-      console.log(startUtcDate)
-      console.log(endUtcDate)
-    
+      console.log(startUtcDate);
+      console.log(endUtcDate);
+
       // Filter based on createdAt being within the range
       matchStage.createdAt = {
         $gte: startUtcDate,
@@ -231,28 +241,55 @@ exports.getAllResponses = async (req, res) => {
           case "ends with":
             filter.response = { $regex: `${answer}$`, $options: "i" };
             break;
+          // case "=":
+          //   filter.response = question_type_map[question] === 'Date' ? new Date(answer) : Number(answer);
+          //   break;
           case "=":
-            filter.response = Number(answer);
+            if (question_type_map[question] === "Date") {
+              const answerDate = new Date(answer);
+              const startOfDay = new Date(answerDate);
+              startOfDay.setUTCHours(0, 0, 0, 0);
+              const endOfDay = new Date(answerDate);
+              endOfDay.setUTCHours(23, 59, 59, 999);
+              filter.response = { $gte: startOfDay, $lte: endOfDay };
+            } else {
+              filter.response = Number(answer);
+            }
             break;
+
           case "!=":
             filter.response = { $ne: Number(answer) };
             break;
           case "<":
-            filter.response = { $lt: Number(answer) };
+            filter.response =
+              question_type_map[question] === "Date"
+                ? { $lt: new Date(answer) }
+                : { $lt: Number(answer) };
             break;
           case "<=":
-            filter.response = { $lte: Number(answer) };
+            filter.response =
+              question_type_map[question] === "Date"
+                ? { $lte: new Date(answer) }
+                : { $lt: Number(answer) };
             break;
           case ">":
-            filter.response = { $gt: Number(answer) };
+            filter.response =
+              question_type_map[question] === "Date"
+                ? { $gt: new Date(answer) }
+                : { $lt: Number(answer) };
             break;
           case ">=":
-            filter.response = { $gte: Number(answer) };
+            filter.response =
+              question_type_map[question] === "Date"
+                ? { $gte: new Date(answer) }
+                : { $lt: Number(answer) };
             break;
         }
         responseFilters.push(filter);
       });
     }
+    console.log("respons filters: " + JSON.stringify(responseFilters, null, 2));
+    if (responseFilters) console.log("respons filters: " + responseFilters[0]);
 
     const aggregationPipeline = [
       { $match: matchStage },
@@ -273,7 +310,6 @@ exports.getAllResponses = async (req, res) => {
           audio_recording_path: 1,
           "responses.question_id": 1,
           "responses.question_type": 1,
-          "responses.pranna_pramukh_assigned":1,
           "responses.question": 1,
           "responses.response": {
             $cond: {
@@ -295,7 +331,18 @@ exports.getAllResponses = async (req, res) => {
                   else: "$responses.response",
                 },
               },
-              else: "$responses.response",
+              else: {
+                $cond: {
+                  if: { $in: ["$responses.question_type", ["Date"]] },
+                  then: {
+                    $dateFromString: {
+                      dateString: "$responses.response",
+                      onError: "$responses.response",
+                    },
+                  },
+                  else: "$responses.response",
+                },
+              },
             },
           },
         },
@@ -314,12 +361,16 @@ exports.getAllResponses = async (req, res) => {
           survey_id: { $first: "$survey_id" },
           createdAt: { $first: "$createdAt" },
           responses: { $push: "$responses" },
-
           audio_recording_path: { $first: "$audio_recording_path" },
         },
       },
     ];
 
+    responseFilters.forEach((resp) =>
+      console.log(resp.question_id, "-->", resp.response)
+    );
+
+    // Add additional match stage if there are filters
     if (responseFilters.length > 0) {
       aggregationPipeline.push({
         $match: {
@@ -335,13 +386,11 @@ exports.getAllResponses = async (req, res) => {
       });
     }
 
-
-
     // Sorting by createdAt in descending order
     aggregationPipeline.push({ $sort: { createdAt: -1 } });
 
     // Calculate total responses count
-    console.log(JSON.stringify(aggregationPipeline,null,2))
+    console.log(JSON.stringify(aggregationPipeline, null, 2));
     const totalResponses = await Responses.aggregate([
       ...aggregationPipeline,
       { $count: "totalResponses" },
@@ -357,11 +406,13 @@ exports.getAllResponses = async (req, res) => {
     aggregationPipeline.push({ $skip: skip }, { $limit: limitNum });
 
     const filteredResponse = await Responses.aggregate(aggregationPipeline);
-   
-    const fin = filteredResponse.map((f)=>Responses.findById(f._id).populate('panna_pramukh_assigned'))  
-    const re =  await Promise.all(fin)
+
+    const fin = filteredResponse.map((f) =>
+      Responses.findById(f._id).populate("panna_pramukh_assigned")
+    );
+    const re = await Promise.all(fin);
     // console.log("res-->",re)
-    
+
     if (!filteredResponse) {
       return res
         .status(404)
@@ -529,17 +580,38 @@ exports.getSurveyResponses = async (req, res) => {
 
 exports.getSurveyResponseStats = async (req, res) => {
   try {
-    const { survey_id } = req.query;
+    const { survey_id,startDate,endDate,filters } = req.query;
+
 
     if (!survey_id) {
       return res.status(400).json({ message: "Survey ID is required." });
     }
+    const matchStage = {
+      survey_id: new mongoose.Types.ObjectId(String(survey_id))
+    }
+    if (startDate && endDate) {
+      if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid date range." });
+      }
+      const startUtcDate = new Date(startDate);
+      startUtcDate.setUTCHours(0, 0, 0, 0); // Start of the day at 12:00 AM UTC
+
+      const endUtcDate = new Date(endDate);
+      endUtcDate.setUTCHours(23, 59, 59, 999); // End of the day at 11:59 PM UTC
+
+      console.log(startUtcDate);
+      console.log(endUtcDate);
+      matchStage.createdAt = {
+        $gte: startUtcDate,
+        $lte: endUtcDate,
+      };
+    }
 
     const stats = await Responses.aggregate([
       {
-        $match: {
-          survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-        },
+        $match: matchStage
       },
       {
         $unwind: "$responses",
@@ -601,6 +673,7 @@ exports.getSurveyResponseStats = async (req, res) => {
     return res.status(500).json({ message: "Internal server error." });
   }
 };
+
 exports.getMediaResource = async (req, res) => {
   console.log("get media resource called");
   try {
@@ -671,7 +744,7 @@ exports.updateResponse = async (req, res) => {
       responseToUpdate,
       {
         new: true,
-      },
+      }
     );
 
     if (!response) {

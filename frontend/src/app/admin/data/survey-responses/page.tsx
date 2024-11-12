@@ -7,7 +7,13 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { getSurveyResponses } from "@/networks/response_networks";
 import { useSearchParams } from "next/navigation";
 import { FaEye } from "react-icons/fa";
-import { getAllKaryakarta, getAllUsers, getPannaPramukh, getUser, updateKaryakartas } from "@/networks/user_networks";
+import {
+  getAllKaryakarta,
+  getAllUsers,
+  getPannaPramukh,
+  getUser,
+  updateKaryakartas,
+} from "@/networks/user_networks";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import { useRouter } from "next/navigation"; // For routing
 import CustomModal from "@/components/ui/Modal";
@@ -18,9 +24,9 @@ import { FaLocationDot } from "react-icons/fa6";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { RxCross2 } from "react-icons/rx";
 import InfiniteScroll from "react-infinite-scroll-component";
-import Select from 'react-select';
+import Select from "react-select";
 import { getSurvey } from "@/networks/survey_networks";
-
+import * as XLSX from "xlsx";
 const operatorOptions = {
   text: ["contains", "equals", "starts with", "ends with"],
   number: ["=", "!=", "<", "<=", ">", ">="],
@@ -53,26 +59,26 @@ function Page() {
   const [mapModalIsOpen, setMapModalIsOpen] = useState<boolean>(false);
   const [questions, setQuestions] = useState<any[] | null>(null);
   const [gmap, setGmap] = useState(null);
-  const [assignMode,setAssignMode] = useState<boolean>(false);
-  const [userModal,setUserModal] = useState<boolean>(false);
-  const [userSearch,setUserSearch] = useState<string|null>(null);
-  const [pannaPramukh,setPannaPramukh] = useState<any>(null);
-  const [selectedPanna,setSelectedPanna] = useState<string|null>(null);
-  const [surveyQuestions,setSurveyQuestions] = useState<any>(null);
-   //response selection states
-   const [startIndex,setStartIndex] = useState<number|null>(null)
-   const [endIndex,setEndIndex] = useState<number|null>(null)
-   const [selectedResponses,setSelectedResponses] = useState<string[]>([])
-  
+  const [assignMode, setAssignMode] = useState<boolean>(false);
+  const [userModal, setUserModal] = useState<boolean>(false);
+  const [userSearch, setUserSearch] = useState<string | null>(null);
+  const [pannaPramukh, setPannaPramukh] = useState<any>(null);
+  const [selectedPanna, setSelectedPanna] = useState<string | null>(null);
+  const [surveyQuestions, setSurveyQuestions] = useState<any>(null);
+  //response selection states
+  const [startIndex, setStartIndex] = useState<number | null>(null);
+  const [endIndex, setEndIndex] = useState<number | null>(null);
+  const [selectedResponses, setSelectedResponses] = useState<string[]>([]);
+  const [dataToExport,setDataToExport] = useState<any>(null);
 
   //  infinite scroll
-   const [responsePage, setResponsePage] = useState<number>(1);
-   const [totalResponsePages,setTotalResponsePages] = useState<number>(1)
+  const [responsePage, setResponsePage] = useState<number>(1);
+  const [totalResponsePages, setTotalResponsePages] = useState<number>(1);
 
-  console.log("selected Responses ------>",selectedResponses)
-  console.log("applied filters------>",appliedFilters)
-  console.log("dates-------->",startDate,endDate)
-  console.log("survey questions ----->",surveyQuestions);
+  console.log("selected Responses ------>", selectedResponses);
+  console.log("applied filters------>", appliedFilters);
+  console.log("dates-------->", startDate, endDate);
+  console.log("survey questions ----->", surveyQuestions);
 
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
@@ -83,16 +89,16 @@ function Page() {
     id: "google-map-script",
     googleMapsApiKey: "AIzaSyAAOwDBvpg5ZDv5JFG-CoDW23GsKkOPeuA",
   });
-
+  console.log("date--------------=-==-=-=-=",response)
   useEffect(() => {
-    getQuestions()
+    getQuestions();
     getUserResponses();
     getUsers();
   }, [reset]);
 
-  useEffect(()=>{
+  useEffect(() => {
     handleGetPannaPramukh();
-  },[userSearch])
+  }, [userSearch]);
 
   async function getUserResponses() {
     let nStartDate, nEndDate;
@@ -113,14 +119,23 @@ function Page() {
     const response = await getSurveyResponses(params);
     setResponses(response.data);
     setTotalResponsePages(response.totalPages);
-    console.log("responses of responses ------>",response.data)
+    console.log("responses of responses ------>", response.data);
     if (response.data && response.data.length > 0) {
       setQuestions(
         response.data[0].responses.map((res: any) => ({
           question: res.question,
           question_id: res.question_id,
         }))
+
       );
+      const d = response.data.map((res:any)=>{
+        const a = res.responses.map((r:any)=>{
+          return {[r.question]:r.response}
+        })
+        return a
+      })
+      console.log("data to export ==================",d)
+      setDataToExport(d.flat());
     }
     setLoading(false);
   }
@@ -138,28 +153,28 @@ function Page() {
       endDate: nEndDate,
       userId,
       filters: appliedFilters,
-      page: responsePage+1,
-      limit: 5
+      page: responsePage + 1,
+      limit: 5,
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
-    setResponses((prev)=>[...prev,response.data]);
-    console.log("responses ------>",response.data)
-    setResponsePage(prev=>prev+1)
+    setResponses((prev) => [...prev, response.data]);
+    console.log("responses ------>", response.data);
+    setResponsePage((prev) => prev + 1);
     if (response.data && response.data.length > 0) {
       const questions = response.data[0].responses.map((res: any) => ({
         question: res.question,
         question_id: res.question_id,
-      }))
-      setQuestions((prev)=>prev ? [...prev, ...questions] : [])
+      }));
+      setQuestions((prev) => (prev ? [...prev, ...questions] : []));
     }
     setLoading(false);
   }
 
-  async function getQuestions(){
-    const response = await getSurvey({_id:surveyId})
-    console.log("res--------------------------------->",response)
-    const questions = response.data.questions.map((el:any)=>el);
+  async function getQuestions() {
+    const response = await getSurvey({ _id: surveyId });
+    console.log("res--------------------------------->", response);
+    const questions = response.data.questions.map((el: any) => el);
     setSurveyQuestions(questions);
   }
   // selection logic
@@ -177,79 +192,87 @@ function Page() {
         setSelectedResponses([]);
         return; // Early return since we've reset everything
       }
-  
+
       // If clicking before the start index, update the start index to the current index
       if (index < startIndex) {
         setStartIndex(index);
-        setEndIndex(null)
+        setEndIndex(null);
         setSelectedResponses([responseId]);
         return; // Early return after resetting states
       }
-  
+
       // Handle the case where the index is greater than the start index
       if (index > startIndex) {
         // Set the end index
         setEndIndex(index);
-  
+
         // Calculate the range of selections
         const range = Math.abs(index - startIndex) + 1;
-  
+
         // Check if the selected range exceeds the maximum allowed
         if (range > 60) {
           toast.error("Maximum of 60 responses are allowed");
           return;
         }
-  
+
         // Create an array to hold selected responses
         const selected: string[] = [];
         for (let i = startIndex; i <= index; i++) {
           selected.push(responses[i]._id); // Use `_id` from the `responses` array
         }
-  
+
         // Update selected responses state
         setSelectedResponses(selected);
       }
-  
+
       // Handle case where a user clicks on an index lower than the current end index
       if (endIndex !== null && index < endIndex) {
         setEndIndex(index);
-  
+
         // Create a new selected array up to the new end index
         const selected: string[] = [];
         for (let i = startIndex; i <= index; i++) {
           selected.push(responses[i]._id);
         }
-  
+
         // Update selected responses state
         setSelectedResponses(selected);
       }
     }
   }
 
-  async function updatePannaPramukhs(){
-    const response = await updateKaryakartas({id:selectedPanna,responses:selectedResponses,surveyId})
-    if(response.success){
-      toast.success("Data assigned successfully")
+  async function updatePannaPramukhs() {
+    const response = await updateKaryakartas({
+      id: selectedPanna,
+      responses: selectedResponses,
+      surveyId,
+    });
+    if (response.success) {
+      toast.success("Data assigned successfully");
       setAssignMode(false);
-      setSelectedResponses([])
+      setSelectedResponses([]);
       setSelectedPanna(null);
-      getUserResponses()
-    }else{
-      toast.error("Error assigning data")
+      getUserResponses();
+    } else {
+      toast.error("Error assigning data");
     }
   }
 
   async function getUsers() {
     setLoading(true);
     const response = await getAllUsers({});
-    console.log("users-------->",response.data);
+    console.log("users-------->", response.data);
     setUsers(response.data);
     setLoading(false);
   }
   async function handleGetPannaPramukh() {
     setLoading(true);
-    const response = await getPannaPramukh({ac_no,booth_no,filter:userSearch});
-    console.log("panna below-------->",response);
+    const response = await getPannaPramukh({
+      ac_no,
+      booth_no,
+      filter: userSearch,
+    });
+    console.log("panna below-------->", response);
     setPannaPramukh(response);
     setLoading(false);
   }
@@ -282,7 +305,7 @@ function Page() {
         "Phone Number",
         "Checkbox List",
         "Checkbox List With Other",
-        "Radio Grid"
+        "Radio Grid",
       ].includes(questionType)
     ) {
       return operatorOptions.text;
@@ -303,8 +326,27 @@ function Page() {
     return options.length > 0 ? options[0] : ""; // Return first operator as default
   };
 
+  // Function to handle export
+  const exportToExcel = () => {
+    // Convert the data to a worksheet
+    if(dataToExport){
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      console.log("sheet-------------------------------",ws)
+      // Create a new workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  
+      // Write the workbook to a binary string and trigger a download
+      XLSX.writeFile(wb,"user_data.xlsx");
+    }else{
+      toast.error("no data to export")
+    }
+  };
+
   const handleQuestionChange = (value: string) => {
-    const selectedQuestion = surveyQuestions.find((q:any)=>Number(q.question_id) === Number(value))
+    const selectedQuestion = surveyQuestions.find(
+      (q: any) => Number(q.question_id) === Number(value)
+    );
     if (selectedQuestion) {
       setQuestion(value);
       setQuestionType(selectedQuestion.type);
@@ -326,7 +368,7 @@ function Page() {
           <p className="text-sm">Survey Response</p>
         </div>
         <div className="flex space-x-2 text-black text-base font-semibold">
-          <ButtonFilled className="rounded-lg px-4 py-2">
+          <ButtonFilled onClick={exportToExcel} className="rounded-lg px-4 py-2">
             Export to Excel
           </ButtonFilled>
           <ButtonFilled className="rounded-lg px-4 py-2">
@@ -403,10 +445,9 @@ function Page() {
             <div className="flex flex-col gap-2">
               {appliedFilters.map((el) => {
                 const questionResponse = surveyQuestions?.find(
-                  (res: any) =>
-                    Number(res.question_id) === Number(el.question)
+                  (res: any) => Number(res.question_id) === Number(el.question)
                 );
-                let questionText
+                let questionText;
                 if (questionResponse) {
                   questionText = questionResponse.parameters.question;
                 }
@@ -418,12 +459,16 @@ function Page() {
                         setAppliedFilters((prev) =>
                           prev.filter(
                             (fil) =>
-                              !(fil.question === el.question && fil.operator === el.operator && fil.response === el.response)
+                              !(
+                                fil.question === el.question &&
+                                fil.operator === el.operator &&
+                                fil.response === el.response
+                              )
                           )
                         )
                       }
                     >
-                     <RxCross2 />
+                      <RxCross2 />
                     </button>
                   </div>
                 );
@@ -466,25 +511,26 @@ function Page() {
                       </option>
                     ))}
                 </select> */}
-                 <Select
-                    value={options.find((option) => option.value === userId)}
-                    onChange={(selectedOption) => setUserId(selectedOption?.value || '')}
-                    options={options}
-                    placeholder="Select user"
-                    // className="border h-10 w-[352px] border-my-gray-200 rounded-lg px-4 py-2"
-                    classNamePrefix="react-select"
-                    isSearchable={true} // Enables search
-                  />
+                <Select
+                  value={options.find((option) => option.value === userId)}
+                  onChange={(selectedOption) =>
+                    setUserId(selectedOption?.value || "")
+                  }
+                  options={options}
+                  placeholder="Select user"
+                  // className="border h-10 w-[352px] border-my-gray-200 rounded-lg px-4 py-2"
+                  classNamePrefix="react-select"
+                  isSearchable={true} // Enables search
+                />
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
-              <h1 className="text-my-gray-200">Data Filter</h1>
               <ButtonFilled
-                className="w-10 h-10 flex justify-center items-center"
+                className=" flex justify-center items-center"
                 onClick={openModal}
               >
-                +
+                Data filter +
               </ButtonFilled>
             </div>
 
@@ -524,9 +570,10 @@ function Page() {
             </div>
 
             <div>
-              <ButtonFilled onClick={()=>setUserModal(true)}>Assign Data</ButtonFilled>
+              <ButtonFilled onClick={() => setUserModal(true)}>
+                Assign Data
+              </ButtonFilled>
             </div>
-
           </div>
         </div>
       </div>
@@ -534,21 +581,29 @@ function Page() {
         <Loader className="h-[30vh] w-full flex justify-center items-center" />
       )}
       {!loading && responses && responses.length > 0 ? (
-        <div id="scrollableDiv" className="w-[1250px] overflow-scroll rounded-t-2xl border border-secondary-200 mx-4">
-          
+        <div
+          id="scrollableDiv"
+          className="w-[1250px] overflow-scroll rounded-t-2xl border border-secondary-200 mx-4"
+        >
           <table className="w-full table-auto">
             <thead className="">
               <tr className="bg-secondary-100">
-                <td className="min-w-24 px-4 py-2 border-b text-center"></td>
-                <td className="min-w-24 px-4 py-2 border-b text-center"></td>
-                
-                <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">
+                <td className="min-w-32 px-4 py-2 border-b text-center"></td>
+                <td className="min-w-32 px-4 py-2 border-b text-center"></td>
+
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-32 whitespace-nowrap text-center">
                   Panna pramukh
                 </td>
-                <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-32 whitespace-nowrap text-center">
+                  Status
+                </td>
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-32 whitespace-nowrap text-center">
+                  Remark
+                </td>
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-32 whitespace-nowrap text-center">
                   Response date
                 </td>
-                <td className="text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center">
+                <td className="text-secondary-300 px-4 py-2 border-b min-w-32 whitespace-nowrap text-center">
                   User
                 </td>
                 {responses &&
@@ -556,7 +611,7 @@ function Page() {
                   responses[0].responses.map((response: any, index: number) => (
                     <td
                       key={index}
-                      className="gap-2 text-secondary-300 px-4 py-2 border-b min-w-24 whitespace-nowrap text-center"
+                      className="gap-2 text-secondary-300 px-4 py-2 border-b min-w-32 whitespace-nowrap text-center"
                     >
                       {more !== response.question_id
                         ? truncateText(response.question, 10)
@@ -584,7 +639,7 @@ function Page() {
               </tr>
             </thead>
             <tbody className="bg-white">
-            {/* <InfiniteScroll
+              {/* <InfiniteScroll
               dataLength={responses.length}
               next={getMoreUserResponses}
               hasMore={responsePage <= totalResponsePages}
@@ -608,13 +663,22 @@ function Page() {
                     className="cursor-pointer"
                     key={rowIndex}
                   >
-                    {assignMode && 
-                      <td onClick ={(e)=>e.stopPropagation()} className="min-w-24 px-4 py-2 border-b text-center">
-                        <input onChange={()=>handleMemberClick(response._id,rowIndex)} checked={selectedResponses.includes(response._id)} className="h-5 w-5" type="checkbox"/>
+                    {assignMode && (
+                      <td
+                        onClick={(e) => e.stopPropagation()}
+                        className="min-w-32 px-4 py-2 border-b text-center"
+                      >
+                        <input
+                          onChange={() =>
+                            handleMemberClick(response._id, rowIndex)
+                          }
+                          checked={selectedResponses.includes(response._id)}
+                          className="h-5 w-5"
+                          type="checkbox"
+                        />
                       </td>
-
-                    }
-                    <td className="min-w-24 px-4 py-2 border-b text-center">
+                    )}
+                    <td className="min-w-32 px-4 py-2 border-b text-center">
                       <ButtonFilled
                         onClick={(e) => {
                           e.stopPropagation();
@@ -624,13 +688,26 @@ function Page() {
                         <FaLocationDot />
                       </ButtonFilled>
                     </td>
-                    <td className="min-w-24 px-4 py-2 border-b text-center">
+                    <td className="min-w-32 px-4 py-2 border-b text-center">
                       <FaEye />
                     </td>
-                    <td className="min-w-24 px-4 py-2 border-b text-center">
-                      {response.panna_pramukh_assigned ? response.panna_pramukh_assigned.name : "--" }
+                    <td className="min-w-32 px-4 py-2 border-b text-center">
+                      {response.panna_pramukh_assigned
+                        ? response.panna_pramukh_assigned.name
+                        : "--"}
                     </td>
-                    <td className="min-w-24 px-4 py-2 border-b text-center">
+                    <td className="min-w-32 px-4 py-2 border-b text-center">
+                     {
+                      response.contacted ? <p className="w-full p-2 bg-green-200 rounded-md">Complete</p> : response.panna_pramukh_assigned ? <p className="w-full p-2 bg-amber-300 rounded-md">Pending</p> : "---"
+                     }
+                    </td>
+                    <td className="min-w-32 px-4 py-2 border-b text-center">
+                      {
+                        response.remark ? truncateText(response.remark,15)  : "---"
+                      }
+                    </td>
+
+                    <td className="min-w-32 px-4 py-2 border-b text-center">
                       {formatDate(response.createdAt)}
                     </td>
                     <td className="min-w-44 whitespace-nowrap px-4 py-2 border-b text-center">
@@ -643,13 +720,21 @@ function Page() {
                         key={colIndex}
                         className="px-4 py-2 border-b min-w-44 whitespace-nowrap text-center"
                       >
-                        {res.question_type === "Radio Grid" ? (
-                          res.response.split('\n').slice(0, 2).map((line: string, index: number) => (
-                            <p key={index}>{line}</p>
-                          )).concat(res.response.split('\n').length > 2 ? <p key="ellipsis">...</p> : null)
-                        ) : (
-                          truncateText(res.response, 20) || "-"
-                        )}
+                        {res.question_type === "Radio Grid"
+                          ? res.response
+                              .split("\n")
+                              .slice(0, 2)
+                              .map((line: string, index: number) => (
+                                <p key={index}>{line}</p>
+                              ))
+                              .concat(
+                                res.response.split("\n").length > 2 ? (
+                                  <p key="ellipsis">...</p>
+                                ) : null
+                              )
+                          : res.question_type === "Date" ? (
+                            formatDate(res.response)
+                          ) :truncateText(res.response, 20) || "-"}
                       </td>
                     ))}
                   </tr>
@@ -657,9 +742,16 @@ function Page() {
               {/* </InfiniteScroll> */}
             </tbody>
           </table>
-          {assignMode && <ButtonFilled className="mt-5" onClick={()=>{
-            updatePannaPramukhs()
-          }}>Assign</ButtonFilled>}
+          {assignMode && (
+            <ButtonFilled
+              className="mt-5"
+              onClick={() => {
+                updatePannaPramukhs();
+              }}
+            >
+              Assign
+            </ButtonFilled>
+          )}
         </div>
       ) : (
         !loading && (
@@ -687,11 +779,12 @@ function Page() {
                 <option value="" disabled selected>
                   Select question
                 </option>
-                {surveyQuestions && surveyQuestions.map((response: any, index: number) => (
+                {surveyQuestions &&
+                  surveyQuestions.map((response: any, index: number) => (
                     <option
                       key={index}
                       value={response.question_id}
-                      className="text-secondary-300 px-4 py-2 text-left border-b min-w-24 whitespace-nowrap"
+                      className="text-secondary-300 px-4 py-2 text-left border-b min-w-32 whitespace-nowrap"
                     >
                       {response.parameters.question}
                     </option>
@@ -728,7 +821,7 @@ function Page() {
                 onChange={(e) => setResponse(e.target.value)}
                 value={response}
                 className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-full disabled:cursor-not-allowed"
-                type="text"
+                type={surveyQuestions?.find((q:any)=>Number(question) === Number(q.question_id))?.type === 'Date' ? "date" : "text"}
                 placeholder="Enter response"
               />
             </div>
@@ -773,6 +866,14 @@ function Page() {
                   Response
                 </p>
               </div>
+              <div className="grid grid-cols-2 w-full">
+                <p className="py-4 bg-blue-100 w-full h-full text-center font-medium">Status</p>
+                <p className="py-4 bg-blue-100 w-full h-full flex justify-center font-medium">{selectedResponse.contacted ? <p className="bg-green-200 p-2 rounded-md w-fit">Completed</p> : <p>Pending</p>}</p>
+              </div>
+              <div className="grid grid-cols-2 w-full">
+                <p className="py-4 bg-blue-100 w-full h-full text-center font-medium">Remark</p>
+                <p className="py-4 bg-blue-100 w-full h-full flex justify-center font-medium">{selectedResponse.remark ? selectedResponse.remark : "---"}</p>
+              </div>
 
               {/* Scrollable Content */}
               <div className="flex h-full w-full flex-col overflow-y-auto">
@@ -800,12 +901,13 @@ function Page() {
                           index % 2 === 0 ? "bg-blue-50" : "bg-blue-100"
                         }`}
                       >
-                        {response.question_type==="Radio Grid" ?
-                          response.response.split('\n').map((line: string, index: number) => (
-                            <p key={index}>{line}</p>
-                          ))
-                        
-                        : response.response}
+                        {response.question_type === "Radio Grid"
+                          ? response.response
+                              .split("\n")
+                              .map((line: string, index: number) => (
+                                <p key={index}>{line}</p>
+                              ))
+                          : response.response}
                       </p>
                     </div>
                   )
@@ -851,30 +953,49 @@ function Page() {
         </div>
       </CustomModal>
 
-      <CustomModal open={userModal} closeModal={()=>{
-          setUserModal(false)
-          setSelectedPanna(null)
-        }}>
-            <div className="relative flex flex-col h-[60vh] w-[30vw] p-4">
-              <h1 className="self-center text-lg font-semibold mb-5">Assign to Panna Pramukh</h1>
-                <input placeholder="Search by name" className="sticky top-5 left-0 px-4 py-2 border-2 outline-none rounded-md" value={userSearch||""} onChange={(e)=>setUserSearch(e.target.value)} type="text"/>
-                <div className="grid mt-5 grid-cols-2 gap-3">
-                  {
-                    pannaPramukh && pannaPramukh.map((us:any)=>(
-                      <label className="flex gap-5">
-                        <input onChange={() =>
-                            setSelectedPanna(us._id)
-                          } type="radio" name="panna" className="h-5 w-5"/>
-                        <p>{us.name}</p>
-                      </label>
-                    ))
-                  }
-                </div>
-                <ButtonFilled onClick={()=>{
-                  setAssignMode(true)
-                  setUserModal(false)
-                  }} className="mt-auto disabled:bg-blue-100 disabled:cursor-not-allowed" disabled={!selectedPanna}>Proceed</ButtonFilled>
-            </div>
+      <CustomModal
+        open={userModal}
+        closeModal={() => {
+          setUserModal(false);
+          setSelectedPanna(null);
+        }}
+      >
+        <div className="relative flex flex-col h-[60vh] w-[30vw] p-4">
+          <h1 className="self-center text-lg font-semibold mb-5">
+            Assign to Panna Pramukh
+          </h1>
+          <input
+            placeholder="Search by name"
+            className="sticky top-5 left-0 px-4 py-2 border-2 outline-none rounded-md"
+            value={userSearch || ""}
+            onChange={(e) => setUserSearch(e.target.value)}
+            type="text"
+          />
+          <div className="grid mt-5 grid-cols-2 gap-3">
+            {pannaPramukh &&
+              pannaPramukh.map((us: any) => (
+                <label className="flex gap-5">
+                  <input
+                    onChange={() => setSelectedPanna(us._id)}
+                    type="radio"
+                    name="panna"
+                    className="h-5 w-5"
+                  />
+                  <p>{us.name}</p>
+                </label>
+              ))}
+          </div>
+          <ButtonFilled
+            onClick={() => {
+              setAssignMode(true);
+              setUserModal(false);
+            }}
+            className="mt-auto disabled:bg-blue-100 disabled:cursor-not-allowed"
+            disabled={!selectedPanna}
+          >
+            Proceed
+          </ButtonFilled>
+        </div>
       </CustomModal>
     </div>
   );

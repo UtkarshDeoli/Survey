@@ -7,99 +7,106 @@ import { getSurvey, getSurveyResponseStats } from "@/networks/survey_networks";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import QuestionChart from "@/components/data/QuestionChart";
+import CustomModal from "@/components/ui/Modal";
 
-interface QuestionResponseData {
-  questionTitle: string;
-  responses: {
-    responseTitle: string;
-    count: number;
-  }[];
-  totalResponses: number;
-}
+const operatorOptions = {
+  text: ["contains", "equals", "starts with", "ends with"],
+  number: ["=", "!=", "<", "<=", ">", ">="],
+  choice: ["equals", "not equals"],
+};
 
 function Page() {
   const [responseStats,setResponseStats] = useState <any[]>([]);
-  const searchParams = useSearchParams();
-  const surveyID = searchParams.get("survey_id");
-
+  const [showFilters,setShowFilters] = useState<boolean>(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string>("");
+  const [appliedFilters, setAppliedFilters] = useState<
+    { question: string; operator: string; response: string }[]
+  >([]);
+  const [filters, setFilters] = useState<
+  { question: string; operator: string; response: string }[]
+>([]);
+  const [question, setQuestion] = useState<string>("");
+  const [modal,setModal] = useState<boolean>(false);
+  const [surveyQuestions, setSurveyQuestions] = useState<any>(null);
+  const [questionType, setQuestionType] = useState<string>("");
+  const [operator, setOperator] = useState<string>("");
+  const [response, setResponse] = useState<string>("");
 
-  const surveyResponseData = {
-    survey_id: surveyID,
-    survey_name: "My Survey",
-    questions: [
-      {
-        questionTitle: "This is Question 1",
-        responses: [
-          {
-            responseTitle: "Response 1",
-            count: 10,
-          },
-          {
-            responseTitle: "Response 2",
-            count: 15,
-          },
-          {
-            responseTitle: "Response 3",
-            count: 17,
-          },
-        ],
-        totalResponses: 42,
-      },
-      {
-        questionTitle: "This is Question 2",
-        responses: [
-          {
-            responseTitle: "RQ 12",
-            count: 200,
-          },
-          {
-            responseTitle: "RQ 22",
-            count: 75,
-          },
-          {
-            responseTitle: "RQ 32",
-            count: 55,
-          },
-          {
-            responseTitle: "RQ 42",
-            count: 180,
-          },
-        ],
-        totalResponses: 510,
-      },
-
-      {
-        questionTitle: "This is Question 3",
-        responses: [
-          {
-            responseTitle: "RQ 13",
-            count: 200,
-          },
-          {
-            responseTitle: "RQ 23",
-            count: 100,
-          },
-        ],
-        totalResponses: 300,
-      },
-    ],
-  };
-
-  //const [surveyResponseData, setSurveyResponseData] = useState<any>([]);
-
+  
+  const searchParams = useSearchParams();
+  const surveyID = searchParams.get("survey_id");
   useEffect(() => {
+    getQuestions()
     fetchSurveyData();
   }, []);
 
+  // event handlers
+  const handleQuestionChange = (value: string) => {
+    const selectedQuestion = surveyQuestions.find(
+      (q: any) => Number(q.question_id) === Number(value)
+    );
+    if (selectedQuestion) {
+      setQuestion(value);
+      setQuestionType(selectedQuestion.type);
+      setOperator(getDefaultOperator(selectedQuestion.type));
+    } else {
+      setQuestionType("");
+    }
+  };
+
+  const getOperatorOptions = (questionType: string) => {
+    if (
+      [
+        "Single line Text Input",
+        "Multiline Text Input",
+        "Email",
+        "Phone Number",
+        "Checkbox List",
+        "Checkbox List With Other",
+        "Radio Grid",
+      ].includes(questionType)
+    ) {
+      return operatorOptions.text;
+    } else if (
+      ["Number Input", "Number Point", "Rating", "Date"].includes(questionType)
+    ) {
+      return operatorOptions.number;
+    } else if (
+      ["Radio Button", "DropDown", "DropDown With Other"].includes(questionType)
+    ) {
+      return operatorOptions.choice;
+    }
+    return [];
+  };
+
+  const getDefaultOperator = (questionType: string) => {
+    const options = getOperatorOptions(questionType);
+    return options.length > 0 ? options[0] : ""; // Return first operator as default
+  };
+
+  const saveFilter = () => {
+    setFilters([...filters, { question, operator, response }]);
+    setModal(false)
+  };
+
+
+
+  // api calls
   async function fetchSurveyData() {
     const response = await getSurveyResponseStats({ survey_id: surveyID });
-    console.log("response is---->",response.data);
+    console.log("response stats data--->", response.data)
     if(response.success){
       setResponseStats(response.data)
     }
-    
+  }
+
+  async function getQuestions() {
+    const response = await getSurvey({ _id: surveyID });
+    console.log("res--------------------------------->", response);
+    const questions = response.data.questions.map((el: any) => el);
+    setSurveyQuestions(questions);
   }
 
   return (
@@ -107,7 +114,7 @@ function Page() {
       <nav className="h-16 w-full py-3 px-8 flex justify-between font-semibold ">
         <div className="text-my-gray-200 items-center my-auto">
           <p className="text-sm ">
-            Analytics: {surveyResponseData.survey_name}
+            Analytics
           </p>
         </div>
         <div className="flex space-x-2 text-black text-base">
@@ -139,7 +146,7 @@ function Page() {
             />
           </div>
           <div className="flex space-x-2 items-center text-xs">
-            <ButtonBordered className="p-2 h-[50px] py-1 ">
+            <ButtonBordered onClick={()=>setShowFilters(!showFilters)} className="p-2 h-[50px] py-1 ">
               Filters
             </ButtonBordered>
             <ButtonBordered className="p-2 h-[50px] py-1 ">
@@ -152,6 +159,29 @@ function Page() {
           </div>
         </div>
       </div>
+      {
+        showFilters && (
+          <div className="p-4 w-full ">
+             <div className="flex flex-col justify-center-center gap-3">
+              <ButtonFilled
+                className=" flex justify-center items-center w-fit"
+                onClick={()=>setModal(true)}
+              >
+                Data filter +
+              </ButtonFilled>
+              <select className="w-1/2 p-2 rounded-md outline-none">
+                <option disabled selected>Select filters</option>
+                {
+                  filters.map(filter=>(
+                    <option>{filter.question}{filter.operator} {filter.response}</option>
+                  ))
+                }
+              </select>
+              
+            </div>
+          </div>
+        )
+      }
 
       <div className="p-5 text-sm text-my-gray-200">
         {responseStats && responseStats.length > 0 && responseStats.map(
@@ -167,6 +197,92 @@ function Page() {
           },
         )}
       </div>
+      <CustomModal open={modal} closeModal={()=>setModal(false)}>
+        <div className="min-w-[500px] h-[270px] flex flex-col">
+          <div className="relative z-10 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">
+            Add filters
+          </div>
+          <form className="w-full h-full p-4 flex gap-10 justify-center items-center">
+            {/* Question Select */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-my-gray-200">Question</label>
+              <select
+                onChange={(e) => handleQuestionChange(e.target.value)}
+                value={question}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-full"
+              >
+                <option value="" disabled selected>
+                  Select question
+                </option>
+                {surveyQuestions &&
+                  surveyQuestions.map((response: any, index: number) => (
+                    <option
+                      key={index}
+                      value={response.question_id}
+                      className="text-secondary-300 px-4 py-2 text-left border-b min-w-24 whitespace-nowrap"
+                    >
+                      {response.parameters.question}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Operator Input */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-my-gray-200">Operator</label>
+              <select
+                disabled={question.trim().length === 0}
+                onChange={(e) => setOperator(e.target.value)}
+                value={operator}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-full disabled:cursor-not-allowed"
+              >
+                <option disabled selected>
+                  Select operator
+                </option>
+                {getOperatorOptions(questionType).map((option) => (
+                  <option value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Response Input */}
+            <div className="flex flex-col items-center gap-2">
+              <label className="text-my-gray-200">Response</label>
+              <input
+                disabled={
+                  questionType.trim().length === 0 ||
+                  operator.trim().length === 0
+                }
+                onChange={(e) => setResponse(e.target.value)}
+                value={response}
+                className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-full disabled:cursor-not-allowed"
+                type={surveyQuestions?.find((q:any)=>Number(question) === Number(q.question_id))?.type === 'Date' ? "date" : "text"}
+                placeholder="Enter response"
+              />
+            </div>
+          </form>
+          <div className="flex gap-3 items-center p-4">
+            <ButtonBordered
+              className="disabled:bg-blue-100 disabled:cursor-not-allowed disabled:text-secondary-100"
+              disabled={
+                question.trim().length === 0 ||
+                operator.trim().length === 0 ||
+                response.trim().length === 0
+              }
+              onClick={saveFilter}
+            >
+              Save Filter
+            </ButtonBordered>
+            <ButtonBordered
+              className="border-red-500 hover:bg-red-500 hover:text-white text-red-500"
+              onClick={()=>setModal(false)}
+            >
+              Cancel
+            </ButtonBordered>
+          </div>
+        </div>
+      </CustomModal>
+
     </div>
   );
 }

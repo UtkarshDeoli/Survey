@@ -1,5 +1,5 @@
-// export const SERVER_URI = "http://localhost:6969";
-export const SERVER_URI = "https://survey-3uf0.onrender.com";
+export const SERVER_URI = "http://localhost:6969";
+// export const SERVER_URI = "https://survey-3uf0.onrender.com";
 
 // users
 export const get_user = "api/user/getUser";
@@ -58,5 +58,4 @@ export const get_todo = "api/todo/todo"
 export const get_all_todos = "api/todo/todos"
 export const update_todo = "api/todo/update"
 export const delete_todo = "api/todo/delete"
-
 
