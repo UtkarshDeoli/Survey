@@ -52,6 +52,9 @@ const responseSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    remark: {
+      type: String,
+    },
   },
   { strict: false, timestamps: true },
 );
@@ -59,4 +62,3 @@ const responseSchema = new Schema(
 const Response = mongoose.model("Response99", responseSchema);
 
 module.exports = Response;
-

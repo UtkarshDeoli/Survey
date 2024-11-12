@@ -36,5 +36,6 @@ router.get(
 );
 router.post("/updateResponse", responseController.updateResponse);
 router.post("/markAsContacted", responseController.markAsContacted);
+router.post("/saveRemark", responseController.saveRemark);
 
 module.exports = router;
