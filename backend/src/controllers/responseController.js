@@ -51,7 +51,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      }
+      },
     );
     if (!survey) {
       return res
@@ -106,7 +106,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } }
+        { $set: { family_head: response._id } },
       );
     }
     return res
@@ -367,7 +367,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response)
+      console.log(resp.question_id, "-->", resp.response),
     );
 
     // Add additional match stage if there are filters
@@ -408,7 +408,7 @@ exports.getAllResponses = async (req, res) => {
     const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
     const fin = filteredResponse.map((f) =>
-      Responses.findById(f._id).populate("panna_pramukh_assigned")
+      Responses.findById(f._id).populate("panna_pramukh_assigned"),
     );
     const re = await Promise.all(fin);
     // console.log("res-->",re)
@@ -881,7 +881,7 @@ exports.updateResponse = async (req, res) => {
       responseToUpdate,
       {
         new: true,
-      }
+      },
     );
 
     if (!response) {
@@ -913,6 +913,23 @@ exports.markAsContacted = async (req, res) => {
     return res
       .status(201)
       .json({ success: "true", message: "Response marked as contacted" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
+
+exports.saveRemark = async (req, res) => {
+  try {
+    const { response_id, remark_text } = req.body;
+    const responseToUpdate = {
+      remark: remark_text,
+    };
+    await Responses.findByIdAndUpdate(response_id, responseToUpdate, {
+      new: true,
+    });
+    return res
+      .status(201)
+      .json({ success: "true", message: "Remark saved successfully" });
   } catch (error) {
     return res.status(400).json({ success: "false", message: error.message });
   }
