@@ -310,10 +310,6 @@ exports.getAllResponses = async (req, res) => {
           audio_recording_path: 1,
           "responses.question_id": 1,
           "responses.question_type": 1,
-<<<<<<< HEAD
-=======
-          "responses.pranna_pramukh_assigned": 1,
->>>>>>> 9defeeed5617057be10d47b86bdc1932598a3c18
           "responses.question": 1,
           "responses.response": {
             $cond: {
