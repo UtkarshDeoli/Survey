@@ -310,6 +310,10 @@ exports.getAllResponses = async (req, res) => {
           audio_recording_path: 1,
           "responses.question_id": 1,
           "responses.question_type": 1,
+<<<<<<< HEAD
+=======
+          "responses.pranna_pramukh_assigned": 1,
+>>>>>>> 9defeeed5617057be10d47b86bdc1932598a3c18
           "responses.question": 1,
           "responses.response": {
             $cond: {
@@ -759,5 +763,24 @@ exports.updateResponse = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+exports.markAsContacted = async (req, res) => {
+  try {
+    const { responsesIdsList } = req.body;
+    for (let responseId of responsesIdsList) {
+      const responseToUpdate = {
+        contacted: true,
+      };
+      await Responses.findByIdAndUpdate(responseId, responseToUpdate, {
+        new: true,
+      });
+    }
+    return res
+      .status(201)
+      .json({ success: "true", message: "Response marked as contacted" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
   }
 };
