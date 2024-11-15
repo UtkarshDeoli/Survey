@@ -9,7 +9,16 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
-const permissions = ['Create survey','View survey', 'Edit survey', 'Contact voter', 'All']
+const permissions = ['Create survey','Assign data', 'View survey','Edit survey','Call voter','SMS voter','Whatsapp voter','View panna pramukh',"View booth adhyaksh"]
+const customPermissions:any = {
+    "Operation team" : ['Create survey','Assign data', 'View survey','Edit survey'],
+    "Panna Pramukh": ['Call voter','SMS voter','Whatsapp voter'],
+    "Mandal Adhyaksh" :['View panna pramukh',"View booth adhyaksh"],
+    "Support Executive":['Create survey','Assign data', 'View survey','Edit survey'],
+    "Survey Collector":['Create survey','Assign data', 'View survey','Edit survey'],
+    "Survey Manager":['Create survey','Assign data', 'View survey','Edit survey'],
+    "Booth Adhyaksh":['Create survey','Assign data', 'View survey','Edit survey']
+}
 
 function Page() {
 
@@ -75,12 +84,12 @@ function Page() {
         setLoading(false)
     }
 
-    async function handleUpdateRoles(role_id:string,permissionsToChange?:string,add?:boolean){
+    async function handleUpdateRoles(role_id:string,permissionsToChange?:string[],add?:boolean){
         const params:any = {
             role_id,
         }
-        if(add) params.permissionsToAdd = [permissionsToChange]
-        else params.permissionsToRemove = [permissionsToChange]
+        if(add) params.permissionsToAdd = permissionsToChange ? [...permissionsToChange]:[]
+        else params.permissionsToRemove = permissionsToChange ? [...permissionsToChange]:[]
 
         if(editedRole){
             params.name = editedRole;
@@ -96,6 +105,7 @@ function Page() {
             toast.error("Something went wrong")
         }
     }
+    
 
     //event handlers
 
@@ -111,6 +121,16 @@ function Page() {
                 return [permission];
             }
         })
+    }
+
+    function arrayIsSame(arr1: any[], arr2: any[]): boolean {
+        if (arr1.length !== arr2.length) return false;
+    
+        for (let item of arr1) {
+            if (!arr2.includes(item)) return false;
+        }
+    
+        return true;
     }
     
   return (
@@ -136,13 +156,18 @@ function Page() {
                        {editRole === role._id ? (
                         <input className='h-[40px] w-3/4 border focus:ring-1 focus:ring-blue-200 rounded-md outline-none col-span-2 p-4' value={editedRole || ""} onChange={(e)=>setEditedRole(e.target.value)}/>
                        ):(
-                        <h3 className='col-span-2 font-medium'>{role.name}</h3>
+                        <div className='col-span-2 font-medium flex gap-2'>
+                            <div className='flex items-center h-fit gap-2'>
+                                <p>{role.name}</p>
+                                <input checked={arrayIsSame(customPermissions[role.name],role.permissions)} onChange={()=>handleUpdateRoles(role._id,customPermissions[role.name],!arrayIsSame(customPermissions[role.name],role.permissions))} type="checkbox" className='h-5 w-5'/>
+                            </div>
+                        </div>
                        )}
                         <div className='flex flex-col gap-3 col-span-2'>
                             {
-                                permissions.map((permission:string,index:number)=>(
+                                customPermissions[role.name]?.map((permission:string,index:number)=>(
                                     <label key={index} className='cursor-pointer flex gap-2 items-center'>
-                                        <input onChange={()=>handleUpdateRoles(role._id,permission,!role.permissions.includes(permission))} type='checkbox' checked={role.permissions.includes(permission)}/>
+                                        <input onChange={()=>handleUpdateRoles(role._id,[permission],!role.permissions.includes(permission))} type='checkbox' checked={role.permissions.includes(permission)}/>
                                         <p>{permission}</p>
                                     </label>
                                 ))

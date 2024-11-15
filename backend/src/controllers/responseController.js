@@ -677,6 +677,7 @@ exports.getSurveyResponses = async (req, res) => {
 exports.getSurveyResponseStats = async (req, res) => {
   try {
     const { survey_id, startDate, endDate, filters } = req.query;
+    console.log("filters are -->",filters)
 
     if (!survey_id) {
       return res.status(400).json({ message: "Survey ID is required." });
@@ -795,7 +796,8 @@ exports.getSurveyResponseStats = async (req, res) => {
       aggregationPipeline.push({
         $match: {
           $and: responseFilters.map(filter => ({
-            responses: { $elemMatch: filter }
+            question_id:filter.question_id,
+            responses: { $elemMatch: {response_value:filter.response} }
           }))
         }
       });

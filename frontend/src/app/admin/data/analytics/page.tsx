@@ -96,7 +96,7 @@ function Page() {
 
   // api calls
   async function fetchSurveyData() {
-    const response = await getSurveyResponseStats({ survey_id: surveyID,filters });
+    const response = await getSurveyResponseStats({ survey_id: surveyID,filters:appliedFilters });
     console.log("response stats data--->", response.data)
     if(response.success){
       setResponseStats(response.data)
@@ -262,9 +262,12 @@ function Page() {
       <div className="p-5 text-sm text-my-gray-200">
         {responseStats && responseStats.length > 0 && responseStats.map(
           (responseData:any, index: number) => {
+            const exclude = [ "Single line Text Input","Multiline Text Input","Email","Phone Number","Number Input","Date"]
+            if(exclude.includes(responseData.question_type)) return null;
             return (
               <QuestionChart
                 key={index}
+                
                 questionTitle={responseData.question}
                 responses={responseData.responses}
                 totalResponses={responseData.total_responses}

@@ -1,33 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BsBookFill,
   BsSpeedometer,
   BsTable,
-  BsClipboardDataFill,
   BsGearFill,
-  BsChevronRight,
-  BsChevronLeft,
   BsLifePreserver,
 } from "react-icons/bs";
 import { ImUser } from "react-icons/im";
 import { usePathname, useRouter } from "next/navigation";
 import { Tooltip } from "react-tooltip";
-import { VscThreeBars } from "react-icons/vsc";
 import Image from "next/image";
 import logo from "../../../public/icons/logo.png";
 import logolg from "../../../public/icons/logo-large.png";
-import { BiTestTube } from "react-icons/bi";
 import { RiCalendarTodoFill } from "react-icons/ri";
+import { checkToken } from "@/utils/common_functions";
 
 // Paths that should have a small sidebar
-
 function Sidebar({ sidebarOpen }: any) {
   const path = usePathname();
   const router = useRouter();
+  const [user, setUser] = useState<any | null>(null);
 
-  const SidebarScreens: any = [
+  useEffect(() => {
+    const token = checkToken();
+    if (token) {
+      setUser(token);
+    }
+  }, []);
+
+  // Define Sidebar items
+  let SidebarScreens: any = [
     {
       icon: <BsSpeedometer size={18} />,
       name: "Dashboard",
@@ -45,18 +49,6 @@ function Sidebar({ sidebarOpen }: any) {
       name: "Data",
       path: "/admin/data",
       tooltip: "Data",
-    },
-    {
-      icon: <ImUser size={18} />,
-      name: "Users",
-      path: "/admin/users",
-      tooltip: "Users",
-    },
-    {
-      icon: <ImUser size={18} />,
-      name: "Karyakarta",
-      path: "/admin/karyakarta",
-      tooltip: "Karyakarta",
     },
     {
       icon: <RiCalendarTodoFill size={18} />,
@@ -77,6 +69,29 @@ function Sidebar({ sidebarOpen }: any) {
       tooltip: "Settings",
     },
   ];
+
+  // Filter out "Karyakarta" and "Users" tabs if the user has "operation team" role
+  if (user?.role && user.role.includes("Operation team")) {
+    SidebarScreens = SidebarScreens.filter(
+      (item: any) => item.name !== "Karyakarta" && item.name !== "Users"
+    );
+  } else {
+    // Add "Karyakarta" and "Users" if the user does not have "operation team" role
+    SidebarScreens.push(
+      {
+        icon: <ImUser size={18} />,
+        name: "Karyakarta",
+        path: "/admin/karyakarta",
+        tooltip: "Karyakarta",
+      },
+      {
+        icon: <ImUser size={18} />,
+        name: "Users",
+        path: "/admin/users",
+        tooltip: "Users",
+      }
+    );
+  }
 
   return (
     <aside
@@ -101,21 +116,25 @@ function Sidebar({ sidebarOpen }: any) {
           {SidebarScreens.map((el: any, ind: number) => (
             <div
               key={ind}
-              className={`relative flex justify-center  ${sidebarOpen ? "w-full mb-6" : "w-fit self-center mb-10"} rounded-md ${
+              className={`relative flex justify-center ${
+                sidebarOpen ? "w-full mb-6" : "w-fit self-center mb-10"
+              } rounded-md ${
                 el.path === "/admin" // Exact match for Dashboard
                   ? path === el.path
                     ? "bg-primary-300 text-secondary-600"
                     : "text-secondary-300"
                   : path.includes(el.path) // For all other paths
-                    ? "bg-primary-300 text-secondary-600"
-                    : "text-secondary-300"
+                  ? "bg-primary-300 text-secondary-600"
+                  : "text-secondary-300"
               }`}
             >
               <button
                 onClick={() => {
                   router.push(el.path);
                 }}
-                className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-semibold ${!sidebarOpen ? "w-fir" : "w-[150px]"}`}
+                className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-semibold ${
+                  !sidebarOpen ? "w-fir" : "w-[150px]"
+                }`}
               >
                 {!sidebarOpen && (
                   <div

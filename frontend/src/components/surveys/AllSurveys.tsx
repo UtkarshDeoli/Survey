@@ -54,7 +54,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   const [surveyToAssign,setSurveyToAssign] = useState <string>("")
   const [user,setUser] = useState <any> (null);
   const [userSearch,setUserSearch] = useState<string>("")
-
+ console.log("user is--->",user);
   console.log("selected Users --->",selectedUsers);
   console.log("deselected Users --->",deSelectedUsers);
 
