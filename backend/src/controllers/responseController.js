@@ -20,6 +20,7 @@ exports.saveResponse = async (req, res) => {
       booth_no,
       house_no,
       last_name,
+      phone_no,
       family_id,
       save_mode,
     } = req.body;
@@ -47,18 +48,6 @@ exports.saveResponse = async (req, res) => {
       });
     }
 
-    const survey = await Survey.findOneAndUpdate(
-      { _id: survey_id },
-      {
-        $inc: { response_count: 1 },
-      },
-    );
-    if (!survey) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Survey not found" });
-    }
-
     let responseToSave = {
       survey_id,
       user_id,
@@ -69,6 +58,7 @@ exports.saveResponse = async (req, res) => {
       house_no,
       name,
       last_name,
+      phone_no,
     };
 
     let createdNewFamily = false;
@@ -109,6 +99,19 @@ exports.saveResponse = async (req, res) => {
         { $set: { family_head: response._id } },
       );
     }
+
+    const survey = await Survey.findOneAndUpdate(
+      { _id: survey_id },
+      {
+        $inc: { response_count: 1 },
+      },
+    );
+    if (!survey) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Survey not found" });
+    }
+
     return res
       .status(201)
       .json({ success: true, message: "Response created successfully" });
@@ -582,7 +585,6 @@ exports.getSurveyResponses = async (req, res) => {
 //   try {
 //     const { survey_id,startDate,endDate,filters } = req.query;
 
-
 //     if (!survey_id) {
 //       return res.status(400).json({ message: "Survey ID is required." });
 //     }
@@ -677,7 +679,7 @@ exports.getSurveyResponses = async (req, res) => {
 exports.getSurveyResponseStats = async (req, res) => {
   try {
     const { survey_id, startDate, endDate, filters } = req.query;
-    console.log("filters are -->",filters)
+    console.log("filters are -->", filters);
 
     if (!survey_id) {
       return res.status(400).json({ message: "Survey ID is required." });
@@ -685,9 +687,9 @@ exports.getSurveyResponseStats = async (req, res) => {
 
     // Basic match stage for survey and date filtering
     const matchStage = {
-      survey_id: new mongoose.Types.ObjectId(String(survey_id))
+      survey_id: new mongoose.Types.ObjectId(String(survey_id)),
     };
-    
+
     if (startDate && endDate) {
       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
         return res
@@ -740,8 +742,8 @@ exports.getSurveyResponseStats = async (req, res) => {
           "responses.question_id": 1,
           "responses.question": 1,
           "responses.response": 1,
-          "responses.question_type": 1
-        }
+          "responses.question_type": 1,
+        },
       },
       {
         $group: {
@@ -749,8 +751,8 @@ exports.getSurveyResponseStats = async (req, res) => {
           question: { $first: "$responses.question" },
           question_type: { $first: "$responses.question_type" },
           responses: { $push: "$responses.response" },
-          total_responses: { $sum: 1 }
-        }
+          total_responses: { $sum: 1 },
+        },
       },
       { $unwind: "$responses" },
       {
@@ -759,8 +761,8 @@ exports.getSurveyResponseStats = async (req, res) => {
           question: { $first: "$question" },
           question_type: { $first: "$question_type" },
           response_count: { $sum: 1 },
-          total_responses: { $first: "$total_responses" }
-        }
+          total_responses: { $first: "$total_responses" },
+        },
       },
       {
         $group: {
@@ -771,10 +773,10 @@ exports.getSurveyResponseStats = async (req, res) => {
           responses: {
             $push: {
               response_value: "$_id.response_value",
-              count: "$response_count"
-            }
-          }
-        }
+              count: "$response_count",
+            },
+          },
+        },
       },
       {
         $sort: { _id: 1 }, // Sort questions by question_id in ascending order
@@ -786,24 +788,24 @@ exports.getSurveyResponseStats = async (req, res) => {
           question_type: 1,
           question: 1,
           total_responses: 1,
-          responses: 1
-        }
-      }
+          responses: 1,
+        },
+      },
     ];
 
     // Apply response filters if any exist
     if (responseFilters.length > 0) {
       aggregationPipeline.push({
         $match: {
-          $and: responseFilters.map(filter => ({
-            question_id:filter.question_id,
-            responses: { $elemMatch: {response_value:filter.response} }
-          }))
-        }
+          $and: responseFilters.map((filter) => ({
+            question_id: filter.question_id,
+            responses: { $elemMatch: { response_value: filter.response } },
+          })),
+        },
       });
     }
 
-    console.log(JSON.stringify(aggregationPipeline,null,2))
+    console.log(JSON.stringify(aggregationPipeline, null, 2));
 
     const stats = await Responses.aggregate(aggregationPipeline);
     return res.status(200).json({ success: true, data: stats });
