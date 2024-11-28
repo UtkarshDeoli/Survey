@@ -35,6 +35,10 @@ const responseSchema = new Schema(
       type: String,
       required: true,
     },
+    phone_no: {
+      type: String,
+      required: true,
+    },
     response: {
       type: Schema.Types.Mixed,
     },

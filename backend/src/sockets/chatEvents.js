@@ -73,6 +73,27 @@ const chatEvents = (socket, io) => {
       socket.emit("error", { message: "Failed to send message" });
     }
   });
+
+  socket.on("exit_room", async ({ currentUserId, otherUserId }) => {
+    try {
+      const room = await ChatRoom.findOne({
+        participants: { $all: [currentUserId, otherUserId].sort() },
+      });
+
+      if (!room) {
+        throw new Error("Room not found");
+      }
+
+      if (room.messages.length === 0) {
+        room.deleteOne().then(() => {
+          socket.emit("room_exited", { roomId: room._id });
+        });
+      }
+    } catch (error) {
+      console.error("error exiting the room", error);
+      socket.emit("error", { message: "Failed to send message" });
+    }
+  });
 };
 
 module.exports = chatEvents;
