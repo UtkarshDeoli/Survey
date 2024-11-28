@@ -2,8 +2,7 @@ import { format } from "date-fns";
 import DatePicker from "react-datepicker";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { twMerge } from "tailwind-merge";
-import Image from "next/image";
-import survey_analytics_calender from "../../../../public/icons/survey_data/survey_analytics_calender.png";
+import doubleArrow from "/public/images/doubleArrow.png"
 import "react-datepicker/dist/react-datepicker.css";
 
 
@@ -30,10 +29,7 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
   };
 
   return (
-    <div className={twMerge("w-fit flex font-medium text-lg px-4 py-2 items-center space-x-2 rounded-md focus:outline-none cursor-pointer", className)}>
-      <div className="">
-        <Image src={survey_analytics_calender.src} alt="calender" height={24} width={24} />
-      </div>
+    <div className={twMerge("w-fit flex font-medium text-lg py-2 items-center space-x-2 rounded-md focus:outline-none cursor-pointer", className)}>
 
       <div className="flex items-center">
         <DatePicker
@@ -51,12 +47,12 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
                   console.log("inside input");
                 }}
                 placeholder={`Select start`}
-                className="my-2 w-[120px] text-center outline-none font-normal text-sm"
+                className="my-2 w-[150px] px-4 py-2 rounded-[20px] shadow-floating  text-center outline-none font-normal text-sm"
               />
             </div>
           }
         />
-        <BiRightArrowAlt className="inline-block pt-1 text-2xl" />
+       <img src={doubleArrow.src} className="object-contain w-[30px] mx-4"/>
         <DatePicker
           selected={endDate}
           onChange={(date) => setEndDate(normalizeDate(date))}
@@ -72,7 +68,7 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
                   console.log("inside input");
                 }}
                 placeholder={`Select end`}
-                className="my-2 w-[120px] text-center outline-none font-normal text-sm"
+                className="my-2 w-[150px] px-4 py-2 rounded-[20px] shadow-floating text-center outline-none font-normal text-sm"
               />
             </div>
           }

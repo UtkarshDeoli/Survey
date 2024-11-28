@@ -239,7 +239,7 @@ function Page() {
                       placeholder="Search survey"
                       className="border border-gray-300 rounded-md px-2 py-1 w-4/5"
                     />
-                    <button type='button' className='text-white bg-blue-500 p-1 px-4 rounded-md' onClick={() => {setPageNo(1); getSurveys()}}>Search</button>
+                    <button type='button' className='text-white bg-primary-300 p-1 px-4 rounded-md' onClick={() => {setPageNo(1); getSurveys()}}>Search</button>
                   </div>
 
                   <div className="space-y-2">
@@ -286,9 +286,9 @@ function Page() {
                     ))}
                   </div>
                   <div className='flex justify-between items-center'>
-                    <button type='button' onClick={()=>{ if(pageNo > 1) setPageNo(pageNo-1)}}  className='text-white bg-blue-500 p-1 px-4 rounded-md'>Previous</button>
+                    <button type='button' onClick={()=>{ if(pageNo > 1) setPageNo(pageNo-1)}}  className='text-white bg-primary-300 p-1 px-4 rounded-md'>Previous</button>
                     <p className='text-xs'>{pageNo} of {totalPages} Pages</p>
-                    <button type='button' onClick={()=>{ if(pageNo < totalPages) setPageNo(pageNo+1)}} className='text-white bg-blue-500 p-1 px-4 rounded-md'>Next</button>
+                    <button type='button' onClick={()=>{ if(pageNo < totalPages) setPageNo(pageNo+1)}} className='text-white bg-primary-300 p-1 px-4 rounded-md'>Next</button>
                   </div>
                 </div>
               </div>
@@ -299,7 +299,7 @@ function Page() {
             <div className="flex justify-center space-x-5 mt-3">
               <button
                 type="submit"
-                className="bg-blue-500 text-white py-2 px-4 rounded-md "
+                className="bg-primary-300 text-white py-2 px-4 rounded-md "
               >
                 {userId ? "Update" : "Save"}
               </button>

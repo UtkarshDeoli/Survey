@@ -34,16 +34,6 @@ function Navbar({ onSidebarToggle }: any) {
         <button onClick={() => onSidebarToggle()} className="text-secondary-300">
           <VscThreeBars size={22} />
         </button>
-        <ButtonBordered
-            onClick={() => {
-              localStorage.removeItem("jwt_token");
-              router.push("/");
-            }}
-            className="text-[14px] flex gap-2 font-semibold text-red-500 border-red-500 hover:bg-red-500 survitems-center whitespace-nowrap"
-          >
-            <IoLogOutOutline className="text-xl " />
-            Logout
-          </ButtonBordered>
       </div>
       <div className="flex gap-9 justify-center items-center">
         {/* <ButtonBordered className="text-[14px] font-semibold"> */}

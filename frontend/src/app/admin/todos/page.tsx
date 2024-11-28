@@ -283,7 +283,7 @@ function page() {
 
   return (
     <main>
-         <nav className='w-full sticky top-0 left-0 p-4 flex justify-between items-center'>
+         <nav className='w-full sticky top-0 bg-white z-10 left-0 p-4 flex justify-between items-center'>
             <h1 className='text-xl text-secondary-300'>To-Do List</h1>
             <div className='flex gap-2'>
                 <ButtonFilled onClick={()=>setScheduleModal(true)}>Add schedule</ButtonFilled>

@@ -21,11 +21,11 @@ function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="flex">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar sidebarOpen={sidebarOpen} />
-      <div className={` flex-col ${sidebarOpen ? "flex-1": "w-[calc(100vw-75px)]"}`}>
+      <div className={`flex flex-col ${sidebarOpen ? "flex-1": "w-[calc(100vw-75px)]"}`}>
         <Navbar onSidebarToggle={handleToggle} />
-        <main className="w-full h-full">{children}</main>
+        <main className="flex-1 h-full overflow-auto">{children}</main>
       </div>
       {/* "w-[calc(100vw-250px)]"  */}
       <Toaster />

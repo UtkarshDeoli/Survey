@@ -80,7 +80,7 @@ export default function login() {
         </div>
         <div className="flex justify-center">
           <button
-            className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className="py-2 px-4 bg-primary-300 text-white rounded-md hover:bg-blue-600"
             onClick={() => handleForgotPassword(Email)}
           >
             Submit

@@ -17,8 +17,16 @@ const config: Config = {
       transitionDuration: {
         "300": "300ms",
       },
+      fontFamily:{
+        'nunito-sans':["Nunito Sans", "sans-serif"]
+      },
+      boxShadow:{
+        floating: "0 35px 60px -15px rgba(0, 0, 0, 0.3)",
+      },
       colors: {
-        "primary-300": "#477BFF",
+        // "primary-300": "#477BFF",
+        "primary-300": "#FF8437",
+        "primary-100":"#f7a572",
 
         "secondary-100": "#F3F3F3",
         "secondary-200": "#DDDDDD",
@@ -42,6 +50,8 @@ const config: Config = {
         "custom-green-300": "#03B520",
         "green-online": "#46fb16",
         "red-offline": "#f61818",
+        "light-gray":"#F2F8FC",
+        "dark-gray":"#525151"
       },
     },
   },

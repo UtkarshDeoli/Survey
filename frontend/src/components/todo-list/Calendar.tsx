@@ -51,10 +51,10 @@ function Calendar({selectedDate,setSelectedDate}:calendarProps){
     <div className="w-full h-full mx-auto p-4 bg-white rounded-lg shadow-lg">
       <header className="flex justify-between items-center mb-4">
         <div className="flex gap-2">
-          <button onClick={handlePrevMonth} className="px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
+          <button onClick={handlePrevMonth} className="px-2 py-1 text-white bg-primary-300 rounded hover:bg-blue-600">
             Previous
           </button>
-          <button onClick={handleNextMonth} className="px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600">
+          <button onClick={handleNextMonth} className="px-2 py-1 text-white bg-primary-300 rounded hover:bg-blue-600">
             Next
           </button>
         </div>
@@ -88,7 +88,7 @@ function Calendar({selectedDate,setSelectedDate}:calendarProps){
           return (
             <div
               key={day}
-              className={`border p-8 ${isBeforeToday ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-blue-100'} ${isSelected ? 'bg-blue-500 text-white' : ''}`}
+              className={`border p-8 ${isBeforeToday ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-blue-100'} ${isSelected ? 'bg-primary-300 text-white' : ''}`}
               onClick={() => !isBeforeToday && handleDateClick(dayNumber)}
             >
               {dayNumber}

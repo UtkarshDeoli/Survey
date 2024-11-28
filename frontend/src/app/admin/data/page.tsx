@@ -86,7 +86,7 @@ function page() {
       </div>
 
       <div className="w-full px-5 py-5 text-sm">
-        <div className="grid grid-cols-7 text-white bg-blue-500 font-semibold px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+        <div className="grid grid-cols-7 text-white bg-primary-300 font-semibold px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1">Names</p>
           <p className="col-span-1 flex justify-center items-center">
             Responses

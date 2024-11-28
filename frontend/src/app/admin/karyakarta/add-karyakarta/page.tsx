@@ -589,7 +589,7 @@ function Page() {
         <div className="sticky bottom-0 left-0 bg-white border-t p-2 flex justify-center space-x-5 mt-3">
           <button
             onClick={handleSubmit(onSubmit)}
-            className="bg-blue-500 text-white py-2 px-4 rounded-md "
+            className="bg-primary-300 text-white py-2 px-4 rounded-md "
           >
             {userId ? "Update" : "Save"}
           </button>

@@ -5,17 +5,14 @@ import {
   BsBookFill,
   BsSpeedometer,
   BsTable,
-  BsGearFill,
-  BsLifePreserver,
 } from "react-icons/bs";
 import { ImUser } from "react-icons/im";
 import { usePathname, useRouter } from "next/navigation";
 import { Tooltip } from "react-tooltip";
 import Image from "next/image";
-import logo from "../../../public/icons/logo.png";
-import logolg from "../../../public/icons/logo-large.png";
 import { RiCalendarTodoFill } from "react-icons/ri";
 import { checkToken } from "@/utils/common_functions";
+import surveyProfile from "/public/images/survey_profile.png";
 
 // Paths that should have a small sidebar
 function Sidebar({ sidebarOpen }: any) {
@@ -33,37 +30,40 @@ function Sidebar({ sidebarOpen }: any) {
   // Define Sidebar items
   let SidebarScreens: any = [
     {
-      icon: <BsSpeedometer size={18} />,
+      icon: "/images/dashboard.png",
       name: "Dashboard",
       path: "/admin",
       tooltip: "Dashboard",
     },
     {
-      icon: <BsBookFill size={18} />,
+      icon: "/images/survey.png",
       name: "Surveys",
       path: "/admin/surveys",
       tooltip: "Surveys",
     },
     {
-      icon: <BsTable size={18} />,
+      icon: "/images/database.png",
       name: "Data",
       path: "/admin/data",
       tooltip: "Data",
     },
     {
-      icon: <RiCalendarTodoFill size={18} />,
+      icon: "/images/todo.png",
       name: "To-Do list",
       path: "/admin/todos",
       tooltip: "todo-list",
     },
+  ];
+
+  let bottomTabs = [
     {
-      icon: <BsLifePreserver size={18} />,
+      icon: "/images/support.png",
       name: "Support",
       path: "/admin/support",
       tooltip: "Support",
     },
     {
-      icon: <BsGearFill size={18} />,
+      icon: "/images/settings.png",
       name: "Settings",
       path: "/admin/settings",
       tooltip: "Settings",
@@ -79,61 +79,78 @@ function Sidebar({ sidebarOpen }: any) {
     // Add "Karyakarta" and "Users" if the user does not have "operation team" role
     SidebarScreens.push(
       {
-        icon: <ImUser size={18} />,
+        icon: "/images/karyakarta.png",
         name: "Karyakarta",
         path: "/admin/karyakarta",
         tooltip: "Karyakarta",
       },
       {
-        icon: <ImUser size={18} />,
+        icon: "/images/survey-user.png",
         name: "Users",
         path: "/admin/users",
         tooltip: "Users",
       }
     );
   }
+  function getSidebarButtonClass(el: any) {
+    return `relative flex justify-center ${
+      sidebarOpen ? "w-full mb-3" : "w-fit self-center mb-10"
+    } rounded-[15px] transition-all ease-in-out duration-200 ${
+      el.path === "/admin" // Exact match for Dashboard
+        ? path === el.path
+          ? "bg-primary-300 text-secondary-600 hover:bg-primary-100 hover:text-white hover:scale-105"
+          : "text-secondary-300 hover:bg-primary-300 hover:text-white hover:scale-105"
+        : path.includes(el.path) // For all other paths
+        ? "bg-primary-300 text-secondary-600 hover:bg-primary-100 hover:text-white hover:scale-105"
+        : "text-secondary-300 hover:bg-primary-300 hover:text-white hover:scale-105"
+    }`;
+  }
+  
 
   return (
     <aside
-      className={`h-screen sticky top-0 left-0 border-2 border-secondary-100 flex flex-col transition-all duration-300 ease-in-out justify-between ${
-        sidebarOpen ? "max-w-[250px]" : "max-w-[75px]"
+      className={`h-screen overflow-visible relative border-2 border-secondary-100 flex flex-col transition-all duration-300 ease-in-out justify-between pb-5 ${
+        sidebarOpen ? "w-[250px]" : "w-[75px]"
       }`}
     >
-      <div>
+      <button className="absolute z-50 -right-[25px] top-1/2 transform -translate-y-1/2">
+        <img src="/images/arrow-left.png" className=" w-[50px]"/>
+      </button>
+      <div className="flex flex-col h-full w-full">
         <h1
           onClick={() => router.push("/")}
-          className="font-bold text-primary-300 cursor-pointer justify-center pt-2"
+          className="flex flex-col font-semibold gap-3 cursor-pointer justify-center pt-2 items-center"
         >
           {sidebarOpen ? (
-            <Image src={logolg.src} alt="logo" height={200} width={200} />
+            <Image
+              src={surveyProfile.src}
+              alt="logo"
+              height={123}
+              width={123}
+            />
           ) : (
-            <Image src={logo.src} alt="logo" height={64} width={64} />
+            <Image src={surveyProfile.src} alt="logo" height={64} width={64} />
           )}
+          <button>Profile</button>
         </h1>
+
+        {/* upper section of tabs */}
         <div
-          className={`flex flex-col items-start pt-16 ${sidebarOpen ? "px-2" : ""}`}
+          className={`flex flex-1 flex-col items-start pt-10 ${
+            sidebarOpen ? "px-2" : ""
+          }`}
         >
           {SidebarScreens.map((el: any, ind: number) => (
             <div
               key={ind}
-              className={`relative flex justify-center ${
-                sidebarOpen ? "w-full mb-6" : "w-fit self-center mb-10"
-              } rounded-md ${
-                el.path === "/admin" // Exact match for Dashboard
-                  ? path === el.path
-                    ? "bg-primary-300 text-secondary-600"
-                    : "text-secondary-300"
-                  : path.includes(el.path) // For all other paths
-                  ? "bg-primary-300 text-secondary-600"
-                  : "text-secondary-300"
-              }`}
+              className={getSidebarButtonClass(el)}
             >
               <button
                 onClick={() => {
                   router.push(el.path);
                 }}
                 className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-semibold ${
-                  !sidebarOpen ? "w-fir" : "w-[150px]"
+                  !sidebarOpen ? "w-fit" : "w-[150px]"
                 }`}
               >
                 {!sidebarOpen && (
@@ -143,10 +160,10 @@ function Sidebar({ sidebarOpen }: any) {
                     data-tooltip-content={el.tooltip}
                     data-tooltip-place="right"
                   >
-                    {el.icon}
+                    <img src={el.icon} className="w-[20px]"/>
                   </div>
                 )}
-                {sidebarOpen && el.icon}
+                {sidebarOpen && <img src={el.icon} className="w-[20px]"/>}
                 {sidebarOpen && el.name}
               </button>
               <Tooltip
@@ -155,6 +172,60 @@ function Sidebar({ sidebarOpen }: any) {
               />
             </div>
           ))}
+        </div>
+
+        {/* lower section of tabs */}
+        <div
+          className={`flex flex-col w-full ${
+            sidebarOpen ? "px-2" : ""
+          }`}
+        >
+          {bottomTabs.map((el: any, ind: number) => (
+            <div
+              key={ind}
+              className={getSidebarButtonClass(el)}
+            >
+              <button
+                onClick={() => {
+                  router.push(el.path);
+                }}
+                className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-semibold ${
+                  !sidebarOpen ? "" : "w-[150px]"
+                }`}
+              >
+                {!sidebarOpen && (
+                  <div
+                    className="w-full"
+                    data-tooltip-id={`tooltip-${ind}`}
+                    data-tooltip-content={el.tooltip}
+                    data-tooltip-place="right"
+                  >
+                    <img src={el.icon} className="w-[20px]"/>
+                  </div>
+                )}
+                {sidebarOpen && <img src={el.icon} className="w-[20px]"/>}
+                {sidebarOpen && el.name}
+              </button>
+              <Tooltip
+                id={`tooltip-${ind}`}
+                style={{ zIndex: 30, position: "fixed" }}
+              />
+            </div>
+          ))}
+          <div className="relative flex justify-center hover:bg-primary-300 rounded-[20px] transition-all duration-150">
+            <button
+              onClick={() => {
+                localStorage.removeItem("jwt_token");
+                router.push("/");
+              }}
+              className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-bold text-primary-300 hover:text-white ${
+                !sidebarOpen ? "w-fit" : "w-[150px]"
+              }`}
+            >
+              <img src="/images/logout.png" className="w-[25px]" />
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </aside>

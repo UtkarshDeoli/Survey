@@ -116,7 +116,7 @@ function page() {
       </div>
 
       <div className="w-full px-5 py-5 text-sm">
-        <div className="grid grid-cols-5 text-white bg-blue-500 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+        <div className="grid grid-cols-5 text-white bg-primary-300 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1 flex justify-center items-center">Name</p>
           <p className="col-span-1 flex justify-center items-center">
             Username

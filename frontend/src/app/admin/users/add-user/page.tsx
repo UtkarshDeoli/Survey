@@ -309,7 +309,7 @@ function Page() {
                     />
                     <button
                       type="button"
-                      className="text-white bg-blue-500 p-1 px-4 rounded-md"
+                      className="text-white bg-primary-300 p-1 px-4 rounded-md"
                       onClick={() => {
                         setPageNo(1);
                         getSurveys();
@@ -380,7 +380,7 @@ function Page() {
                       onClick={() => {
                         if (pageNo > 1) setPageNo(pageNo - 1);
                       }}
-                      className="text-white bg-blue-500 p-1 px-4 rounded-md"
+                      className="text-white bg-primary-300 p-1 px-4 rounded-md"
                     >
                       Previous
                     </button>
@@ -392,7 +392,7 @@ function Page() {
                       onClick={() => {
                         if (pageNo < totalPages) setPageNo(pageNo + 1);
                       }}
-                      className="text-white bg-blue-500 p-1 px-4 rounded-md"
+                      className="text-white bg-primary-300 p-1 px-4 rounded-md"
                     >
                       Next
                     </button>
@@ -405,7 +405,7 @@ function Page() {
             <div className="flex justify-center space-x-5 mt-3">
               <button
                 type="submit"
-                className="bg-blue-500 text-white py-2 px-4 rounded-md "
+                className="bg-primary-300 text-white py-2 px-4 rounded-md "
               >
                 {userId ? "Update" : "Save"}
               </button>
