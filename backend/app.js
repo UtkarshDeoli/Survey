@@ -13,6 +13,7 @@ const familyRoutes = require("./src/routes/familyRoutes");
 const roleRoutes = require("./src/routes/roleRoutes");
 const dataRoutes = require("./src/routes/dataRoutes");
 const todoRoutes = require("./src/routes/todoRoutes")
+const contactRoutes = require("./src/routes/contactRoutes")
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/api/family", familyRoutes);
 app.use("/api/role", roleRoutes);
 app.use("/api/data", dataRoutes);
 app.use("/api/todo", todoRoutes);
+app.use("/api/contact",contactRoutes);
 
 app.use(express.static(path.join(__dirname, "../frontend/out/")));
 app.get("*", (req, res) =>
