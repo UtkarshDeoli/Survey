@@ -33,6 +33,12 @@ const chatEvents = (socket, io) => {
       console.log("currentRoomId was", currentRoomId);
       if (currentRoomId) {
         console.log(`User leaving room: ${currentRoomId}`);
+        const currentRoom = await ChatRoom.findById(currentRoomId);
+        if (currentRoom && currentRoom.messages.length === 0) {
+          currentRoom.deleteOne().then(() => {
+            socket.emit("room_exited", { roomId: currentRoomId });
+          });
+        }
         socket.leave(currentRoomId);
       }
 
