@@ -15,7 +15,7 @@ import { checkToken } from "@/utils/common_functions";
 import surveyProfile from "/public/images/survey_profile.png";
 
 // Paths that should have a small sidebar
-function Sidebar({ sidebarOpen }: any) {
+function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
   const path = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<any | null>(null);
@@ -94,7 +94,7 @@ function Sidebar({ sidebarOpen }: any) {
   }
   function getSidebarButtonClass(el: any) {
     return `relative flex justify-center ${
-      sidebarOpen ? "w-full mb-3" : "w-fit self-center mb-10"
+      sidebarOpen ? "w-full mb-3" : "w-fit self-center mb-5"
     } rounded-[15px] transition-all ease-in-out duration-200 ${
       el.path === "/admin" // Exact match for Dashboard
         ? path === el.path
@@ -113,7 +113,7 @@ function Sidebar({ sidebarOpen }: any) {
         sidebarOpen ? "w-[250px]" : "w-[75px]"
       }`}
     >
-      <button className="absolute z-50 -right-[25px] top-1/2 transform -translate-y-1/2">
+      <button onClick={onSidebarToggle} className={`transition-all duration-300 absolute z-50 -right-[25px] top-1/2 transform -translate-y-1/2 ${!sidebarOpen ? "rotate-180":"" }`}>
         <img src="/images/arrow-left.png" className=" w-[50px]"/>
       </button>
       <div className="flex flex-col h-full w-full">
@@ -222,9 +222,23 @@ function Sidebar({ sidebarOpen }: any) {
                 !sidebarOpen ? "w-fit" : "w-[150px]"
               }`}
             >
-              <img src="/images/logout.png" className="w-[25px]" />
-              Logout
-            </button>
+               {!sidebarOpen && (
+                  <div
+                    className="w-full"
+                    data-tooltip-id={`tooltip-logout`}
+                    data-tooltip-content={"Logout"}
+                    data-tooltip-place="right"
+                  >
+                    <img src="/images/logout.png" className="w-[25px]" />
+                  </div>
+                )}
+                {sidebarOpen && <img src="/images/logout.png" className="w-[25px]" />}
+                {sidebarOpen && 'logout'}
+              </button>
+              <Tooltip
+                id={`tooltip-logout`}
+                style={{ zIndex: 30, position: "fixed" }}
+              />
           </div>
         </div>
       </div>

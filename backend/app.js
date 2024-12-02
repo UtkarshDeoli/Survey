@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // app.use(fileUpload());
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "*" , exposedHeaders: ["Content-Disposition"]}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

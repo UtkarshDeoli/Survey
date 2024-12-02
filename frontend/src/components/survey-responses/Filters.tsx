@@ -65,7 +65,7 @@ function Filters({filters, responses, surveyQuestions, appliedFilters,setApplied
             })}
         </select>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 mt-2">
             {appliedFilters.map((el) => {
             const questionResponse = surveyQuestions?.find(
                 (res: any) => Number(res.question_id) === Number(el.question)
@@ -75,7 +75,7 @@ function Filters({filters, responses, surveyQuestions, appliedFilters,setApplied
                 questionText = questionResponse.parameters.question;
             }
             return (
-                <div className="flex justify-between w-full border border-secondary-200 rounded-sm px-4 py-2">
+                <div className="flex justify-between w-full border border-secondary-200 rounded-[20px] px-4 py-2 bg-white">
                 <h2>{`${questionText} ${el.operator} ${el.response}`}</h2>
                 <button
                     onClick={() =>

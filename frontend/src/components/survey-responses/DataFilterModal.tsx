@@ -1,6 +1,7 @@
-import React from 'react';
-import ButtonBordered from '../ui/buttons/ButtonBordered';
-import CustomModal from '../ui/Modal';
+import React from "react";
+import ButtonBordered from "../ui/buttons/ButtonBordered";
+import CustomModal from "../ui/Modal";
+import ResponseFilterInput from "./ResponseFilterInput";
 
 interface PropTypes {
   modalIsOpen: boolean;
@@ -10,10 +11,10 @@ interface PropTypes {
   questionType: string;
   operator: string;
   response: string;
-  setQuestionType:(val:string)=>void,
-  setQuestion:(val:string)=>void,
-  setOperator:(val:any)=>void,
-  setResponse:(val:any)=>void,
+  setQuestionType: (val: string) => void;
+  setQuestion: (val: string) => void;
+  setOperator: (val: any) => void;
+  setResponse: (val: any) => void;
   saveFilter: () => void;
 }
 
@@ -33,8 +34,8 @@ function DataFilterModal({
   response,
   setQuestion,
   setQuestionType,
- setResponse,
- setOperator,
+  setResponse,
+  setOperator,
   saveFilter,
 }: PropTypes) {
   const getOperatorOptions = (questionType: string) => {
@@ -47,6 +48,10 @@ function DataFilterModal({
         "Checkbox List",
         "Checkbox List With Other",
         "Radio Grid",
+        "DropDown Grid",
+        "Single line Text Grid",
+        "Number Grid",
+        "Checkbox Grid",
       ].includes(questionType)
     ) {
       return operatorOptions.text;
@@ -78,6 +83,30 @@ function DataFilterModal({
       setQuestionType("");
     }
   };
+  function showRadioGridFilters() {
+    const questions = surveyQuestions?.find(
+      (q: any) => Number(question) === Number(q.question_id)
+    );
+    const row = questions.parameters.row_options.split("\n");
+    const column = questions.parameters.column_options.split("\n");
+    const result = row.flatMap((row: string) =>
+      column.map((col: string) => `${row}: ${col}`)
+    );
+    console.log("result from radio grid --->", result);
+    return (
+      <select
+        onChange={(e) => setResponse(e.target.value)}
+        className="flex items-center border border-secondary-200 rounded-[20px] outline-none focus:ring focus:ring-primary-50 px-8 py-3 w-full disabled:cursor-not-allowed"
+      >
+        <option value="">select</option>
+        {result.map((item: string, index: number) => (
+          <option key={index} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+    );
+  }
   return (
     <CustomModal open={modalIsOpen} closeModal={closeModal}>
       <div className="min-w-[500px] h-[270px] flex flex-col">
@@ -91,7 +120,7 @@ function DataFilterModal({
             <select
               onChange={(e) => handleQuestionChange(e.target.value)}
               value={question}
-              className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-full"
+              className="flex items-center border border-secondary-200 rounded-[20px] outline-none focus:ring focus:ring-primary-50 px-8 py-3 w-full"
             >
               <option value="" disabled>
                 Select question
@@ -116,11 +145,9 @@ function DataFilterModal({
               disabled={question.trim().length === 0}
               onChange={(e) => setOperator(e.target.value)}
               value={operator}
-              className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-full disabled:cursor-not-allowed"
+              className="flex items-center border border-secondary-200 rounded-[20px] outline-none focus:ring focus:ring-primary-50 px-8 py-3 w-full disabled:cursor-not-allowed"
             >
-              <option disabled>
-                Select operator
-              </option>
+              <option disabled>Select operator</option>
               {getOperatorOptions(questionType).map((option, idx) => (
                 <option key={idx} value={option}>
                   {option}
@@ -132,25 +159,19 @@ function DataFilterModal({
           {/* Response Input */}
           <div className="flex flex-col items-center gap-2">
             <label className="text-my-gray-200">Response</label>
-            <input
-              disabled={
-                questionType.trim().length === 0 || operator.trim().length === 0
-              }
-              onChange={(e) => setResponse(e.target.value)}
-              value={response}
-              className="flex items-center border border-secondary-200 rounded-md px-8 py-3 w-full disabled:cursor-not-allowed"
-              type={
-                surveyQuestions?.find((q: any) => Number(question) === Number(q.question_id))?.type === 'Date'
-                  ? "date"
-                  : "text"
-              }
-              placeholder="Enter response"
+            <ResponseFilterInput
+              operator={operator}
+              question={question}
+              questionType={questionType}
+              response={response}
+              setResponse={setResponse}
+              surveyQuestions={surveyQuestions}
             />
           </div>
         </form>
         <div className="flex gap-3 items-center p-4">
           <ButtonBordered
-            className="disabled:bg-blue-100 disabled:cursor-not-allowed disabled:text-secondary-100"
+            className="disabled:bg-primary-100 disabled:cursor-not-allowed disabled:text-secondary-100"
             disabled={
               question.trim().length === 0 ||
               operator.trim().length === 0 ||

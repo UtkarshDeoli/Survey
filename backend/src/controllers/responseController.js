@@ -4,6 +4,7 @@ const Family = require("../models/family");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const Survey = require("../models/survey");
+const { downloadExcel } = require("../utils/utils");
 
 exports.saveResponse = async (req, res) => {
   console.log("here it works");
@@ -96,7 +97,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } },
+        { $set: { family_head: response._id } }
       );
     }
 
@@ -104,7 +105,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      },
+      }
     );
     if (!survey) {
       return res
@@ -161,13 +162,14 @@ exports.getCount = async (req, res) => {
 exports.getAllResponses = async (req, res) => {
   try {
     const {
+      download,
       surveyId,
       userId,
       startDate,
       endDate,
       filters,
       page = 1,
-      limit = 10,
+      limit = 4,
     } = req.query;
     console.log("query is------>", req.query);
     const selectedSurvey = await Survey.findById(surveyId);
@@ -184,19 +186,7 @@ exports.getAllResponses = async (req, res) => {
     if (userId) {
       matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
     }
-    // if (startDate && endDate) {
-    //   if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
-    //     return res
-    //       .status(400)
-    //       .json({ success: false, message: "Invalid date range." });
-    //   }
-    //   console.log("start-->",new Date(startDate))
-    //   console.log("end--->",new Date(endDate));
-    //   matchStage.createdAt = {
-    //     $gte: new Date(startDate),
-    //     $lte: new Date(endDate),
-    //   };
-    // }
+
     if (startDate && endDate) {
       // Validate if the dates are valid
       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
@@ -279,13 +269,13 @@ exports.getAllResponses = async (req, res) => {
             filter.response =
               question_type_map[question] === "Date"
                 ? { $gt: new Date(answer) }
-                : { $lt: Number(answer) };
+                : { $gt: Number(answer) };
             break;
           case ">=":
             filter.response =
               question_type_map[question] === "Date"
                 ? { $gte: new Date(answer) }
-                : { $lt: Number(answer) };
+                : { $gte: Number(answer) };
             break;
         }
         responseFilters.push(filter);
@@ -370,7 +360,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response),
+      console.log(resp.question_id, "-->", resp.response)
     );
 
     // Add additional match stage if there are filters
@@ -401,37 +391,56 @@ exports.getAllResponses = async (req, res) => {
     const totalCount =
       totalResponses.length > 0 ? totalResponses[0].totalResponses : 0;
 
-    // Pagination logic
-    const pageNum = parseInt(page, 10);
-    const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
+    if (download) {
+      const filteredResponse = await Responses.aggregate(aggregationPipeline);
+      const fin = filteredResponse.map((f) =>
+        Responses.findById(f._id)
+          .populate("panna_pramukh_assigned")
+          .populate("user_id")
+          .populate("survey_id")
+      );
 
-    aggregationPipeline.push({ $skip: skip }, { $limit: limitNum });
+      const re = await Promise.all(fin);
 
-    const filteredResponse = await Responses.aggregate(aggregationPipeline);
-
-    const fin = filteredResponse.map((f) =>
-      Responses.findById(f._id).populate("panna_pramukh_assigned"),
-    );
-    const re = await Promise.all(fin);
-    // console.log("res-->",re)
-
-    if (!filteredResponse) {
-      return res
-        .status(404)
-        .json({ success: "false", message: "Response not found" });
+      if (!filteredResponse) {
+        return res
+          .status(404)
+          .json({ success: "false", message: "Response not found" });
+      }
+      await downloadExcel(re, res);
     } else {
-      // Calculate total pages
-      const totalPages = Math.ceil(totalCount / limitNum);
+      const pageNum = parseInt(page, 10);
+      const limitNum = parseInt(limit, 10);
+      const skip = (pageNum - 1) * limitNum;
 
-      return res.status(200).json({
-        success: "true",
-        // data: filteredResponse,
-        data: re,
-        totalResponses: totalCount,
-        totalPages: totalPages,
-      });
+      aggregationPipeline.push({ $skip: skip }, { $limit: limitNum });
+
+      const filteredResponse = await Responses.aggregate(aggregationPipeline);
+
+      const fin = filteredResponse.map((f) =>
+        Responses.findById(f._id).populate("panna_pramukh_assigned")
+      );
+      const re = await Promise.all(fin);
+      // console.log("res-->",re)
+
+      if (!filteredResponse) {
+        return res
+          .status(404)
+          .json({ success: "false", message: "Response not found" });
+      } else {
+        // Calculate total pages
+        const totalPages = Math.ceil(totalCount / limitNum);
+
+        return res.status(200).json({
+          success: "true",
+          // data: filteredResponse,
+          data: re,
+          totalResponses: totalCount,
+          totalPages: totalPages,
+        });
+      }
     }
+    // Pagination logic
   } catch (error) {
     console.log(error);
     return res.status(400).json({ success: "false", message: error.message });
@@ -885,7 +894,7 @@ exports.updateResponse = async (req, res) => {
       responseToUpdate,
       {
         new: true,
-      },
+      }
     );
 
     if (!response) {

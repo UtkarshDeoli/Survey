@@ -4,12 +4,11 @@ import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
 import { Suspense, useEffect, useState } from "react";
-import { getSurveyResponses } from "@/networks/response_networks";
+import { downloadResponses, getSurveyResponses } from "@/networks/response_networks";
 import { useSearchParams } from "next/navigation";
 import {
   getAllUsers,
   getPannaPramukh,
-  updateKaryakartas,
 } from "@/networks/user_networks";
 
 import { useRouter } from "next/navigation"; // For routing
@@ -27,6 +26,7 @@ import MapModal from "@/components/survey-responses/MapModal";
 import ResponseTable from "@/components/survey-responses/ResponseTable";
 import Image from "next/image";
 import survey_analytics_calender from "/public/images/calendar_new.png";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 function Page() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -60,13 +60,18 @@ function Page() {
   const [selectedPanna, setSelectedPanna] = useState<string | null>(null);
   const [surveyQuestions, setSurveyQuestions] = useState<any>(null);
   //response selection states
-  const [startIndex, setStartIndex] = useState<number | null>(null);
-  const [endIndex, setEndIndex] = useState<number | null>(null);
   const [selectedResponses, setSelectedResponses] = useState<string[]>([]);
   const [dataToExport, setDataToExport] = useState<any>(null);
 
-  //  infinite scroll
+  //  pagination
   const [totalResponsePages, setTotalResponsePages] = useState<number>(1);
+  const [pageLimit,setPageLimit] = useState<number>(10)
+  const [page,setPage] = useState<number>(1)
+
+  // downloading
+  const [downloading,setDownloading] = useState<boolean>(false)
+
+  
 
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
@@ -81,7 +86,7 @@ function Page() {
     getQuestions();
     getUserResponses();
     getUsers();
-  }, [reset]);
+  }, [reset,page,pageLimit]);
 
   useEffect(() => {
     handleGetPannaPramukh();
@@ -101,12 +106,14 @@ function Page() {
       endDate: nEndDate,
       userId,
       filters: appliedFilters,
+      limit:pageLimit,
+      page
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
     setResponses(response.data);
     setTotalResponsePages(response.totalPages);
-    console.log("responses of responses ------>", response.data);
+    console.log("responses of responses ------>", response);
     if (response.data && response.data.length > 0) {
       setQuestions(
         response.data[0].responses.map((res: any) => ({
@@ -129,86 +136,6 @@ function Page() {
     const response = await getSurvey({ _id: surveyId });
     const questions = response.data.questions.map((el: any) => el);
     setSurveyQuestions(questions);
-  }
-  // selection logic
-
-  function handleMemberClick(responseId: string, index: number) {
-    // If no start index is set, set the current index as the start index
-    if (startIndex === null) {
-      setStartIndex(index);
-      setSelectedResponses([responseId]);
-    } else {
-      // If the clicked index is the same as the start index, reset all states
-      if (index === startIndex) {
-        setStartIndex(null);
-        setEndIndex(null);
-        setSelectedResponses([]);
-        return; // Early return since we've reset everything
-      }
-
-      // If clicking before the start index, update the start index to the current index
-      if (index < startIndex) {
-        setStartIndex(index);
-        setEndIndex(null);
-        setSelectedResponses([responseId]);
-        return; // Early return after resetting states
-      }
-
-      // Handle the case where the index is greater than the start index
-      if (index > startIndex) {
-        // Set the end index
-        setEndIndex(index);
-
-        // Calculate the range of selections
-        const range = Math.abs(index - startIndex) + 1;
-
-        // Check if the selected range exceeds the maximum allowed
-        if (range > 60) {
-          toast.error("Maximum of 60 responses are allowed");
-          return;
-        }
-
-        // Create an array to hold selected responses
-        const selected: string[] = [];
-        for (let i = startIndex; i <= index; i++) {
-          selected.push(responses[i]._id); // Use `_id` from the `responses` array
-        }
-
-        // Update selected responses state
-        setSelectedResponses(selected);
-      }
-
-      // Handle case where a user clicks on an index lower than the current end index
-      if (endIndex !== null && index < endIndex) {
-        setEndIndex(index);
-
-        // Create a new selected array up to the new end index
-        const selected: string[] = [];
-        for (let i = startIndex; i <= index; i++) {
-          selected.push(responses[i]._id);
-        }
-
-        // Update selected responses state
-        setSelectedResponses(selected);
-      }
-    }
-  }
-
-  async function updatePannaPramukhs() {
-    const response = await updateKaryakartas({
-      id: selectedPanna,
-      responses: selectedResponses,
-      surveyId,
-    });
-    if (response.success) {
-      toast.success("Data assigned successfully");
-      setAssignMode(false);
-      setSelectedResponses([]);
-      setSelectedPanna(null);
-      getUserResponses();
-    } else {
-      toast.error("Error assigning data");
-    }
   }
 
   async function getUsers() {
@@ -250,29 +177,67 @@ function Page() {
   };
 
   // Function to handle export
-  const exportToExcel = () => {
-    // Convert the data to a worksheet
-    if (dataToExport) {
-      const ws = XLSX.utils.json_to_sheet(dataToExport);
-      console.log("sheet-------------------------------", ws);
-      // Create a new workbook
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-      // Write the workbook to a binary string and trigger a download
-      XLSX.writeFile(wb, "user_data.xlsx");
-    } else {
-      toast.error("no data to export");
+  const exportToExcel = async () => {
+    try {
+      setDownloading(true);
+      let nStartDate, nEndDate;
+      if (startDate && endDate) {
+        nStartDate = new Date(startDate || "");
+        nEndDate = new Date(endDate || "");
+        nStartDate.setDate(nStartDate.getDate() + 1);
+        nEndDate.setDate(nEndDate.getDate() + 1);
+      }
+      const params = {
+        surveyId,
+        startDate: nStartDate,
+        endDate: nEndDate,
+        userId,
+        filters: appliedFilters,
+        download:true
+      };
+      let filename= "response.xlsx"
+      const response:any = await downloadResponses(params);
+    
+      const contentDisposition = response.headers["content-disposition"];
+      console.log("header ======>",contentDisposition);
+      const file= contentDisposition.split('filename=')[1].replace(/"/g, ''); 
+      if(file) filename=file
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename); 
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      toast.error("Failed to export to Excel");
+    }finally{
+      setDownloading(false);
     }
   };
+  
 
   const options = users?.map((user) => ({
     value: user._id,
     label: user.name,
   }));
 
+  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setPageLimit(newLimit);
+  };
+
+  const handleNextPage = () => {
+   setPage(page+1)
+  };
+
+  const handlePreviousPage = () => {
+   setPage(page-1)
+  };
+
   return (
-    <div className="w-full font-medium bg-light-gray">
+    <div className="flex flex-col w-full font-medium bg-light-gray">
       <nav className="w-full py-3 px-8 flex flex-col gap-10 font-semibold">
         <h3 className="text-[24px] font-semibold">Survey Response</h3>
 
@@ -288,17 +253,18 @@ function Page() {
           />
           <div className="flex space-x-2 text-black text-base font-semibold">
             <ButtonFilled
+              loading={downloading} 
               onClick={exportToExcel}
-              className="rounded-[20px] h-fit px-4 py-2"
+              className="rounded-[20px] h-fit px-4 py-2 w-44 justify-center"
             >
               Export to Excel
             </ButtonFilled>
-            <ButtonFilled className="rounded-[20px] px-4 h-fit py-2">
+            {/* <ButtonFilled className="rounded-[20px] px-4 h-fit py-2">
               Export to CSV
             </ButtonFilled>
             <ButtonFilled className="rounded-[20px] px-4 h-fit py-2">
               Configure Fields
-            </ButtonFilled>
+            </ButtonFilled> */}
             <FilledGreyButton
               onClick={() => router.back()}
               className="rounded-[20px] h-fit px-4 py-2"
@@ -310,7 +276,7 @@ function Page() {
       </nav>
 
       <div className="p-5 font-semibold text-sm ">
-        <div className="bg-light-gray space-y-4 rounded-lg px-4 py-6">
+        <div className="bg-light-gray space-y-4 w-full rounded-lg px-4 py-6">
           <div className="w-[780px] space-y-8 pb-6 ">
             <div className="flex gap-10">
               {/* Date Range */}
@@ -407,17 +373,18 @@ function Page() {
       )}
       {!loading && responses && responses.length > 0 ? (
         <ResponseTable
-          handleMemberClick={handleMemberClick}
+          selectedPanna={selectedPanna}
           more={more}
           responses={responses}
-          selectedResponses={selectedResponses}
           setMapModalIsOpen={setMapModalIsOpen}
           setMore={setMore}
           setResponseModalIsOpen={setResponseModalIsOpen}
           setSelectedResponse={setSelectedResponse}
-          updatePannaPramukhs={updatePannaPramukhs}
           users={users}
           assignMode={assignMode}
+          setAssignedMode={setAssignMode}
+          getUserResponses={getUserResponses}
+          setSelectedPanna={setSelectedPanna}
         />
       ) : (
         !loading && (
@@ -426,6 +393,51 @@ function Page() {
           </div>
         )
       )}
+       {/* Pagination Controls */}
+       {
+        !loading && (
+          <div className="flex gap-3 items-center my-4 ml-3">
+            {/* Limit Select */}
+            <div>
+              <label htmlFor="limit-select" className="mr-2">
+                Show:
+              </label>
+              <select
+                id="limit-select"
+                value={pageLimit}
+                onChange={handleLimitChange}
+                className="p-2 border rounded-md"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+
+            {/* Navigation Arrows */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+                className="p-2 border rounded-md disabled:opacity-50"
+              >
+                <IoIosArrowBack />
+              </button>
+              <span>
+                Page {page} of {totalResponsePages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={page === totalResponsePages}
+                className="p-2 border rounded-md disabled:opacity-50"
+              >
+                <IoIosArrowForward />
+              </button>
+            </div>
+          </div>
+        )
+       }
 
       {/* Custom Modal for Data Filter */}
       <DataFilterModal

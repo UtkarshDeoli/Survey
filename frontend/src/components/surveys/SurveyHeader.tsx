@@ -13,9 +13,9 @@ import { saveResponses } from "@/networks/response_networks";
 import { CiImport } from "react-icons/ci";
 
 interface props {
-  setUpdated:any;
+  setUpdated: any;
 }
-function SurveyHeader({setUpdated}:props) {
+function SurveyHeader({ setUpdated }: props) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [name, setName] = useState<string>("");
@@ -75,14 +75,14 @@ function SurveyHeader({setUpdated}:props) {
           console.log(response);
           if (response.success) {
             toast.success("Survey created successfully!");
-            console.log(response.survey._id)
+            console.log(response.survey._id);
             const allResponses: any = [];
             jsonData.forEach((data: any, index: number) => {
               const responses: any = [];
               Object.keys(data).forEach((key, ind) => {
                 let obj: any = {};
                 obj.response = String(data[key]);
-                obj.question_id = ind+10;
+                obj.question_id = ind + 10;
                 obj.question = key;
                 obj.question_type = "Single line Text Input";
                 responses.push(obj);
@@ -97,7 +97,7 @@ function SurveyHeader({setUpdated}:props) {
             toast.error("Failed to create survey!");
           }
           setImportModalOpen(false);
-          setUpdated((prev:boolean)=>!prev)
+          setUpdated((prev: boolean) => !prev);
         }
         setExcelData(jsonData);
       };
@@ -135,20 +135,26 @@ function SurveyHeader({setUpdated}:props) {
             className="flex gap-2 items-center bg-white font-semibold"
           >
             <CiImport className="tex-xl" />
-             Import survey
+            Import survey
           </ButtonBordered>
         </div>
       </div>
 
       {/* modal */}
       <CustomModal open={modalIsOpen} closeModal={closeModal}>
-        <div className="min-w-[662px] h-[400px] flex flex-col justify-center items-center">
-          <div className="relative z-10 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">
+        <div className="min-w-[662px] h-[400px] flex flex-col items-center">
+          <div className="relative z-10 text-primary-300 px-8 py-4 text-[24px] font-bold border-b w-full">
             Create surveys
           </div>
-          <form className="grid grid-cols-2 h-full w-[90%] place-items-center">
-            
-              <label className="h-full w-full flex justify-center items-center">Name</label>
+          <div className="flex p-4 w-full h-full ">
+            <img
+              src="/images/create-survey.png"
+              className="w-[300px] h-[223px]"
+            />
+            <form className="grid grid-cols-2 w-full h-full place-items-center">
+              <label className="h-full w-full flex justify-center items-center">
+                Name
+              </label>
               <input
                 onChange={(e) => setName(e.target.value)}
                 value={name}
@@ -156,9 +162,10 @@ function SurveyHeader({setUpdated}:props) {
                 type="text"
                 placeholder="Survey name"
               />
-          
-           
-              <label className="h-full w-full flex justify-center items-center">AC_NO</label>
+
+              <label className="h-full w-full flex justify-center items-center">
+                AC_NO
+              </label>
               <input
                 onChange={(e) => setAcNo(e.target.value)}
                 value={acNo}
@@ -166,8 +173,10 @@ function SurveyHeader({setUpdated}:props) {
                 type="text"
                 placeholder="AC_NO"
               />
-            
-              <label className="h-full w-full flex justify-center items-center">BOOTH_NO</label>
+
+              <label className="h-full w-full flex justify-center items-center">
+                BOOTH_NO
+              </label>
               <input
                 onChange={(e) => setBoothNo(e.target.value)}
                 value={boothNo}
@@ -175,38 +184,50 @@ function SurveyHeader({setUpdated}:props) {
                 type="text"
                 placeholder="BOOTH_NO"
               />
-          
-            <div className="col-span-2 flex items-center gap-10">
-              <ButtonBordered
-                onClick={closeModal}
-                type="button"
-                className="border-secondary-200"
-              >
-                Cancel
-              </ButtonBordered>
-              <button
-                disabled={!name || !acNo || !boothNo}
-                className="px-6 py-2 bg-primary-300 text-white rounded-md disabled:bg-blue-100 disabled:cursor-not-allowed"
-                type="button"
-                onClick={() =>
-                  router.push(
-                    `/admin/surveys/create?name=${encodeURIComponent(name)}&ac_no=${encodeURIComponent(acNo)}&booth_no=${encodeURIComponent(boothNo)}`
-                  )
-                }
-              >
-                Create survey
-              </button>
-            </div>
-          </form>
+
+              <div className="col-start-2 flex items-center gap-10">
+                <ButtonBordered
+                  onClick={closeModal}
+                  type="button"
+                  className="border-secondary-200"
+                >
+                  Cancel
+                </ButtonBordered>
+                <button
+                  disabled={!name || !acNo || !boothNo}
+                  className="px-6 py-2 bg-primary-300 text-white rounded-md disabled:bg-primary-100 disabled:cursor-not-allowed"
+                  type="button"
+                  onClick={() =>
+                    router.push(
+                      `/admin/surveys/create?name=${encodeURIComponent(
+                        name
+                      )}&ac_no=${encodeURIComponent(
+                        acNo
+                      )}&booth_no=${encodeURIComponent(boothNo)}`
+                    )
+                  }
+                >
+                  Create survey
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </CustomModal>
       <CustomModal open={importModalOpen} closeModal={closeImportModal}>
-        <div className="min-w-[662px] h-[400px] flex flex-col justify-center items-center">
-          <div className="relative z-10 text-primary-300 px-8 py-4 font-semibold border-b border-secondary-300 w-full shadow-md">
+        <div className="min-w-[600px] h-[400px] flex flex-col justify-center items-center">
+          <div className="relative z-10 text-primary-300 px-8 py-4 text-[24px] font-bold border-b w-full">
             Import survey
           </div>
-          <form className="grid grid-cols-2 h-full w-[90%] place-items-center">
-          <label className="h-full w-full flex justify-center items-center">Name</label>
+          <div className="flex w-full h-full p-4">
+            <img
+              src="/images/create-survey.png"
+              className="w-[300px] h-[223px]"
+            />
+            <form className="grid grid-cols-2 h-full w-full place-items-center">
+              <label className="h-full w-full flex justify-center items-center">
+                Name
+              </label>
               <input
                 onChange={(e) => setName(e.target.value)}
                 value={name}
@@ -214,9 +235,10 @@ function SurveyHeader({setUpdated}:props) {
                 type="text"
                 placeholder="Survey name"
               />
-          
-           
-              <label className="h-full w-full flex justify-center items-center">AC_NO</label>
+
+              <label className="h-full w-full flex justify-center items-center">
+                AC_NO
+              </label>
               <input
                 onChange={(e) => setAcNo(e.target.value)}
                 value={acNo}
@@ -224,8 +246,10 @@ function SurveyHeader({setUpdated}:props) {
                 type="text"
                 placeholder="AC_NO"
               />
-            
-              <label className="h-full w-full flex justify-center items-center">BOOTH_NO</label>
+
+              <label className="h-full w-full flex justify-center items-center">
+                BOOTH_NO
+              </label>
               <input
                 onChange={(e) => setBoothNo(e.target.value)}
                 value={boothNo}
@@ -233,38 +257,39 @@ function SurveyHeader({setUpdated}:props) {
                 type="text"
                 placeholder="BOOTH_NO"
               />
-          
-            <div className="flex items-center gap-10 col-span-2">
-              <ButtonBordered
-                onClick={closeImportModal}
-                type="button"
-                className="border-secondary-200"
-              >
-                Cancel
-              </ButtonBordered>
-              <label>
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept=".xlsx, .xls"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <button
+
+              <div className="flex items-center gap-10 col-start-2">
+                <ButtonBordered
+                  onClick={closeImportModal}
                   type="button"
-                  onClick={() => {
-                    if (inputRef.current) {
-                      inputRef.current.click();
-                    }
-                  }}
-                  disabled={!name || !acNo || !boothNo}
-                  className="px-6 py-2 bg-primary-300 text-white rounded-md disabled:bg-blue-100 disabled:cursor-not-allowed"
+                  className="border-secondary-200"
                 >
-                  Import questions
-                </button>
-              </label>
-            </div>
-          </form>
+                  Cancel
+                </ButtonBordered>
+                <label>
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    accept=".xlsx, .xls"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (inputRef.current) {
+                        inputRef.current.click();
+                      }
+                    }}
+                    disabled={!name || !acNo || !boothNo}
+                    className="px-6 py-2 bg-primary-300 text-white rounded-md disabled:bg-primary-100 disabled:cursor-not-allowed"
+                  >
+                    Import questions
+                  </button>
+                </label>
+              </div>
+            </form>
+          </div>
         </div>
       </CustomModal>
     </header>

@@ -22,9 +22,9 @@ function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar sidebarOpen={sidebarOpen} />
-      <div className={`flex flex-col ${sidebarOpen ? "flex-1": "w-[calc(100vw-75px)]"}`}>
-        <Navbar onSidebarToggle={handleToggle} />
+      <Sidebar onSidebarToggle={handleToggle} sidebarOpen={sidebarOpen} />
+      <div className={`flex flex-col flex-1`}>
+        <Navbar />
         <main className="flex-1 h-full overflow-auto">{children}</main>
       </div>
       {/* "w-[calc(100vw-250px)]"  */}

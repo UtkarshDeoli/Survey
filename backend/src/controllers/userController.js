@@ -340,22 +340,30 @@ exports.updateMultipleKaryakarta = async (req, res) => { //for assigining data
   try {
     const { id, surveyId, responses } = req.body;
     console.log(req.body);
-    // const data = await Data.findOne({ user_id: id });
-    // if (data) {
-    //   data.responses = responses;
-    //   await data.save();
-    // } 
-    // else {
-    //   await Data.create({ survey_id: surveyId, user_id: id, responses });
-    // } 
     const data = await Data.findOne({ survey_id: surveyId ,user_id:id});
     console.log("data is --->",data)
     if(data){
       console.log("data existed")
-      data.responses = [...data.responses,...responses]
-      await data.save()
+      const finalLength = data.responses.length + responses.length;
+      if(finalLength > 4){
+        return res.status(500).json({
+          success:false,
+          message: "Cannot assign more than 4 responses.",
+        })
+      }
+      else{
+        data.responses = [...data.responses,...responses]
+        await data.save()
+      }
     }
     else{
+      if(responses.length > 4){
+        console.log("returned exceeded response")
+        return res.status(500).json({
+          success:false,
+          message: "Cannot assign more than 4 responses.",
+        })
+      }
       console.log("new data created")
       await Data.create({ survey_id: surveyId, user_id: id, responses });
     }

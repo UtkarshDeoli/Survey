@@ -2,32 +2,32 @@
 
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser , forgotPassword } from "@/networks/auth_networks";
+import { loginUser, forgotPassword } from "@/networks/auth_networks";
 import ReactModal from "react-modal";
 import toast, { Toaster } from "react-hot-toast";
+import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 
-ReactModal.setAppElement('#main');
-
+ReactModal.setAppElement("#main");
 
 export default function login() {
   const [Email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const router = useRouter();
+  const [see,setSee] = useState<boolean>(false);
 
   useEffect(() => {
     const checkToken = () => {
-    const token = localStorage.getItem("jwt_token");
-    if (token) {
-      router.push("/admin/surveys");
-    }
-  };
-  checkToken();
-  },[router]);      
-
+      const token = localStorage.getItem("jwt_token");
+      if (token) {
+        router.push("/admin/surveys");
+      }
+    };
+    checkToken();
+  }, [router]);
 
   const handleSubmit = () => {
-    loginUser({ email: Email, password:password }).then(  (res) => {
+    loginUser({ email: Email, password: password }).then((res) => {
       localStorage.setItem("jwt_token", res.token);
       if (res.success) {
         toast.success(res.message);
@@ -41,22 +41,18 @@ export default function login() {
 
   const handleForgotPassword = async (email: string) => {
     console.log("Forgot Password for Email:", email);
-  
+
     const res = forgotPassword({ email });
-    toast.promise(
-      res,
-      {
-        loading: "Sending email to reset password...",
-        success: "Email sent successfully.",
-        error: (err) => err.message || "Failed to send email.",
-      }
-    );
+    toast.promise(res, {
+      loading: "Sending email to reset password...",
+      success: "Email sent successfully.",
+      error: (err) => err.message || "Failed to send email.",
+    });
     setIsModalOpen(false);
   };
 
   return (
-
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-between min-h-screen bg-primary-50">
       <Toaster position="top-center" reverseOrder={false} />
       <ReactModal
         isOpen={isModalOpen}
@@ -93,57 +89,61 @@ export default function login() {
           </button>
         </div>
       </ReactModal>
+      <div className="relative h-screen flex flex-col items-center justify-center bg-[url('/images/semi-circle.png')] bg-cover bg-center w-[55%]">
+        <img src="/images/map.png" className="h-[450px] " />
+        <h1 className="absolute bottom-8 left-4 w-[200px] text-[30px] text-white font-bold">BHARAT DEMOGRAPHIC RESEARCH</h1>
+      </div>
 
-      <div id="main" className="relative bg-blue-50 border rounded-lg shadow-lg p-10 w-full max-w-md">
-        <h2 className="text-center text-xl font-semibold text-orange-500 mb-6">
-          Survey Login
-        </h2>
-        <div>
+      <div
+        id="main"
+        className="relative bg-white flex flex-col justify-center items-center border rounded-[20px] shadow-lg p-12 min-h-[600px] w-full max-w-[450px] mr-16"
+      >
+        <div className="flex flex-col gap-3">
+          <h2 className="text-center text-[25px] font-semibold">
+            WELCOME BACK
+          </h2>
+          <h2 className="text-center text-xl font-semibold mb-6">
+             Login
+          </h2>
+        </div>
+        <div className="w-full">
           <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
             <input
               type="text"
               value={Email}
+              placeholder="Email address"
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-full rounded-[13px] px-6 py-4 mt-1 shadow-[0_8px_30px_rgb(0,0,0,0.12)] focus:outline-none focus:ring focus:ring-primary-50"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Password</label>
+          <div className="mb-4 flex pr-2 gap-1 shadow-[0_8px_30px_rgb(0,0,0,0.12)] bg-white rounded-[13px] overflow-hidden focus:ring focus:ring-primary-50">
             <input
-              type="password"
+              type={see ? "text" : "password"}
               value={password}
+              placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+              className="w-full px-6 py-4 h-full focus:outline-none"
               required
             />
+            <img onClick={()=>setSee(!see)} src="/images/eye.png" className="w-[25px]  object-contain cursor-pointer"/>
           </div>
 
           <div className="flex justify-between items-center mb-6">
             <a
               onClick={() => setIsModalOpen(true)}
-              className="cursor-pointer text-sm text-blue-600 hover:underline"
+              className="cursor-pointer text-sm hover:underline"
             >
               Forgot your password?
             </a>
           </div>
-          <button
+          <ButtonFilled
             onClick={handleSubmit}
-            className="w-full py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            className="w-full py-2 bg-orange-500 text-white  hover:bg-orange-600"
           >
             Login
-          </button>
+          </ButtonFilled>
         </div>
-        {/* <div className="text-center mt-4">
-          <span>Don't have an account? </span>
-          <a
-            onClick={() => router.push("/signup")}
-            className="text-blue-600 cursor-pointer hover:underline"
-          >
-            Register Now
-          </a>
-        </div> */}
       </div>
     </div>
   );

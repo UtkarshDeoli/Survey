@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser , forgotPassword } from "@/networks/auth_networks";
 import ReactModal from "react-modal";
@@ -56,7 +56,7 @@ export default function login() {
 
   return (
 
-    <div className="flex items-center justify-center min-h-screen bg-white">
+    <div className="flex items-center justify-center min-h-screen bg-primary-100">
       <Toaster position="top-center" reverseOrder={false} />
       <ReactModal
         isOpen={isModalOpen}

@@ -19,19 +19,19 @@ export const questions = [
 ];
 
 export const advanceQuestions = [
-  "Radio Button With Text",
+  // "Radio Button With Text",
   "DropDown Grid",
-  "DropDown With Other Grid",
+  // "DropDown With Other Grid",
   "Single line Text Grid",
   "Number Grid",
-  "Decimal Grid",
+  // "Decimal Grid",
   "Radio Grid",
-  "Radio Grid With Other",
-  "Checkbox With Text",
+  // "Radio Grid With Other",
+  // "Checkbox With Text",
   "Checkbox Grid",
-  "Checkbox Grid With Other",
-  "Number Point Grid",
-  "Audio",
+  // "Checkbox Grid With Other",
+  // "Number Point Grid",
+  // "Audio",
   // "Contact Form",
   // "Address",
 ];

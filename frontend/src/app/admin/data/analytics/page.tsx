@@ -146,17 +146,10 @@ function Page() {
               setEndDate={setEndDate}
             />
           </div>
-          <div className="flex space-x-2 items-center text-xs">
-            <ButtonBordered onClick={()=>setShowFilters(!showFilters)} className="p-2 h-[50px] py-1 ">
+          <div className="flex space-x-2 items-center">
+            <ButtonFilled onClick={()=>setShowFilters(!showFilters)} className="">
               Filters
-            </ButtonBordered>
-            <ButtonBordered className="p-2 h-[50px] py-1 ">
-              Chat Visibility
-            </ButtonBordered>
-            <ButtonFilled className="p-2 h-[50px] py-1 ">
-              Export All
             </ButtonFilled>
-            <ButtonFilled className="p-2 h-[50px]  pt-1 ">⌄</ButtonFilled>
           </div>
         </div>
       </div>
@@ -192,9 +185,9 @@ function Page() {
                 value={selectedFilter}
                 name="filters"
                 id="filters"
-                className="outline-none shadow-lg rounded-lg p-2 w-1/2"
+                className="outline-none shadow-lg px-6 py-3 w-[30%] rounded-[20px]"
               >
-                <option value="" disabled selected>
+                <option className="outline-none shadow-lg px-6 py-3 w-[30%] rounded-[20px]" value="" disabled selected>
                   Select filter
                 </option>
                 {filters &&
@@ -232,7 +225,7 @@ function Page() {
                     questionText = questionResponse.parameters.question;
                   }
                   return (
-                    <div className="flex justify-between mt-5 border border-secondary-200 bg-white rounded-sm w-1/2 px-4 py-2">
+                    <div className="flex justify-between mt-5 border border-secondary-200 bg-white rounded-[20px] w-1/2 px-4 py-2">
                       <h2>{`${questionText} ${el.operator} ${el.response}`}</h2>
                       <button
                         onClick={() =>

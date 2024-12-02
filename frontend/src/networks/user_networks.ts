@@ -250,8 +250,9 @@ export const updateKaryakartas = async (params: any) => {
     };
     const response = await axios.request(options);
     return response.data;
-  } catch (error) {
-    return { success: false, message: "Something Went Wrong", error };
+  } catch (error:any) {
+    console.log("error in network",error)
+    return { success: false, message: error.response.data.message, error };
   }
 };
 export const getKaryakarta = async (params: any) => {
