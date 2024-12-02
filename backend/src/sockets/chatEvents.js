@@ -13,6 +13,11 @@ async function createOrGetChatRoom(userId1, userId2) {
     await room.save();
   }
 
+  await Message.updateMany(
+    { _id: { $in: room.messages }, sender: { $ne: userId1 } },
+    { $set: { read: true } },
+  );
+
   return room;
 }
 

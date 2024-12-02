@@ -51,6 +51,7 @@ exports.getAllChatsData = async (req, res) => {
         const unreadMessages = chatRoom
           ? await Message.countDocuments({
               chat_room_id: chatRoom._id,
+              sender: { $ne: currentUserId },
               read: false,
             })
           : 0;
