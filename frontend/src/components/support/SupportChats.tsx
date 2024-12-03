@@ -9,6 +9,7 @@ import {
 } from "@/types/support_interfaces";
 import { truncateText, getDateAndMonth } from "@/utils/common_functions";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { PuffLoader } from "react-spinners";
 
 interface ChatCardProp {
   chat: UserDataInterface;
@@ -163,7 +164,7 @@ function SupportChatsList({
           dataLength={userData?.length} // This is the length of the current items
           next={loadMoreChats} // Function to call when scrolled to bottom
           hasMore={userData?.length < total} // Whether there are more items to load
-          loader={<h4>Loading...</h4>}
+          loader={<div className="flex justify-center p-4"><PuffLoader/></div>}
           scrollableTarget="scrollableDiv" // The scrollable container
           endMessage={<p style={{ textAlign: "center" }}>No more chats</p>}
         >

@@ -52,7 +52,7 @@ function AssignPannaPramukhModal({pannaPramukh,setUserModal,selectedPanna,setSel
               setAssignMode(true);
               setUserModal(false);
             }}
-            className="mt-auto disabled:bg-blue-100 disabled:cursor-not-allowed"
+            className="mt-auto disabled:bg-primary-100 disabled:cursor-not-allowed justify-center"
             disabled={!selectedPanna}
           >
             Proceed

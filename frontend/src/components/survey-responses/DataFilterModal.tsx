@@ -71,6 +71,8 @@ function DataFilterModal({
     const options = getOperatorOptions(questionType);
     return options.length > 0 ? options[0] : ""; // Return first operator as default
   };
+
+  
   const handleQuestionChange = (value: string) => {
     const selectedQuestion = surveyQuestions.find(
       (q: any) => Number(q.question_id) === Number(value)
@@ -83,6 +85,7 @@ function DataFilterModal({
       setQuestionType("");
     }
   };
+  console.log("================>",response)
   return (
     <CustomModal open={modalIsOpen} closeModal={closeModal}>
       <div className="min-w-[500px] h-[270px] flex flex-col">

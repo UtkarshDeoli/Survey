@@ -25,21 +25,27 @@ function ResponseFilterInput({
   if (questions) {
     qType = questions.type;
   }
-  console.log("qtype from response input --->", qType);
+  console.log("qtype from response input --->",typeof(qType));
 
-  function handleExtraInput(e:any){
-    setExtraInput(e.target.value);
-    setResponse(`${response} :${extraInput}`);
+  function handleExtraInput(e: any) {
+    const value = e.target.value;
+    setExtraInput(value);
+
+    // Update the response state, appending `extraInput` at the end
+    setResponse((prev: string) => {
+      const baseResponse = prev.split(":")[0]; // Keep only the part before ':'
+      return `${baseResponse}:${value}`; // Append the new extraInput value
+    });
   }
 
-  if (qType && ["Radio Grid","Number Grid"].includes(qType)) {
+  if (qType && ["Radio Grid","Number Grid","DropDown Grid","Single line Text Grid","Checkbox Grid"].includes(qType)) {
     const row = questions.parameters.row_options.split("\n");
     const column = questions.parameters.column_options.split("\n");
     const result = row.flatMap((row: string) =>
       column.map((col: string) => {
-        if(qType === "Radio Grid") return `${row}: ${col}`
-        else if(qType === "Number Grid") return `${row} ( ${col} )`
-        else return `${row}: ${col}`
+        if (qType === "Radio Grid") return `${row}: ${col}`;
+        else if (["Number Grid","DropDown Grid","Single line Text Grid","Checkbox Grid"].includes(qType)) return `${row}-${col}`;
+        else return `${row}: ${col}`;
       })
     );
     console.log("result from radio grid --->", result);
@@ -56,10 +62,12 @@ function ResponseFilterInput({
             </option>
           ))}
         </select>
-        {qType === "Number Grid" && (
+        {["Number Grid","DropDown Grid","Single line Text Grid","Checkbox Grid"].includes(qType) && (
           <input
             disabled={
-              questionType.trim().length === 0 || operator.trim().length === 0 || response.trim().length === 0
+              questionType.trim().length === 0 ||
+              operator.trim().length === 0 ||
+              response.trim().length === 0
             }
             onChange={handleExtraInput}
             value={extraInput || ""}

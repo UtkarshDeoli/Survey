@@ -6,6 +6,10 @@ const fs = require("fs");
 const Survey = require("../models/survey");
 const { downloadExcel } = require("../utils/utils");
 
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 exports.saveResponse = async (req, res) => {
   console.log("here it works");
   console.log(req.file.path);
@@ -317,7 +321,7 @@ exports.getAllResponses = async (req, res) => {
                   if: {
                     $regexMatch: {
                       input: { $toString: "$responses.response" },
-                      regex: /^\d+(\.\d+)?$/,
+                      regex: new RegExp(escapeRegex("$responses.response"), "i")
                     },
                   },
                   then: { $toDouble: "$responses.response" },
