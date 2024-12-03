@@ -14,6 +14,7 @@ const roleRoutes = require("./src/routes/roleRoutes");
 const dataRoutes = require("./src/routes/dataRoutes");
 const todoRoutes = require("./src/routes/todoRoutes")
 const contactRoutes = require("./src/routes/contactRoutes")
+const dashboardRoutes = require("./src/routes/dashboardRoutes")
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/api/role", roleRoutes);
 app.use("/api/data", dataRoutes);
 app.use("/api/todo", todoRoutes);
 app.use("/api/contact",contactRoutes);
+app.use("/api/dashboard",dashboardRoutes);
 
 app.use(express.static(path.join(__dirname, "../frontend/out/")));
 app.get("*", (req, res) =>

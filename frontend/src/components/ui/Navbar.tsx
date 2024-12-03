@@ -1,13 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
-import ButtonBordered from "./buttons/ButtonBordered";
 import { useEffect, useState } from "react";
 import { checkToken } from "@/utils/common_functions";
-import { VscThreeBars } from "react-icons/vsc";
 import Image from "next/image";
 import bell from "../../../public/icons/active.png";
 import profile from "../../../public/icons/profile.png";
-import { IoLogOutOutline } from "react-icons/io5";
 
 interface UserData {
   id: string;

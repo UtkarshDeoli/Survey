@@ -3,77 +3,30 @@
 import React, { useEffect, useState } from "react";
 import IndiaMap from "@/components/ui/IndianMap";
 
-import { Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
   Title,
   Tooltip,
   Legend,
+  ArcElement,
+  Colors,
 } from "chart.js";
+import { getDashboard } from "@/networks/dashboard_networks";
+import Loader from "@/components/ui/Loader";
+import { formatDate, truncateText } from "@/utils/common_functions";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-);
+ChartJS.register(Title, Tooltip, Legend, Colors, ArcElement);
 
-const data = {
-  labels: ["January", "February", "March", "April", "May", "June", "July"],
-  datasets: [
-    {
-      label: "Survey",
-      data: [12, 19, 3, 5, 2, 3, 7],
-      backgroundColor: [
-        "#EF9595",
-        "#EFB495",
-        "#EFD595",
-        "#EBEF95",
-        "#A5DD9B",
-        "#BB9AB1",
-        "#EECEB9",
-      ],
-      borderColor: "",
-      borderWidth: 0,
-    },
-  ],
-};
-
-const options = {
-  responsive: true,
+const options: any = {
+  maintainAspectRatio: false,
+  responsive: false,
   plugins: {
     legend: {
-      position: "top",
-    },
-    tooltip: {
-      callbacks: {
-        label: function (tooltipItem: any) {
-          return `Sales: ${tooltipItem.raw}`;
-        },
-      },
-    },
-  },
-  scales: {
-    x: {
-      grid: {
-        color: "#e5e5e5",
-      },
-      ticks: {
-        color: "#333",
-      },
-    },
-    y: {
-      beginAtZero: true,
-      grid: {
-        color: "#e5e5e5",
-      },
-      ticks: {
-        color: "#333",
+      position: "right",
+      labels: {
+        usePointStyle: true,
+        pointStyle: "circle",
       },
     },
   },
@@ -81,52 +34,164 @@ const options = {
 
 function Page() {
   const [isClient, setIsClient] = useState(false);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [userData, setUserData] = useState<any>(null);
+  const [karyakartaData, setKaryakartaData] = useState<any>(null);
 
   useEffect(() => {
     setIsClient(true);
+    fetchDashboard();
   }, []);
+
+  async function fetchDashboard() {
+    setLoading(true);
+    const response = await getDashboard();
+    if (response.success) {
+      setDashboardData(response.data);
+      const userStats = response.data.userStats.find(
+        (user: any) => user._id === "user"
+      );
+      const userRoles = userStats.roles.map((role: any) => role.role.name);
+      const userRoleCounts = userStats.roles.map((role: any) => role.count);
+
+      const karyakartaStats = response.data.userStats.find(
+        (user: any) => user._id === "karyakarta"
+      );
+      const karyakartaRoleCounts = karyakartaStats.roles.map(
+        (role: any) => role.count
+      );
+      const karyakartaRoles = karyakartaStats.roles.map(
+        (role: any) => role.role.name
+      );
+
+      setUserData({
+        labels: userRoles,
+        datasets: [
+          {
+            label: "Users",
+            data: userRoleCounts,
+            borderColor: "",
+            borderWidth: 0,
+          },
+        ],
+      });
+      setKaryakartaData({
+        labels: karyakartaRoles,
+        datasets: [
+          {
+            label: "Karyakartas",
+            data: karyakartaRoleCounts,
+            borderColor: "",
+            borderWidth: 0,
+          },
+        ],
+      });
+    }
+    setLoading(false);
+  }
 
   if (!isClient) {
     return null; // Prevent SSR issues
   }
 
   return (
-    <div className="h-full bg-[#ECF0FA]">
-      <div className="p-5 font-medium">Admin dashboard</div>
-      <div className="flex flex-col gap-10">
-        <div className="flex gap-5 justify-between bg-white mx-6 p-4 rounded-2xl">
-          <div className="flex flex-col bg-gradient-to-r from-[#0086FF] via-[#62B4FE] to-[#a8d5ff] text-white w-full h-[150px] rounded-lg p-3">
-            <p className="text-lg font-medium">Total Survey</p>
-            <p className="text-2xl font-medium mt-10">5,753</p>
-            <p>last week survey</p>
-          </div>
-          <div className="flex flex-col bg-gradient-to-r from-[#ffa959] via-[#e2ab4c] to-[#ffda7b] text-white w-full h-[150px] rounded-lg p-3">
-            <p className="text-lg font-medium">Pending Survey</p>
-            <p className="text-2xl font-medium mt-10">2,563</p>
-            <p>last week survey</p>
-          </div>
-          <div className="flex flex-col bg-gradient-to-r from-[#396f33] via-[#38982d] to-[#8dc086] text-white w-full h-[150px] rounded-lg p-3">
-            <p className="text-lg font-medium">Approved Survey</p>
-            <p className="text-2xl font-medium mt-10">1,433</p>
-            <p>last week survey</p>
-          </div>
-          <div className="flex flex-col bg-gradient-to-r from-[#d45050] via-[#f35f5f] to-[#ffb3b3] text-white w-full h-[150px] rounded-lg p-3">
-            <p className="text-lg font-medium">Rejected Survey</p>
-            <p className="text-2xl font-medium mt-10">3,563</p>
-            <p>last week survey</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-10 justify-center items-center">
-          <div className="self-start col-span-6 px-10 bg-white mx-6 py-4 rounded-2xl">
-            <div>
-              <Bar data={data} />
+    <div className="bg-[#ECF0FA]">
+      <div className="p-5 font-bold text-[28px]">Activity</div>
+
+      {loading && <Loader />}
+      {dashboardData && (
+        <div className="flex flex-col gap-10 p-5">
+          <div className="flex justify-evenly">
+            <div className="flex flex-col min-h-200px justify-between py-2">
+              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[356px]">
+                <h2 className="text-[20px] font-bold">Total survey</h2>
+                <img src="/images/right.png" className="h-3" />
+                <h2 className="text-[20px] font-bold">
+                  {dashboardData.surveysCount}
+                </h2>
+              </div>
+              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[356px]">
+                <h2 className="text-[20px] font-bold">Total responses</h2>
+                <img src="/images/right.png" className="h-3" />
+                <h2 className="text-[20px] font-bold">
+                  {dashboardData.responseCount}
+                </h2>
+              </div>
+            </div>
+            <div className="flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-10 py-8 bg-white ">
+              <h2 className="text-[20px] font-bold ">Number of karyakarta</h2>
+              {karyakartaData && (
+                <Pie data={karyakartaData} options={options} />
+              )}
+            </div>
+            <div className="flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-10 py-8 bg-white ">
+              <h2 className="text-[20px] font-bold ">Number of Users</h2>
+              {userData && <Pie data={userData} options={options} />}
             </div>
           </div>
-          <div className="col-span-4 bg-white mx-6 py-4 rounded-2xl">
-            <IndiaMap />
+
+          <div className="flex justify-between">
+            <div className="w-[49%] rounded-[25px] flex flex-col gap-4 bg-white shadow-md p-5">
+              <h3 className="text-[20px] font-bold">Recent tasks</h3>
+              <div className="rounded-[25px] flex flex-col gap-4 bg-lighter-gray h-[40vh] p-4 w-full border-2 vertical-scrollbar-orange overflow-y-scroll">
+                <div className="grid grid-cols-4 w-full text-[13px] font-semibold place-items-center">
+                  <p>Id</p>
+                  <p></p>
+                  <p>Created at</p>
+                  <p>Status</p>
+                </div>
+                {dashboardData.todos.length > 0 ? (
+                  dashboardData.todos.map((todo: any) => (
+                    <div key={todo._id} className="grid grid-cols-4 w-full place-items-center text-[13px]">
+                      <p>{truncateText(todo._id,10)}</p>
+                      <img src="/images/right.png" className="h-2" />
+                      <p className="text-dark-gray">{formatDate(todo.createdAt)}</p>
+                      <p>{todo.status}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No recent todos</p>
+                )}
+              </div>
+            </div>
+            <div className="w-[49%] rounded-[25px] flex flex-col gap-4 bg-white shadow-md p-5">
+              <h3 className="text-[20px] font-bold">Recent Surveys</h3>
+              <div className="rounded-[25px] flex flex-col gap-4 bg-lighter-gray h-[40vh] p-4 w-full border-2 vertical-scrollbar-orange overflow-y-scroll">
+                <div className="grid grid-cols-3 w-full text-[13px] font-semibold place-items-center">
+                  <p>Name</p>
+                  <p></p>
+                  <p>Created at</p>
+                </div>
+                {dashboardData.todos.length > 0 ? (
+                  dashboardData.surveys.map((survey: any) => (
+                    <div key={survey._id} className="grid grid-cols-3 w-full place-items-center text-[13px]">
+                      <p>{truncateText(survey.name,20)}</p>
+                      <img src="/images/long-arrow.png" className="h-2" />
+                      <p className="text-dark-gray">{formatDate(survey.createdAt)}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No recent todos</p>
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* <div className="grid grid-cols-10 justify-center items-center">
+            <div className="self-start col-span-6 px-10 bg-white mx-6 py-4 rounded-2xl">
+              <div>
+                {userData && <Pie data={userData} />}
+                {karyakartaData && <Pie data={karyakartaData} />}
+              </div>
+            </div>
+            <div className="col-span-4 bg-white mx-6 py-4 rounded-2xl">
+              <IndiaMap />
+            </div>
+          </div> */}
         </div>
-      </div>
+      )}
     </div>
   );
 }

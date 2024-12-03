@@ -83,30 +83,6 @@ function DataFilterModal({
       setQuestionType("");
     }
   };
-  function showRadioGridFilters() {
-    const questions = surveyQuestions?.find(
-      (q: any) => Number(question) === Number(q.question_id)
-    );
-    const row = questions.parameters.row_options.split("\n");
-    const column = questions.parameters.column_options.split("\n");
-    const result = row.flatMap((row: string) =>
-      column.map((col: string) => `${row}: ${col}`)
-    );
-    console.log("result from radio grid --->", result);
-    return (
-      <select
-        onChange={(e) => setResponse(e.target.value)}
-        className="flex items-center border border-secondary-200 rounded-[20px] outline-none focus:ring focus:ring-primary-50 px-8 py-3 w-full disabled:cursor-not-allowed"
-      >
-        <option value="">select</option>
-        {result.map((item: string, index: number) => (
-          <option key={index} value={item}>
-            {item}
-          </option>
-        ))}
-      </select>
-    );
-  }
   return (
     <CustomModal open={modalIsOpen} closeModal={closeModal}>
       <div className="min-w-[500px] h-[270px] flex flex-col">

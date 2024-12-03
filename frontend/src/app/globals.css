@@ -39,6 +39,25 @@
     border: 1.25px solid #D2DBE4;
   }
 
+  /*  */
+  .vertical-scrollbar-orange::-webkit-scrollbar{
+    height: 70%;
+    width:8px;
+  }
+
+  .vertical-scrollbar-orange::-webkit-scrollbar-track {
+    height:100%;
+    border-radius: 100vh;
+    background: #D2DBE4;
+  }
+
+  .vertical-scrollbar-orange::-webkit-scrollbar-thumb {
+    background: #FF8437;
+    border-radius: 10px;
+    border: 1.25px solid #D2DBE4;
+  }
+
+
   /* .scrollbar::-webkit-scrollbar-thumb:hover {
     background: #c0a0b9;
   } */

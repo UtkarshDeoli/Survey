@@ -113,7 +113,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
         sidebarOpen ? "w-[250px]" : "w-[75px]"
       }`}
     >
-      <button onClick={onSidebarToggle} className={`transition-all duration-300 absolute z-50 -right-[25px] top-1/2 transform -translate-y-1/2 ${!sidebarOpen ? "rotate-180":"" }`}>
+      <button onClick={onSidebarToggle} className={`transition-all duration-300 absolute z-10 -right-[25px] top-1/2 transform -translate-y-1/2 ${!sidebarOpen ? "rotate-180":"" }`}>
         <img src="/images/arrow-left.png" className=" w-[50px]"/>
       </button>
       <div className="flex flex-col h-full w-full">

@@ -52,7 +52,8 @@ const config: Config = {
         "green-online": "#46fb16",
         "red-offline": "#f61818",
         "light-gray":"#F2F8FC",
-        "dark-gray":"#525151"
+        "dark-gray":"#525151",
+        "lighter-gray":"#FAFAFA"
       },
     },
   },
