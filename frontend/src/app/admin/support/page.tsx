@@ -3,7 +3,7 @@ import ChatComponent from "@/components/support/ChatComponent";
 import SupportChatsList from "@/components/support/SupportChats";
 import useSupportSocket from "@/hooks/useSupportSocket";
 import { UserDataInterface } from "@/types/support_interfaces";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function page() {
   const [selectedChat, setSelectedChat] = useState<UserDataInterface | null>(
@@ -38,8 +38,8 @@ function page() {
         total={totalUsers}
         handleRoleSelect={handleRoleSelect}
         handleSearchClick={handleSearchClick}
-        setUserData={(data:any)=>{
-          setUserData((prev:any)=>[...prev,data])
+        setUserData={(data: any) => {
+          setUserData((prev: any) => [...prev, ...data]);
         }}
       />
       <ChatComponent
@@ -47,9 +47,8 @@ function page() {
         sendMessage={sendMessage}
         currentUserData={currentUserData}
         otherUserData={selectedChat}
-
       />
-  </main>
+    </main>
   );
 }
 

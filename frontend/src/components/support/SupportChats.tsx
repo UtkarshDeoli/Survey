@@ -94,7 +94,7 @@ interface SupportChatProps {
   handleSearchClick: (input: string) => void;
   setUserData: (userData: UserDataInterface[]) => void;
   currentUserData: any;
-  total:number;
+  total: number;
 }
 
 function SupportChatsList({
@@ -105,7 +105,7 @@ function SupportChatsList({
   handleSearchClick,
   setUserData,
   currentUserData,
-  total
+  total,
 }: SupportChatProps) {
   const Roles = [
     "Admin",
@@ -116,22 +116,21 @@ function SupportChatsList({
   ];
   const [searchBarInput, setSearchBarInput] = useState<string>("");
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [page,setPage] = useState <number> (1);
-  const [limit,setLimit] = useState <number> (10);
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(10);
 
   async function loadMoreChats() {
     const params = {
       currentUserId: currentUserData?.id!,
       searchBarInput,
       selectedRole,
-      page:page+1,
-      limit:10,
-
+      page: page + 1,
+      limit: 10,
     };
-    console.log("loading more...")
+    console.log("loading more...");
     const res = await getAllChatsData(params);
     setUserData(res.data);
-    setPage(page+1);
+    setPage(page + 1);
   }
 
   return (
@@ -156,7 +155,10 @@ function SupportChatsList({
         handleRoleSelect={handleRoleSelect}
       />
 
-      <div className="w-full h-full flex-1 flex-col overflow-y-scroll rounded-lg" id="scrollableDiv">
+      <div
+        className="w-full h-full flex-1 flex-col overflow-y-scroll rounded-lg"
+        id="scrollableDiv"
+      >
         <InfiniteScroll
           dataLength={userData?.length} // This is the length of the current items
           next={loadMoreChats} // Function to call when scrolled to bottom
@@ -165,19 +167,51 @@ function SupportChatsList({
           scrollableTarget="scrollableDiv" // The scrollable container
           endMessage={<p style={{ textAlign: "center" }}>No more chats</p>}
         >
-          {userData?.map((chat) => {
-            return (
-              <ChatCard
-                key={chat._id}
-                chat={chat}
-                onClick={(chat) => {
-                  setSelectedChatId(chat._id);
-                  onChatClick(chat);
-                }}
-                isSelected={selectedChatId === chat._id}
-              />
-            );
-          })}
+          <div>
+            {/* Recents Section */}
+            <div className="w-full flex flex-row justify-center items-center gap-2 my-5">
+              <span className="text-gray-400">Recents</span>
+              <div className="flex-1 border-t border-gray-400 mr-2.5" />
+            </div>
+
+            {/* Chats with Recent Messages */}
+            {userData?.map(
+              (chat, index) =>
+                chat.lastMessageData && (
+                  <ChatCard
+                    key={chat._id}
+                    chat={chat}
+                    onClick={(chat) => {
+                      setSelectedChatId(chat._id);
+                      onChatClick(chat);
+                    }}
+                    isSelected={selectedChatId === chat._id}
+                  />
+                ),
+            )}
+
+            {/* Start New Chat Section */}
+            <div className="w-full flex flex-row justify-center items-center gap-2 my-5">
+              <span className="text-gray-400">Start New</span>
+              <div className="flex-1 border-t border-gray-400 mr-2.5" />
+            </div>
+
+            {/* Chats without Messages */}
+            {userData?.map(
+              (chat, index) =>
+                !chat.lastMessageData && (
+                  <ChatCard
+                    key={chat._id}
+                    chat={chat}
+                    onClick={(chat) => {
+                      setSelectedChatId(chat._id);
+                      onChatClick(chat);
+                    }}
+                    isSelected={selectedChatId === chat._id}
+                  />
+                ),
+            )}
+          </div>
         </InfiniteScroll>
       </div>
     </div>

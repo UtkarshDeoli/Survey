@@ -13,6 +13,11 @@ async function createOrGetChatRoom(userId1, userId2) {
     await room.save();
   }
 
+  await Message.updateMany(
+    { _id: { $in: room.messages }, sender: { $ne: userId1 } },
+    { $set: { read: true } },
+  );
+
   return room;
 }
 
@@ -28,6 +33,12 @@ const chatEvents = (socket, io) => {
       console.log("currentRoomId was", currentRoomId);
       if (currentRoomId) {
         console.log(`User leaving room: ${currentRoomId}`);
+        const currentRoom = await ChatRoom.findById(currentRoomId);
+        if (currentRoom && currentRoom.messages.length === 0) {
+          currentRoom.deleteOne().then(() => {
+            socket.emit("room_exited", { roomId: currentRoomId });
+          });
+        }
         socket.leave(currentRoomId);
       }
 
