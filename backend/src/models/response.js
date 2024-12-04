@@ -59,6 +59,10 @@ const responseSchema = new Schema(
     remark: {
       type: String,
     },
+    call_recording: {
+      type: Schema.Types.ObjectId,
+      ref: "CallRecordings99",
+    },
   },
   { strict: false, timestamps: true },
 );

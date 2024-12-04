@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 const Survey = require("../models/survey");
 const { downloadExcel } = require("../utils/utils");
+const CallRecordings = require("../models/callrecording");
 
 function escapeRegex(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -101,7 +102,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } }
+        { $set: { family_head: response._id } },
       );
     }
 
@@ -109,7 +110,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      }
+      },
     );
     if (!survey) {
       return res
@@ -364,7 +365,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response)
+      console.log(resp.question_id, "-->", resp.response),
     );
 
     // Add additional match stage if there are filters
@@ -401,7 +402,7 @@ exports.getAllResponses = async (req, res) => {
         Responses.findById(f._id)
           .populate("panna_pramukh_assigned")
           .populate("user_id")
-          .populate("survey_id")
+          .populate("survey_id"),
       );
 
       const re = await Promise.all(fin);
@@ -422,7 +423,7 @@ exports.getAllResponses = async (req, res) => {
       const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
       const fin = filteredResponse.map((f) =>
-        Responses.findById(f._id).populate("panna_pramukh_assigned")
+        Responses.findById(f._id).populate("panna_pramukh_assigned"),
       );
       const re = await Promise.all(fin);
       // console.log("res-->",re)
@@ -898,7 +899,7 @@ exports.updateResponse = async (req, res) => {
       responseToUpdate,
       {
         new: true,
-      }
+      },
     );
 
     if (!response) {
@@ -947,6 +948,38 @@ exports.saveRemark = async (req, res) => {
     return res
       .status(201)
       .json({ success: "true", message: "Remark saved successfully" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
+
+exports.saveCallRecording = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: "false", message: "No file uploaded" });
+    }
+    const { response_id, survey_id, created_by } = req.body;
+
+    const recording = CallRecordings({
+      file_path: req.file.path,
+      duration: req.body.duration,
+      response_id,
+      survey_id,
+      user_id: created_by,
+    });
+    await recording.save();
+
+    const responseToUpdate = {
+      call_recording: recording._id,
+    };
+    await Responses.findByIdAndUpdate(response_id, responseToUpdate, {
+      new: true,
+    });
+    return res
+      .status(201)
+      .json({ success: "true", message: "Call recording saved successfully" });
   } catch (error) {
     return res.status(400).json({ success: "false", message: error.message });
   }
