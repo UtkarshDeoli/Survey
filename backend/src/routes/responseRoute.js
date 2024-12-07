@@ -5,7 +5,11 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./uploads/");
+    if (req.path === "/saveCallRecording") {
+      cb(null, "./call_recordings/");
+    } else {
+      cb(null, "./uploads/");
+    }
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -17,6 +21,12 @@ router.post(
   "/saveResponse",
   upload.single("audio"),
   responseController.saveResponse,
+);
+
+router.post(
+  "/saveCallRecording",
+  upload.single("audio"),
+  responseController.saveCallRecording,
 );
 
 router.get("/getAllResponses", responseController.getAllResponses);

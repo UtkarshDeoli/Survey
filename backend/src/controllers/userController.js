@@ -70,7 +70,7 @@ exports.updateUser = async (req, res) => {
     const dbRes = await User.findOneAndUpdate(
       { _id: user_id },
       { $set: userData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     return res
       .status(200)
@@ -138,11 +138,32 @@ exports.getUser = async (req, res) => {
   try {
     const _id = req.query.userId;
     const assignedSurveys = req.query.assignedSurveys;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     if (assignedSurveys) {
       const assignedSurveys = await User.findOne({ _id: _id })
-        .populate("assigned_survey")
+        .populate({
+          path: "assigned_survey",
+          options: { sort: { createdAt: -1 }, skip, limit },
+        })
         .select("assigned_survey _id");
-      return res.status(200).json({ success: true, data: assignedSurveys });
+
+      const totalSurveys = assignedSurveys.assigned_survey.length;
+      const totalPages = Math.ceil(totalSurveys / limit);
+
+      return res.status(200).json({
+        success: true,
+        data: assignedSurveys,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalSurveys: totalSurveys,
+          surveyPerPage: limit,
+        },
+      });
     }
 
     const user = await User.findOne({ _id: _id });
@@ -181,7 +202,7 @@ exports.getAllUsers = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validUserRoleIds.filter(
-        (ro) => ro.toString() === role.toString()
+        (ro) => ro.toString() === role.toString(),
       );
     }
     if (role && roleExists.length > 0) {
@@ -235,7 +256,7 @@ exports.uploadProfilePicture = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { profile_picture: profilePicture._id } },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({
@@ -284,7 +305,7 @@ exports.createKaryakarta = async (req, res) => {
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("ROLE ISS:", role);
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString()
+      (el) => el.toString() === role.toString(),
     );
 
     if (roleExists.length === 0) {
@@ -310,7 +331,7 @@ exports.createKaryakarta = async (req, res) => {
     let responseIds;
     if (responses) {
       responseIds = responses.map(
-        (responseId) => new mongoose.Types.ObjectId(String(responseId))
+        (responseId) => new mongoose.Types.ObjectId(String(responseId)),
       );
     }
 
@@ -371,7 +392,7 @@ exports.updateMultipleKaryakarta = async (req, res) => {
     responses.forEach(async (response) => {
       await Response.findOneAndUpdate(
         { _id: response },
-        { panna_pramukh_assigned: id }
+        { panna_pramukh_assigned: id },
       );
     });
     return res
@@ -408,7 +429,7 @@ exports.updateKaryakarta = async (req, res) => {
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("valid roles are -->",validRoles)
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString()
+      (el) => el.toString() === role.toString(),
     );
     console.log("role exists->>>>",roleExists);
     if (roleExists.length === 0) {
@@ -505,7 +526,7 @@ exports.getAllKaryakarta = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validRoleIds.filter(
-        (ro) => ro.toString() === role.toString()
+        (ro) => ro.toString() === role.toString(),
       );
     }
 
