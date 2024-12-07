@@ -1,17 +1,18 @@
 const ChatRoom = require("../models/chatRoom");
 const Message = require("../models/message");
 const User = require("../models/user");
+const Role = require("../models/role");
 
 exports.getAllChatsData = async (req, res) => {
   try {
     const { currentUserId, filter, role, page = 1, limit = 10 } = req.query;
-    const validRoles = [
-      "Admin",
-      "Booth Karyakarta",
-      "Survey Collector",
-      "Support Executive",
-      "Survey Manager",
-    ];
+    let validRoles = [];
+    let currentRoleId = null;
+    if (role) {
+      const allRoles = await Role.find();
+      validRoles = allRoles.map((role) => role.name);
+      currentRoleId = allRoles.find((roleObj) => roleObj.name === role)._id;
+    }
 
     const searchConditions = [];
     searchConditions.push({ name: { $regex: filter, $options: "i" } });
@@ -21,8 +22,10 @@ exports.getAllChatsData = async (req, res) => {
       $and: [{ $or: searchConditions }],
     };
 
-    if (validRoles.includes(role)) {
-      query.$and.push({ role: { $in: [role] } });
+    if (role) {
+      if (validRoles.includes(role)) {
+        query.$and.push({ role: { $in: [currentRoleId] } });
+      }
     }
     query.$and.push({ _id: { $ne: currentUserId } });
 

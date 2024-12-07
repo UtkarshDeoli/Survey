@@ -31,11 +31,12 @@ const userSchema = new Schema(
       type: Number,
       required: false,
     },
-    role: [{
-      type:mongoose.Schema.Types.ObjectId,
-      ref: "Role99",
-      required: true,
-      }
+    role: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Role99",
+        required: true,
+      },
     ],
     auto_assign_survey: {
       type: Boolean,
@@ -81,6 +82,7 @@ const userSchema = new Schema(
       ref: "profilepictures99",
     },
     isOnline: { type: Boolean, default: false },
+    notification_token: String,
   },
   { timestamps: true },
 );

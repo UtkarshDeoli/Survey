@@ -1,3 +1,4 @@
+const { sendNotification } = require("../firebase");
 const Todos = require("../models/todo");
 
 exports.createTodo = async (req, res) => {
@@ -14,7 +15,17 @@ exports.createTodo = async (req, res) => {
       description,
       reminder,
     } = req.body;
-    console.log(req.body)
+    console.log(req.body);
+
+    const notificationMessaging = firebase.messaging();
+    const todoCreatedMessage = {
+      notification: {
+        title: "New Todo",
+        body: "A new todo has been created and assigned to you",
+      },
+      token: "Device-token",
+    };
+
     const newTodo = new Todos({
       title,
       due_date: new Date(due_date),
@@ -29,21 +40,33 @@ exports.createTodo = async (req, res) => {
     });
 
     await newTodo.save();
-    res
-      .status(201)
-      .json({success:true, message: "Todo created successfully", todo: newTodo });
+    notificationMessaging
+      .send(todoCreatedMessage)
+      .then((response) => {
+        console.log("Successfully sent message:", response);
+      })
+      .catch((error) => {
+        console.log("Error sending message:", error);
+      });
+
+    res.status(201).json({
+      success: true,
+      message: "Todo created successfully",
+      todo: newTodo,
+    });
   } catch (error) {
-    console.log(error)
-    res
-      .status(500)
-      .json({success:false, message: "Error creating todo", error: error.message });
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating todo",
+      error: error.message,
+    });
   }
 };
 
 exports.updateTodo = async (req, res) => {
   try {
- 
-    const {id,updates} = req.body;
+    const { id, updates } = req.body;
 
     const todo = await Todos.findById(id);
     if (!todo) {
@@ -53,31 +76,35 @@ exports.updateTodo = async (req, res) => {
     if (updates.title) todo.title = updates.title;
     if (updates.due_date) todo.due_date = updates.due_date;
     if (updates.end_date) todo.end_date = updates.end_date;
-    if (updates.activity && ['Call', 'Task'].includes(updates.activity)) {
+    if (updates.activity && ["Call", "Task"].includes(updates.activity)) {
       todo.activity = updates.activity;
     }
-    if (updates.status && ['Open', 'Rescheduled', 'Cancelled', 'Completed'].includes(updates.status)) {
+    if (
+      updates.status &&
+      ["Open", "Rescheduled", "Cancelled", "Completed"].includes(updates.status)
+    ) {
       todo.status = updates.status;
     }
     if (updates.priority) todo.priority = updates.priority;
     if (updates.description) todo.description = updates.description;
     if (updates.reminder) todo.reminder = updates.reminder;
-    if (updates.assigned_to && Array.isArray(updates.assigned_to))  todo.assigned_to = updates.assigned_to;
-    
+    if (updates.assigned_to && Array.isArray(updates.assigned_to))
+      todo.assigned_to = updates.assigned_to;
 
     // Save the updated Todo
     const updatedTodo = await todo.save();
 
     res.status(200).json({
-      success:true,
+      success: true,
       message: "Todo updated successfully",
       todo: updatedTodo,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error updating todo", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating todo", error: error.message });
   }
 };
-
 
 exports.getAllTodos = async (req, res) => {
   try {
@@ -85,7 +112,7 @@ exports.getAllTodos = async (req, res) => {
     page = parseInt(page);
     limit = parseInt(limit);
 
-    filters = typeof filters === 'string' ? JSON.parse(filters) : filters;
+    filters = typeof filters === "string" ? JSON.parse(filters) : filters;
     console.log(filters);
 
     if (title) {
@@ -96,7 +123,7 @@ exports.getAllTodos = async (req, res) => {
 
     const todos = await Todos.find(filters)
       .populate("assigned_by assigned_to")
-      .sort({createdAt:-1})
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -114,7 +141,6 @@ exports.getAllTodos = async (req, res) => {
       .json({ message: "Error retrieving todos", error: error.message });
   }
 };
-
 
 exports.getTodosByUserId = async (req, res) => {
   try {
@@ -150,7 +176,7 @@ exports.getTodo = async (req, res) => {
       return res.status(404).json({ message: "Todo not found" });
     }
 
-    res.status(200).json({success:true,data:todo});
+    res.status(200).json({ success: true, data: todo });
   } catch (error) {
     res
       .status(500)
@@ -168,9 +194,23 @@ exports.deleteTodo = async (req, res) => {
       return res.status(404).json({ message: "Todo not found" });
     }
 
-    res
-      .status(200)
-      .json({success:true, message: "Todo deleted successfully", todo: deletedTodo });
+    res.status(200).json({
+      success: true,
+      message: "Todo deleted successfully",
+      todo: deletedTodo,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.dummyNotification = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    sendNotification(token, "A new todo has been created and assigned to you");
+
+    res.status(200).json({ success: true, message: "Notification sent" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

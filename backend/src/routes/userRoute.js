@@ -23,6 +23,7 @@ router.post('/getUsersByAcList',userController.getUsersByAcList)
 
 
 
+// notification settings
+router.post("/saveToken", userController.saveToken);
 
 module.exports = router;
-
