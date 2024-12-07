@@ -4,10 +4,6 @@ import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  BsClipboardData,
-  BsClipboardPlus,
-  BsLayersHalf,
-  BsListTask,
   BsPieChart,
 } from "react-icons/bs";
 import Loader from "@/components/ui/Loader";

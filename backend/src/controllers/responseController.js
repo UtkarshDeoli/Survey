@@ -534,6 +534,7 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
 exports.getSurveyResponses = async (req, res) => {
   try {
     const { search, sortOrder = "desc" } = req.query;
+    console.log("route is hitting --- >")
 
     const pipeline = [
       {
@@ -582,6 +583,7 @@ exports.getSurveyResponses = async (req, res) => {
     });
 
     const results = await Responses.aggregate(pipeline);
+    console.log("results are ----->",results);
 
     return res.status(200).json({
       success: true,

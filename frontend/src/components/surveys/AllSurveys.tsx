@@ -217,9 +217,9 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   }
 
   return (
-    <div className="w-full px-5 py-5 text-sm">
+    <div className="w-[96%] mt-5 mx-auto text-sm pb-5 max-h-[80vh] overflow-y-auto vertical-scrollbar">
       {/* surveys */}
-      <div className="grid grid-cols-8 text-white font-semibold bg-dark-gray px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+      <div className="sticky top-0 z-10 grid grid-cols-8 text-white font-semibold bg-dark-gray px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
         <p className="col-span-2">All surveys</p>
         <p className="col-span-2">Total responses</p>
         <p className="col-span-2">Date created</p>
@@ -238,7 +238,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                 onClick={() =>
                   router.push(`/admin/surveys/edit?survey_id=${el._id}`)
                 }
-                className="col-span-2 cursor-pointer"
+                className="col-span-2 cursor-pointer font-semibold"
               >
                 {el.name}
               </p>

@@ -86,7 +86,7 @@ function Page() {
           <Loader className="h-[50vh] w-full flex justify-center items-center" />
         )}
         {!loading && (
-          <form className="grid grid-cols-2 m-10 border-2 bg-lighter-gray p-4 rounded-[20px]">
+          <form className="grid grid-cols-2 gap-8 m-10 border-2 bg-lighter-gray p-4 rounded-[20px]">
             {/* left */}
             <div className="flex flex-col gap-5 w-full">
               <div className="grid grid-cols-3">
@@ -95,7 +95,7 @@ function Page() {
                   value={surveyData?.name || ""}
                   disabled
                   {...register("name")}
-                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
+                  className="col-span-2 w-full border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
                 />
               </div>
 
@@ -130,7 +130,7 @@ function Page() {
                 <label className="text-secondary-300 font-medium">Access pin</label>
                 <input
                   {...register("access_pin")}
-                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
+                  className="col-span-2 w-full border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
                 />
               </div>
 

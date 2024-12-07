@@ -56,7 +56,7 @@ function Page() {
   };
 
   return (
-    <section className="w-full  bg-[#ECF0FA] h-full">
+    <section className=" bg-[#ECF0FA] min-h-screen w-full">
       <SurveyHeader setUpdated={setUpdatd}/>
 
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">

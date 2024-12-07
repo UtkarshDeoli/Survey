@@ -146,7 +146,7 @@ function page() {
               key={index}
               className="bg-mid-gray border-2 grid p-2 grid-cols-5 text-center text-black"
             >
-              <p className="col-span-1 flex justify-center items-center">
+              <p className="col-span-1 flex justify-center items-center font-semibold">
                 {user.name}
               </p>
               <p className="col-span-1 flex justify-center items-center">

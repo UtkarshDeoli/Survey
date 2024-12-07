@@ -139,7 +139,7 @@ function ResponseTable({
   return (
     <div
       id="scrollableDiv"
-      className="w-[calc(100vw-250px)] max-h-[80vh] overflow-auto vertical-scrollbar rounded-t-2xl border border-secondary-200 mx-4"
+      className="w-[96%] mx-auto max-h-[80vh] overflow-auto vertical-scrollbar rounded-t-2xl border border-secondary-200"
     >
       <table className="w-full table-auto">
         <thead className="">

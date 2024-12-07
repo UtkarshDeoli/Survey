@@ -32,6 +32,12 @@ const options: any = {
   },
 };
 
+const colors:any ={
+  Open:"text-green-400",
+  Rescheduled:"text-amber-500",
+  Cancelled:"text-red-500",
+  Completed:"text-blue-500",
+}
 function Page() {
   const [isClient, setIsClient] = useState(false);
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -98,21 +104,21 @@ function Page() {
 
   return (
     <div className="bg-[#ECF0FA]">
-      <div className="p-5 font-bold text-[28px]">Activity</div>
+      <div className="p-5 font-bold text-[24px]">Activity</div>
 
       {loading && <Loader />}
       {dashboardData && (
         <div className="flex flex-col gap-10 p-5">
-          <div className="flex justify-evenly">
+          <div className="flex justify-around">
             <div className="flex flex-col min-h-200px justify-between py-2">
-              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[356px]">
+              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[300px]">
                 <h2 className="text-[20px] font-bold">Total survey</h2>
                 <img src="/images/right.png" className="h-3" />
                 <h2 className="text-[20px] font-bold">
                   {dashboardData.surveysCount}
                 </h2>
               </div>
-              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[356px]">
+              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[300px]">
                 <h2 className="text-[20px] font-bold">Total responses</h2>
                 <img src="/images/right.png" className="h-3" />
                 <h2 className="text-[20px] font-bold">
@@ -120,7 +126,7 @@ function Page() {
                 </h2>
               </div>
             </div>
-            <div className="flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-10 py-8 bg-white ">
+            <div className="flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-5 py-8 bg-white ">
               <h2 className="text-[20px] font-bold ">Number of karyakarta</h2>
               {karyakartaData && (
                 <Pie data={karyakartaData} options={options} />
@@ -148,7 +154,7 @@ function Page() {
                       <p>{truncateText(todo._id,10)}</p>
                       <img src="/images/right.png" className="h-2" />
                       <p className="text-dark-gray">{formatDate(todo.createdAt)}</p>
-                      <p>{todo.status}</p>
+                      <p className={`${colors[todo.status]} font-semibold`}>{todo.status}</p>
                     </div>
                   ))
                 ) : (
@@ -178,18 +184,6 @@ function Page() {
               </div>
             </div>
           </div>
-
-          {/* <div className="grid grid-cols-10 justify-center items-center">
-            <div className="self-start col-span-6 px-10 bg-white mx-6 py-4 rounded-2xl">
-              <div>
-                {userData && <Pie data={userData} />}
-                {karyakartaData && <Pie data={karyakartaData} />}
-              </div>
-            </div>
-            <div className="col-span-4 bg-white mx-6 py-4 rounded-2xl">
-              <IndiaMap />
-            </div>
-          </div> */}
         </div>
       )}
     </div>
