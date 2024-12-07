@@ -128,7 +128,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
     const params = queryParams;
     setLoading(true);
     const response = await getAllSurveys(params);
-    console.log(response)
+    console.log("all surveys are --->",response)
     setAllSurveys(response.surveys);
     setTotalPages(response.totalPages);
     setLoading(false);
@@ -219,7 +219,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   return (
     <div className="w-full px-5 py-5 text-sm">
       {/* surveys */}
-      <div className="grid grid-cols-8 text-white font-semibold bg-primary-300 px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+      <div className="grid grid-cols-8 text-white font-semibold bg-dark-gray px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
         <p className="col-span-2">All surveys</p>
         <p className="col-span-2">Total responses</p>
         <p className="col-span-2">Date created</p>
@@ -232,7 +232,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
         ? allSurveys.map((el: any, index: number) => (
             <div
               key={index}
-              className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-white"
+              className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-mid-gray"
             >
               <p
                 onClick={() =>

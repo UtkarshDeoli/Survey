@@ -16,6 +16,7 @@ export const get_karyakarta = "api/user/getKaryakarta"
 export const create_karyakarta = "api/user/createKaryakarta"
 export const update_karyakarta = "api/user/updateKaryakarta"
 export const get_panna_pramukh = "api/user/getPannaPramukh"
+export const get_panna_pramukh_ac_list = "api/user/getUsersByAcList"
 export const get_booth_adhyaksh = "api/user/getBoothAdhyaksh"
 export const updateMultipleKaryakarta = "api/user/updateMultipleKaryakarta"
 

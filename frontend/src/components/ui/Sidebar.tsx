@@ -93,15 +93,15 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
     );
   }
   function getSidebarButtonClass(el: any) {
-    return `relative flex justify-center ${
+    return `relative flex  ${
       sidebarOpen ? "w-full mb-3" : "w-fit self-center mb-5"
-    } rounded-[15px] transition-all ease-in-out duration-200 ${
+    } transition-all ease-in-out duration-200 ${
       el.path === "/admin" // Exact match for Dashboard
         ? path === el.path
-          ? "bg-primary-300 text-secondary-600 hover:bg-primary-100 hover:text-white hover:scale-105"
+          ? "bg-primary-100 text-secondary-600 hover:bg-primary-100 hover:text-white hover:scale-105"
           : "text-secondary-300 hover:bg-primary-300 hover:text-white hover:scale-105"
         : path.includes(el.path) // For all other paths
-        ? "bg-primary-300 text-secondary-600 hover:bg-primary-100 hover:text-white hover:scale-105"
+        ? "bg-primary-50 border-l-8 border-primary-300 text-primary-300 font-bold hover:bg-primary-100 hover:text-white hover:scale-105"
         : "text-secondary-300 hover:bg-primary-300 hover:text-white hover:scale-105"
     }`;
   }
@@ -109,7 +109,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
 
   return (
     <aside
-      className={`h-screen overflow-visible relative border-2 border-secondary-100 flex flex-col transition-all duration-300 ease-in-out justify-between pb-5 ${
+      className={`font-montserrat h-screen overflow-visible relative border-2 border-secondary-100 flex flex-col transition-all duration-300 ease-in-out justify-between pb-5 ${
         sidebarOpen ? "w-[250px]" : "w-[75px]"
       }`}
     >
@@ -125,11 +125,11 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
             <Image
               src={surveyProfile.src}
               alt="logo"
-              height={123}
-              width={123}
+              height={80}
+              width={80}
             />
           ) : (
-            <Image src={surveyProfile.src} alt="logo" height={64} width={64} />
+            <Image src={surveyProfile.src} alt="logo" height={50} width={50} />
           )}
           <button>Profile</button>
         </h1>
@@ -149,7 +149,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
                 onClick={() => {
                   router.push(el.path);
                 }}
-                className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-semibold ${
+                className={`rounded-md px-3 py-2 flex items-center gap-3 font-medium ${
                   !sidebarOpen ? "w-fit" : "w-[150px]"
                 }`}
               >
@@ -189,7 +189,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
                 onClick={() => {
                   router.push(el.path);
                 }}
-                className={`rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-semibold ${
+                className={`rounded-md px-3 py-2 flex items-center gap-3 font-medium ${
                   !sidebarOpen ? "" : "w-[150px]"
                 }`}
               >
@@ -212,7 +212,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
               />
             </div>
           ))}
-          <div className="relative flex justify-center hover:bg-primary-300 rounded-[20px] transition-all duration-150">
+          <div className="relative flex hover:bg-primary-300 transition-all duration-150">
             <button
               onClick={() => {
                 localStorage.removeItem("jwt_token");
@@ -233,7 +233,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
                   </div>
                 )}
                 {sidebarOpen && <img src="/images/logout.png" className="w-[25px]" />}
-                {sidebarOpen && 'logout'}
+                {sidebarOpen && 'Logout'}
               </button>
               <Tooltip
                 id={`tooltip-logout`}

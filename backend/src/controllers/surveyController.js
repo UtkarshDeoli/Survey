@@ -12,12 +12,10 @@ const shuffleArray = (array) => {
 exports.saveSurvey = async (req, res) => {
   try {
     const {
-      created_by,
       name,
       header_text,
       access_pin,
-      ac_no,
-      booth_no,
+      ac_list,
       background_location_capture,
       thank_time_duration,
       questions,
@@ -38,15 +36,11 @@ exports.saveSurvey = async (req, res) => {
     }
 
     const survey = new Survey({
-      created_by,
       name,
       header_text,
       access_pin,
-      ac_no,
-      booth_no,
+      ac_list,
       background_location_capture,
-      welcome_image,
-      thankyou_image,
       thank_time_duration,
       response_count: 0,
     });
@@ -67,9 +61,9 @@ exports.saveSurvey = async (req, res) => {
 exports.deleteSurvey = async (req, res) => {
   try {
     console.log("delete route hitting");
-    const { id, created_by } = req.body;
+    const { id } = req.body;
 
-    const survey = await Survey.findOneAndDelete({ _id: id, created_by });
+    const survey = await Survey.findOneAndDelete({ _id: id });
 
     if (!survey) {
       return res
@@ -139,11 +133,10 @@ exports.getAllSurvey = async (req, res) => {
       limit = 10,
       sortBy = "name",
       sortOrder = "asc",
-      created_by,
       published,
       user_id,
     } = req.query;
-    console.log(req.query);
+    console.log("query is ---->",req.query);
 
     const order = sortOrder === "asc" ? 1 : -1;
     const skip = (page - 1) * limit;
@@ -161,10 +154,6 @@ exports.getAllSurvey = async (req, res) => {
       searchConditions.push({ name: { $regex: filter, $options: "i" } });
     }
 
-    if (created_by) {
-      searchConditions.push({ created_by });
-    }
-
     if (
       published !== undefined &&
       published !== "" &&
@@ -175,15 +164,16 @@ exports.getAllSurvey = async (req, res) => {
 
     const findOptions =
       searchConditions.length > 0 ? { $and: searchConditions } : {};
-    console.log("before total")
+      console.log("find options are --->",findOptions)
     const total = await Survey.countDocuments(findOptions);
-    console.log("after total");``
     const surveys = await Survey.find(findOptions)
       .skip(skip)
       .limit(Number(limit))
       .sort(sortOptions)
       .collation({ locale: "en", strength: 2 });
 
+
+    console.log("surveys =--->",surveys);
     if (surveys.length === 0) {
       return res
         .status(404)
@@ -224,7 +214,16 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
         message: "Both ac_no and booth_no are required.",
       });
     }
-    const findOptions = { booth_no, ac_no };
+
+    const findOptions = {
+      ac_list: {
+        $elemMatch: {
+          ac_no,
+          booth_numbers: booth_no,
+        },
+      },
+    };
+
     const order = sortOrder === "asc" ? 1 : -1;
     const skip = (page - 1) * limit;
     const sortOptions = {};
@@ -252,10 +251,13 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
     ) {
       searchConditions.push({ published: published === "true" });
     }
+
     if (searchConditions.length > 0) {
       findOptions.$and = searchConditions;
     }
+
     console.log(findOptions);
+
     const total = await Survey.countDocuments(findOptions);
 
     const surveys = await Survey.find(findOptions)
@@ -284,11 +286,11 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
   }
 };
 
+
 exports.updateSurvey = async (req, res) => {
   try {
     const id = req.query._id;
     const {
-      created_by,
       name,
       header_text,
       access_pin,
@@ -344,9 +346,9 @@ exports.updateSurvey = async (req, res) => {
     }
 
     const result = await Survey.findOneAndUpdate(
-      { _id: id, created_by },
+      { _id: id},
       updateFields,
-      { new: true },
+      { new: true }
     );
 
     if (!result) {

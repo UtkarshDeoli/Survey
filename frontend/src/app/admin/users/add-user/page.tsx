@@ -9,6 +9,7 @@ import { getAllSurveys } from "@/networks/survey_networks";
 import { getUser } from "@/networks/user_networks";
 import { getRoles } from "@/networks/role_networks";
 import toast from "react-hot-toast";
+import Loader from "@/components/ui/Loader";
 
 function Page() {
   const [surveys, setSurveys] = useState<{ name: string }[]>([]);
@@ -18,6 +19,7 @@ function Page() {
   const [filter, setFilter] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [rolesData, setRolesData] = useState<any>([]);
+  const [rolesLoading,setRolesLoading] = useState<boolean>(false);
   const {
     register,
     watch,
@@ -40,6 +42,7 @@ function Page() {
 
     const fetchRoles = async () => {
       try {
+        setRolesLoading(true);
         const response = await getRoles({ category: "user" });
         if (response.success) {
           setRolesData(response.roles);
@@ -48,6 +51,8 @@ function Page() {
         }
       } catch (error) {
         console.error("Error fetching roles:", error);
+      }finally{
+        setRolesLoading(false);
       }
     };
 
@@ -57,23 +62,23 @@ function Page() {
   const router = useRouter();
   const onSubmit: SubmitHandler<IUser> = async (data: any) => {
     delete data.confirm_password;
-    if(userId) delete data._id;
-    const params:any = data;
-    console.log("datatata::::", params)
+    if (userId) delete data._id;
+    const params: any = data;
+    console.log("datatata::::", params);
     let res;
-    if(userId){
-      params.user_id = userId
-      res= await updateUsers(params)
-    }else{
+    if (userId) {
+      params.user_id = userId;
+      res = await updateUsers(params);
+    } else {
       console.log("add user calling");
 
-       res = await addUsers(params);
+      res = await addUsers(params);
     }
     if (res) {
-      toast.success("Success")
+      toast.success("Success");
       router.replace("/admin/users");
-    }else{
-      toast.error("Failed")
+    } else {
+      toast.error("Failed");
     }
   };
 
@@ -118,24 +123,24 @@ function Page() {
       // toast.error("something went wrong")
     }
   }
-
+  if(rolesLoading) return <Loader/>
   return (
     <div className="w-full bg-my-gray-100">
-      <nav className="bg-my-gray-105 w-full py-3 px-8 shadow-md ">
-        <div className="text-my-gray-200">
-          <h1 className="text-2xl">Add User</h1>
+      <nav className="bg-mid-gray w-full py-3 px-8 shadow-md ">
+        <div>
+          <h1 className="text-2xl font-bold">Add User</h1>
         </div>
       </nav>
 
-      <div className="p-5 text-sm text-[#797979]">
-        <div className="justify-center items-center min-h-screen bg-gray-100">
+      <div className="p-5 text-sm text-[#797979] bg-light-gray">
+        <div className="justify-center items-center bg-lighter-gray">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="bg-white shadow-lg p-6 rounded-lg"
+            className="border-2  shadow-lg p-6 rounded-[20px]"
           >
-            <div className="flex justify-between space-x-4">
+            <div className="flex gap-10 space-x-4">
               {/* Left Section */}
-              <div className="w-1/2 ">
+              <div className="w-[60%]">
                 {/* user details */}
                 <div className="w-full">
                   {[
@@ -171,20 +176,27 @@ function Page() {
                     },
                   ].map((field, index) => (
                     <div className="flex w-full space-y-2" key={index}>
-                      <div className="w-1/2 py-2">
+                      <div className="w-[20%] py-2">
                         <label className="block  font-medium">
                           {field.label}
                         </label>
                       </div>
-                      <div className="w-1/2">
+                      <div className="w-[80%]">
                         <input
-                          disabled={userId ? field.name === "confirm_password" || field.name === "password" :false}
+                          disabled={
+                            userId
+                              ? field.name === "confirm_password" ||
+                                field.name === "password"
+                              : false
+                          }
                           type={field.type}
                           placeholder={field.placeholder}
                           {...register(field.name as keyof IUser, {
-                            required: userId ? field.name !== "confirm_password" :true,
+                            required: userId
+                              ? field.name !== "confirm_password"
+                              : true,
                           })}
-                          className="border border-gray-300 rounded-md p-2 w-full"
+                          className="border border-gray-300 rounded-md p-3 w-full outline-none focus:ring-2 focus:ring-primary-50"
                         />
                         {errors[field.name as keyof IUser] && (
                           <p className="text-red-500">This field is required</p>
@@ -195,12 +207,12 @@ function Page() {
                 </div>
 
                 {/* user status active/ inactive */}
-                <div className="flex items-center mt-3 space-x-2 w-full">
-                  <div className=" w-1/2 font-medium">User Status</div>
-                  <div className="w-1/2">
+                {/* <div className="flex space-y-2 items-center mt-3 space-x-2 w-full">
+                  <div className="w-[20%] font-medium">User Status</div>
+                  <div className="w-[80%]">
                     <select
                       {...register("status", { required: true })}
-                      className="border border-gray-300 w-full text-center rounded-md p-2"
+                      className="border border-gray-300 w-full text-center rounded-md p-3 outline-none focus:ring-2 focus:ring-primary-50"
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
@@ -209,13 +221,50 @@ function Page() {
                       <p className="text-red-500">User status is required</p>
                     )}
                   </div>
+                </div> */}
+                <div className="flex space-y-2 items-center mt-3 space-x-2 w-full">
+                  <div className="w-[20%] font-medium">User Status</div>
+                  <div className="w-[80%]">
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setValue("status", "active")}
+                        className={`px-4 py-2 rounded-md ${
+                          watch("status") === "active"
+                            ? "bg-primary-300 text-white"
+                            : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        Active
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setValue("status", "inactive")}
+                        className={`px-4 py-2 rounded-md ${
+                          watch("status") === "inactive"
+                            ? "bg-primary-300 text-white"
+                            : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        Inactive
+                      </button>
+                    </div>
+                    {errors.status && (
+                      <p className="text-red-500 mt-2">
+                        User status is required
+                      </p>
+                    )}
+                  </div>
                 </div>
+              </div>
 
+              {/* right side */}
+              <div className="w-[40%]">
                 {/* Roles */}
                 {rolesData.length > 0 && (
-                  <div className="flex space-x-3 mt-3 w-full">
-                    <div className=" w-1/2 font-medium">Role</div>
-                    <div className="space-y-2 w-1/2">
+                  <div className="flex flex-col gap-3 w-full border-2 p-3 rounded-[20px]">
+                    <div className="font-semibold text-xl">Role</div>
+                    <div className="gap-3 flex flex-col w-1/2">
                       {rolesData.map((role: any) => {
                         return (
                           <div
@@ -223,15 +272,18 @@ function Page() {
                             className="flex items-center space-x-2"
                           >
                             <input
-                              type="Checkbox"
+                              id={role.name} // Match the label's htmlFor attribute
+                              type="checkbox"
                               value={role._id}
                               {...register("role", { required: true })}
-                              className=" text-blue-500"
+                              className="appearance-none w-4 h-4 border-2 border-primary-300 checked:bg-primary-100 checked:text-white rounded-full mt-1"
                             />
-                            <label htmlFor={role.name} className=" font-medium">
+                            <label
+                              htmlFor={role.name}
+                              className="font-medium cursor-pointer"
+                            >
                               {role.name}
                             </label>
-                            <FaQuestionCircle className="text-[#477BFF]" />
                           </div>
                         );
                       })}
@@ -243,9 +295,9 @@ function Page() {
                     </div>
                   </div>
                 )}
-
                 {/* Permissions */}
-                <div className="space-y-2 mt-3 w-full">
+
+                <div className="space-y-2 mt-3 w-full rounded-[20px] border-2 p-4">
                   {[
                     { label: "Auto Assign Survey", name: "auto_assign_survey" },
                     {
@@ -275,128 +327,23 @@ function Page() {
                       className="flex items-center w-full"
                     >
                       <div className="flex space-x-2 items-center w-1/2">
+                        <input
+                          id={permission.name} // Match the label's htmlFor attribute
+                          type="checkbox"
+                          {...register(`${permission.name as keyof IUser}`, {
+                            required: false,
+                          })}
+                          className="appearance-none cursor-pointer w-4 h-4 border-2 border-primary-300 checked:bg-primary-100 checked:text-white rounded-full mt-1"
+                        />
                         <label
                           htmlFor={permission.name}
-                          className=" font-medium"
+                          className=" font-medium cursor-pointer"
                         >
                           {permission.label}
                         </label>
-                        <FaQuestionCircle className="text-[#477BFF]" />
                       </div>
-                      <input
-                        type="checkbox"
-                        {...register(`${permission.name as keyof IUser}`, {
-                          required: false,
-                        })}
-                        className="rounded text-blue-500 float-end"
-                      />
                     </div>
                   ))}
-                </div>
-              </div>
-
-              {/* Right Section -> Assign Surveys */}
-              <div className="w-1/2">
-                <div className="space-y-4 p-2 rounded-lg border border-[#939393] max-h-fit">
-                  <p className="text-gray-700 font-medium">Assign Survey</p>
-
-                  <div className="flex justify-between">
-                    <input
-                      type="text"
-                      onChange={(e) => setFilter(e.target.value)}
-                      placeholder="Search survey"
-                      className="border border-gray-300 rounded-md px-2 py-1 w-4/5"
-                    />
-                    <button
-                      type="button"
-                      className="text-white bg-primary-300 p-1 px-4 rounded-md"
-                      onClick={() => {
-                        setPageNo(1);
-                        getSurveys();
-                      }}
-                    >
-                      Search
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {/* Select All functionality */}
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="selectAllUsers"
-                        checked={isAllSelected}
-                        onChange={(e) => {
-                          const isChecked = e.target.checked;
-                          setValue(
-                            "assigned_survey",
-                            isChecked ? surveys.map((s: any) => s._id) : [],
-                          );
-                        }}
-                        className="rounded text-blue-500"
-                      />
-                      <label
-                        htmlFor="selectAllUsers"
-                        className="text-gray-700 font-semibold"
-                      >
-                        Select All
-                      </label>
-                    </div>
-
-                    {/* Loop through surveys */}
-                    {surveys?.map((survey: any) => (
-                      <div
-                        key={survey._id}
-                        className="flex items-center space-x-2"
-                      >
-                        <input
-                          type="checkbox"
-                          {...register("assigned_survey")}
-                          value={survey._id}
-                          checked={assignedSurveys.includes(survey._id)} // Manage checked state
-                          onChange={(e) => {
-                            const selected = e.target.checked;
-                            if (selected) {
-                              setValue("assigned_survey", [
-                                ...assignedSurveys,
-                                survey._id,
-                              ]);
-                            } else {
-                              setValue(
-                                "assigned_survey",
-                                assignedSurveys.filter((s) => s !== survey._id),
-                              );
-                            }
-                          }}
-                          className="rounded text-blue-500"
-                        />
-                        <label className="text-gray-700">{survey.name}</label>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (pageNo > 1) setPageNo(pageNo - 1);
-                      }}
-                      className="text-white bg-primary-300 p-1 px-4 rounded-md"
-                    >
-                      Previous
-                    </button>
-                    <p className="text-xs">
-                      {pageNo} of {totalPages} Pages
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (pageNo < totalPages) setPageNo(pageNo + 1);
-                      }}
-                      className="text-white bg-primary-300 p-1 px-4 rounded-md"
-                    >
-                      Next
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -410,6 +357,7 @@ function Page() {
                 {userId ? "Update" : "Save"}
               </button>
               <button
+                onClick={()=>router.back()}
                 type="button"
                 className="bg-white border-[#7C7C7C] border-2  py-2 px-4 rounded-md "
               >

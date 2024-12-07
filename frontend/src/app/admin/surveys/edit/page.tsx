@@ -1,7 +1,6 @@
-"use client";
+"use client"
 
 import EditSurveysHeader from "@/components/surveys/EditSurveysHeader";
-import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import Loader from "@/components/ui/Loader";
 import { getSurvey, updateSurvey } from "@/networks/survey_networks";
@@ -13,12 +12,6 @@ import toast from "react-hot-toast";
 function Page() {
   const [surveyData, setSurveyData] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [welcomeImagePreview, setWelcomeImagePreview] = useState<string | null>(
-    null
-  );
-  const [thankyouImagePreview, setThankyouImagePreview] = useState<
-    string | null
-  >(null);
 
   const params = useSearchParams();
   const surveyId = params.get("survey_id");
@@ -41,31 +34,10 @@ function Page() {
   useEffect(() => {
     if (surveyData) {
       Object.keys(surveyData).forEach((key) => {
-        console.log("setting- ",key," to ",surveyData[key])
-        if (
-          key !== "questions" &&
-          key !== "welcome_image" &&
-          key !== "thankyou_image"
-        ) {
+        if (key !== "questions") {
           setValue(key, surveyData[key]);
         }
       });
-
-      if (surveyData?.welcome_image) {
-        const welcomeImageBase64 = Buffer.from(
-          surveyData.welcome_image.data
-        ).toString("base64");
-        const welcomeImageUrl = `data:image/jpeg;base64,${welcomeImageBase64}`;
-        setWelcomeImagePreview(welcomeImageUrl);
-      }
-
-      if (surveyData?.thankyou_image) {
-        const thankyouImageBase64 = Buffer.from(
-          surveyData.thankyou_image.data
-        ).toString("base64");
-        const thankyouImageUrl = `data:image/jpeg;base64,${thankyouImageBase64}`;
-        setThankyouImagePreview(thankyouImageUrl);
-      }
     }
   }, [surveyData, setValue]);
 
@@ -75,57 +47,17 @@ function Page() {
     const response = await getSurvey(params);
     setLoading(false);
     if (response.success) {
-      console.log("res=======",response)
       setSurveyData(response.data);
     } else {
       toast.error("Something went wrong");
     }
   }
 
-  function handleImageChange(e: any, type: string) {
-    const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-
-      // Update preview
-      if (type === "welcome_image") {
-        setWelcomeImagePreview(previewUrl);
-      } else if (type === "thankyou_image") {
-        setThankyouImagePreview(previewUrl);
-      }
-      console.log("setting type - ", type, " to ", e.target.files[0]);
-      setValue(type, [file]);
-    }
-  }
-
   async function submitHandler(data: any) {
-    const formData = new FormData();
-    console.log("dataaaaa------------>.", data.welcome_image[0]);
-    for (const key in data) {
-      if (key !== "welcome_image" && key !== "thankyou_image") {
-        formData.append(key, data[key] == null ? "" : data[key]);
-      }
-    }
-
-    if (data.welcome_image && data.welcome_image.length > 0) {
-      formData.append("welcome_image", data.welcome_image[0]);
-    } else if (welcomeImagePreview === null) {
-      formData.append("welcome_image", "");
-    }
-
-    // Handle thankyou image
-    if (data.thankyou_image && data.thankyou_image.length > 0) {
-      formData.append("thankyou_image", data.thankyou_image[0]);
-    } else if (thankyouImagePreview === null) {
-      formData.append("thankyou_image", "");
-    }
-
-    formData.append("created_by", "rohitchand490@gmail.com");
-
     setLoading(true);
     const params = {
       _id: surveyId,
-      formData,
+      formData: data,
     };
     try {
       const res = await updateSurvey(params);
@@ -141,16 +73,6 @@ function Page() {
     }
   }
 
-  function handleImageDelete(type: string) {
-    console.log("deleted", type);
-    if (type === "welcome_image") {
-      setWelcomeImagePreview(null);
-    } else if (type === "thankyou_image") {
-      setThankyouImagePreview(null);
-    }
-    setValue(type, []);
-  }
-
   return (
     <main className="flex flex-col w-full min-h-screen">
       <div className="w-full flex flex-grow flex-col gap-5">
@@ -164,7 +86,7 @@ function Page() {
           <Loader className="h-[50vh] w-full flex justify-center items-center" />
         )}
         {!loading && (
-          <form className="grid grid-cols-2 m-10">
+          <form className="grid grid-cols-2 m-10 border-2 bg-lighter-gray p-4 rounded-[20px]">
             {/* left */}
             <div className="flex flex-col gap-5 w-full">
               <div className="grid grid-cols-3">
@@ -176,132 +98,36 @@ function Page() {
                   className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
                 />
               </div>
-              {/* <div className="grid grid-cols-3">
-                <label className="text-secondary-300 font-medium">Header text</label>
-                <input
-                  value={surveyData?.header_text || ""}
-                  {...register("header_text")}
-                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
-                />
-              </div> */}
 
-              {/* Welcome Image */}
-              {/* <div className="grid grid-cols-3">
-                <label className="text-secondary-300 font-medium">
-                  Welcome image
-                </label>
-                <div className="col-span-2">
-                  <label className="flex items-center justify-between max-w-[352px] min-h-[41px] rounded-md cursor-pointer hover:bg-secondary-50">
-                    <div className="flex justify-between gap-2 bg-white h-full w-full">
-                    {welcomeImagePreview ? (
-                      <img
-                        src={welcomeImagePreview}
-                        alt="Welcome Preview"
-                        className="max-w-[60%] max-h-64 object-contain rounded-md"
-                      />
-                      ) : (
-                        <div className="h-[41px] w-[60%] bg-secondary-200 rounded-md"></div>
-                      )}
-                      <p className="border border-secondary-200 text-secondary-300 w-fit px-4 py-2 h-fit rounded-md flex items-center justify-center text-[14px]">
-                        Choose file
-                      </p>
-                    </div>
-                    <input
-                      {...register("welcome_image")}
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => handleImageChange(e, "welcome_image")}
-                    />
-                  </label>
-                  {
-                    welcomeImagePreview && (
-                      <ButtonBordered
-                            type="button"
-                            onClick={() => handleImageDelete("welcome_image")}
-                            className="text-red-500 border-red-500 hover:bg-red-500 mt-5 rounded-md flex justify-center items-center"
-                          >
-                            Delete
-                      </ButtonBordered>
-                    )
-                  }
-                </div>
-              </div> */}
-
-              {/* Thank You Image */}
-              {/* <div className="grid grid-cols-3">
-                <label className="text-secondary-300 font-medium">
-                  Thank you image
-                </label>
-                <div className="col-span-2">
-                  <label className="flex items-center justify-between w-[352px] min-h-[41px] rounded-md cursor-pointer hover:bg-secondary-50">
-                    <div className="flex justify-between gap-2 bg-white h-full w-full">
-                    {thankyouImagePreview ? (
-                        <img
-                          src={thankyouImagePreview}
-                          alt="Thank You Preview"
-                          className="max-w-[60%] max-h-64 object-contain rounded-md"
-                        />
-                        
-                      ) : (
-                        <div className="h-[41px] w-[60%] bg-secondary-200 rounded-md"></div>
-                      )}
-                      <div className="flex flex-col gap-2">
-                        <p className="border border-secondary-200 text-secondary-300 w-fit px-4 py-2 h-fit rounded-md flex items-center justify-center text-[14px]">
-                          Choose file
-                        </p>
+              {/* AC List */}
+              <div className="grid grid-cols-3">
+                <label className="text-secondary-300 font-medium">AC List</label>
+                <div className="col-span-2 px-4 py-[10px]">
+                  
+                  {surveyData.ac_list && surveyData.ac_list.length > 0 ? (
+                  surveyData.ac_list.map((item:any, index:number) => (
+                    <div className="flex flex-col">
+                      <span className="text-primary-300 font-bold">
+                        AC_NO: {item.ac_no}
+                      </span>
+                      <div className="flex gap-2">
+                        {
+                          item.booth_numbers.map((booth:string)=>booth.trim().length > 0 ? <span>{booth},</span>:null)
+                        }
                       </div>
                     </div>
-                    <input
-                      {...register("thankyou_image")}
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => handleImageChange(e, "thankyou_image")}
-                    />
-                  </label>
-                  {
-                    thankyouImagePreview && (
-                      <ButtonBordered
-                            type="button"
-                            onClick={() => handleImageDelete("thankyou_image")}
-                            className="text-red-500 border-red-500 hover:bg-red-500 mt-5 rounded-md flex justify-center items-center"
-                          >
-                            Delete
-                      </ButtonBordered>
-                    )
-                  }
+                  ))
+                ) : (
+                  <p className="text-secondary-300">This survey does'nt belong to an AC_NO</p>
+                )}
                 </div>
-              </div> */}
-
-              <div className="grid grid-cols-3">
-                <label className="text-secondary-300 font-medium">AC_NO</label>
-                <input
-                  disabled={true}
-                  {...register("ac_no")}
-                  type="text"
-                  value={surveyData?.ac_no || ""}
-                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
-                />
-              </div>
-              <div className="grid grid-cols-3">
-                <label className="text-secondary-300 font-medium">
-                  BOOTH_NO
-                </label>
-                <input
-                  disabled={true}
-                  {...register("booth_no")}
-                  type="text"
-                  value={surveyData?.booth_no || ""}
-                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md "
-                />
               </div>
             </div>
 
             {/* right */}
             <div className="flex flex-col gap-5 w-full">
               <div className="grid grid-cols-3">
-                <label className="text-secondary-300 font-medium">
-                  Access pin
-                </label>
+                <label className="text-secondary-300 font-medium">Access pin</label>
                 <input
                   {...register("access_pin")}
                   className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
@@ -313,9 +139,9 @@ function Page() {
                   Background location capture
                 </label>
                 <input
-                  type="number"
+                  type="checkbox"
                   {...register("background_location_capture")}
-                  className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
+                  className="border-secondary-200 h-1/2 px-4 py-[10px] focus:outline-none border rounded-md"
                 />
               </div>
             </div>

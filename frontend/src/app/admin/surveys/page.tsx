@@ -60,14 +60,14 @@ function Page() {
       <SurveyHeader setUpdated={setUpdatd}/>
 
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
-        <div className="flex justify-between">
+        <div className="flex gap-10 justify-between items-center">
           <input
             className="w-[387px] h-[42.5px] px-4 py-[10px] border border-secondary-200 rounded-md focus:outline-none text-[14px] text-secondary-300"
             placeholder="Search Surveys here"
             value={searchBarInput}
             onChange={(e) => setSearchBarInput(e.target.value)}
           />
-          <div className="flex gap-4">
+          <div className="flex items-center gap-4">
             <div className="flex  h-10 items-center space-x-1 text-secondary-300 font-semibold text-[14px] whitespace-nowrap">
               <p>Filter By:</p>
               <div className="rounded-md py-2 px-2 justify-between border border-secondary-200 bg-white">
@@ -111,13 +111,13 @@ function Page() {
                 height={20}
                 width={20}
               />
-              <p>Apply filters</p>
+              <p className="whitespace-nowrap">Apply filters</p>
             </ButtonFilled>
             <ButtonFilled
-              className="text-[14px] font-semibold flex gap-2 items-center justify-center"
+              className="text-[14px] font-semibold flex gap-2 items-center justify-center bg-dark-gray"
               onClick={handleClearFilters}
             >
-              <p>Clear Filters</p>
+              <p className="whitespace-nowrap">Clear Filters</p>
             </ButtonFilled>
           </div>
         </div>

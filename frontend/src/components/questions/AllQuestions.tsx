@@ -3,15 +3,16 @@
 import { useState } from "react";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import { questions, advanceQuestions } from "@/utils/devData";
+import { RiInputMethodFill, RiInputMethodLine } from "react-icons/ri";
 
 function AllQuestions() {
   const [level, setLevel] = useState("Standard");
   return (
     <aside className="h-full min-w-[283px] min-h-screen pt-4 pl-2 overflow-hidden">
       <div className="flex flex-col gap-2 w-full">
-        <button className="bg-my-blue-700 w-full text-[14px] font-semibold border text-white px-4 py-[10px] rounded-md text-left ">
+        <ButtonFilled className="w-full text-[14px] font-semibold border text-white px-4 py-[10px] rounded-md text-left ">
           Questionnaire
-        </button>
+        </ButtonFilled>
         <div className="flex gap-1">
           {level === "Standard" ? (
             <ButtonFilled
@@ -21,12 +22,12 @@ function AllQuestions() {
               Standard
             </ButtonFilled>
           ) : (
-            <button
+            <ButtonFilled
               onClick={() => setLevel("Standard")}
-              className="py-[10px] px-4 border rounded-md  w-full border-secondary-200 text-my-blue-700 text-[14px] font-semibold"
+              className="py-[10px] px-4 bg-dark-gray w-full font-semibold"
             >
               Standard
-            </button>
+            </ButtonFilled>
           )}
           {level === "Advance" ? (
             <ButtonFilled
@@ -36,12 +37,12 @@ function AllQuestions() {
               Advance
             </ButtonFilled>
           ) : (
-            <button
+            <ButtonFilled
               onClick={() => setLevel("Advance")}
-              className="py-[10px] px-4 border rounded-md  w-full border-secondary-200 text-my-blue-700 text-[14px] font-semibold"
+              className="py-[10px] px-4 bg-dark-gray w-full font-semibold"
             >
               Advance
-            </button>
+            </ButtonFilled>
           )}
         </div>
         <div className="flex flex-col gap-2 h-[600px] overflow-y-auto">
@@ -55,7 +56,7 @@ function AllQuestions() {
                   }}
                   className="p-2 flex gap-3 rounded-md bg-white cursor-grab"
                 >
-                  <div className="h-6 w-6 bg-secondary-400"></div>
+                  <RiInputMethodFill />
                   <div className="text-[14px] text-secondary-500">
                     {question}
                   </div>
@@ -70,7 +71,7 @@ function AllQuestions() {
                   }}
                   className="p-2 flex gap-3 rounded-md bg-white cursor-grab"
                 >
-                  <div className="h-6 w-6 bg-secondary-400"></div>
+                  <RiInputMethodFill />
                   <div className="text-[14px] text-secondary-500">
                     {question}
                   </div>

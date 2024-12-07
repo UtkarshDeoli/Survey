@@ -1,7 +1,7 @@
 "use client";
 import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
-import { getAllUsers } from "@/networks/user_networks";
+import { getAllUsers, updateUsers } from "@/networks/user_networks";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
@@ -9,28 +9,29 @@ import { IUser } from "@/types/user_interfaces";
 import Switch from "react-switch";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import Loader from "@/components/ui/Loader";
+import toast from "react-hot-toast";
 
 function page() {
   const [users, setUsers] = useState<any[]>([]);
   const [searchBarInput, setSearchBarInput] = useState<string>("");
-  const [limit,setLimit] = useState <number> (10);
-  const [page,setPage] = useState <number> (1);
-  const [totalPages,setTotalPages] = useState <number>(0);
-  const [loading,setLoading] = useState<boolean>(false);
+  const [limit, setLimit] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getData();
-  }, [limit,page]);
+  }, [limit, page]);
 
   async function getData() {
-    const params = {searchBarInput,page,limit}
+    const params = { searchBarInput, page, limit };
     setLoading(true);
     const res: any = await getAllUsers(params);
     setLoading(false);
     console.log("res::::", res);
     if (res.error) return;
     setUsers(res.data);
-    setTotalPages(res.totalPages)
+    setTotalPages(res.totalPages);
   }
   const router = useRouter();
 
@@ -39,37 +40,47 @@ function page() {
   }
   const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLimit = parseInt(e.target.value, 10);
-    setLimit(newLimit)
-    setPage(1)
+    setLimit(newLimit);
+    setPage(1);
   };
 
   const handleNextPage = () => {
     if (page < totalPages) {
-      setPage(page + 1)
+      setPage(page + 1);
     }
   };
 
   const handlePreviousPage = () => {
     if (page > 1) {
-      setPage(page-1)
+      setPage(page - 1);
     }
   };
-  const doNothing = () => {}
+  const doNothing = async(user_id:string,status:string) => {
+    const response = await updateUsers({user_id,status})
+    if(response){
+      toast.success("User status updated successfully!");
+      getData()
+    }
+  };
   return (
-    <div className="w-full bg-[#ECF0FA] text-sm h-full">
+    <div className="w-full bg-[#ECF0FA] text-sm ">
       <nav className="h-16 w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Users</h1>
         </div>
         <div className="flex justify-end space-x-3 text-xs">
-          <ButtonFilled onClick={()=>router.push("/admin/users/manage-roles")} className="bg-my-blue-600">Manage Roles</ButtonFilled>
           <ButtonFilled
+            onClick={() => router.push("/admin/users/manage-roles")}
+          >
+            Manage Roles
+          </ButtonFilled>
+          {/* <ButtonFilled
             onClick={() => {
               router.push("./users/add-multiple-users");
             }}
           >
             Add Multiple Users
-          </ButtonFilled>
+          </ButtonFilled> */}
           <ButtonFilled
             onClick={() => {
               router.push("./users/add-user");
@@ -77,7 +88,7 @@ function page() {
           >
             Add User
           </ButtonFilled>
-          <ButtonFilled>Export Users</ButtonFilled>
+          {/* <ButtonFilled>Export Users</ButtonFilled> */}
         </div>
       </nav>
 
@@ -105,14 +116,14 @@ function page() {
               Search
             </ButtonFilled>
             <div className="flex space-x-3">
-              <ButtonBordered>Reset</ButtonBordered>
+              <ButtonFilled className="bg-dark-gray">Reset</ButtonFilled>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="w-full px-5 py-5 text-sm">
-        <div className="grid grid-cols-5 text-white bg-primary-300 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+      <div className="relative w-[96%] mx-auto text-sm h-[70vh] overflow-y-auto vertical-scrollbar">
+        <div className="sticky top-0 left-0 z-10 grid grid-cols-5 text-white bg-dark-gray font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1 flex justify-center items-center">Name</p>
           <p className="col-span-1 flex justify-center items-center">
             Username
@@ -124,13 +135,16 @@ function page() {
             <p className="flex justify-center items-center">Action</p>
           </div>
         </div>
-        {loading && <Loader className="h-[50vh] flex justify-center items-center w-full"/>}
-        {!loading && users &&
+        {loading && (
+          <Loader className="h-[50vh] flex justify-center items-center w-full" />
+        )}
+        {!loading &&
+          users &&
           users.length !== 0 &&
           users.map((user, index) => (
             <div
               key={index}
-              className="bg-white border grid px-8 py-[16px] grid-cols-5 text-center text-black"
+              className="bg-mid-gray border-2 grid p-2 grid-cols-5 text-center text-black"
             >
               <p className="col-span-1 flex justify-center items-center">
                 {user.name}
@@ -143,7 +157,7 @@ function page() {
               </p>
               <div className="col-span-1 flex justify-center items-center">
                 <div className="flex flex-wrap gap-1 justify-center">
-                  {user.role.map((role:any, roleIndex:number) => (
+                  {user.role.map((role: any, roleIndex: number) => (
                     <span key={roleIndex} className="whitespace-nowrap">
                       {role.name}
                       {roleIndex < user.role.length - 1 ? "," : ""}
@@ -154,7 +168,7 @@ function page() {
               <div className="flex justify-center gap-12 items-center">
                 {/* <p className="p-3 text-white">{user.status === 'active' ? <Active /> : <Inactive />}</p> */}
                 <Switch
-                  onChange={() => doNothing()}
+                  onChange={() => doNothing(user._id,user.status === 'active'?'inactive':'active')}
                   checked={user.status === "active" ? true : false}
                   onColor="#4CAF50"
                   offColor="#DDDDDD"
@@ -163,7 +177,7 @@ function page() {
                   className="transition-switch duration-300 ease-in-out"
                 />
                 <p
-                  className="p-3"
+                  className="p-3 cursor-pointer"
                   onClick={() => {
                     handleEditUser(user._id);
                   }}
@@ -173,52 +187,49 @@ function page() {
               </div>
             </div>
           ))}
-        {
-          !loading && (
-            <div className="flex gap-3 items-center mt-4">
-                  {/* Limit Select */}
-                  <div>
-                    <label htmlFor="limit-select" className="mr-2">
-                      Show:
-                    </label>
-                    <select
-                      id="limit-select"
-                      value={limit}
-                      onChange={handleLimitChange}
-                      className="p-2 border rounded-md"
-                    >
-                      <option value={10}>10</option>
-                      <option value={20}>20</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                  </div>
-
-                  {/* Navigation Arrows */}
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={handlePreviousPage}
-                      disabled={page === 1}
-                      className="p-2 border rounded-md disabled:opacity-50"
-                    >
-                      <IoIosArrowBack />
-                    </button>
-                    <span>
-                      Page {page} of {totalPages}
-                    </span>
-                    <button
-                      onClick={handleNextPage}
-                      disabled={page === totalPages}
-                      className="p-2 border rounded-md disabled:opacity-50"
-                    >
-                      <IoIosArrowForward />
-                    </button>
-                  </div>
-            </div>
-          )
-        }
       </div>
+      {!loading && (
+        <div className="flex gap-3 items-center mt-4 ml-4 pb-3">
+          {/* Limit Select */}
+          <div>
+            <label htmlFor="limit-select" className="mr-2">
+              Show:
+            </label>
+            <select
+              id="limit-select"
+              value={limit}
+              onChange={handleLimitChange}
+              className="p-2 border rounded-md"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
 
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowBack />
+            </button>
+            <span>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalPages}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

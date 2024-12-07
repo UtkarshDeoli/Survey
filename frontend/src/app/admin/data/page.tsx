@@ -33,7 +33,7 @@ function page() {
     setLoading(true)
     const response = await getAllSurveyResponses(params)
     if(response.success){
-      console.log(response)
+      console.log("response -----",response)
       setData(response.data)
     }
     setLoading(false)
@@ -44,9 +44,9 @@ function page() {
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Surveys Data</h1>
         </div>
-        <ButtonBordered className="bg-white font-semibold">
+        {/* <ButtonBordered className="bg-white font-semibold">
           Uploaded Summary
-        </ButtonBordered>
+        </ButtonBordered> */}
       </nav>
 
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
@@ -62,10 +62,10 @@ function page() {
               <p>Search</p>
             </ButtonFilled>
             <div className="flex space-x-3 ">
-              <ButtonBordered onClick={()=>{
+              <ButtonFilled className="bg-dark-gray text-white" onClick={()=>{
                   setSearchValue("")
                   setReset(!reset)
-                }}>Reset</ButtonBordered>
+                }}>Reset</ButtonFilled>
             </div>
           </div>
           <div className="flex items-center space-x-10 ">
@@ -86,7 +86,7 @@ function page() {
       </div>
 
       <div className="w-full px-5 py-5 text-sm">
-        <div className="grid grid-cols-7 text-white bg-primary-300 font-semibold px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+        <div className="grid grid-cols-4 text-white bg-dark-gray font-semibold px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1">Names</p>
           <p className="col-span-1 flex justify-center items-center">
             Responses
@@ -95,17 +95,9 @@ function page() {
             Analytics
           </p>
           <p className="col-span-1 flex justify-center items-center">
-            Daily Report
+            AC list
           </p>
-          <p className="col-span-1 flex justify-center items-center">
-            Summary Report
-          </p>
-          <p className="col-span-1 flex justify-center items-center">
-            Spatial Report
-          </p>
-          <p className="col-span-1 flex justify-center items-center">
-            Scoring Report
-          </p>
+          
         </div>
         {loading && (
           <Loader className="h-[50vh] w-full flex justify-center items-center text-primary-300" />
@@ -113,12 +105,12 @@ function page() {
         {!loading &&
           data.length > 0 ? data.map((el: any, index: number) => (
             <div
-              onClick={()=>router.push(`/admin/data/survey-responses?survey_id=${el.survey_id}&ac_no=${el.ac_no}&booth_no=${el.booth_no}`)}
+              onClick={()=>router.push(`/admin/data/survey-responses?survey_id=${el.survey_id}`)}
               key={index}
-              className="grid cursor-pointer grid-cols-7 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-white"
+              className="grid cursor-pointer grid-cols-4 p-4 border-l border-r border-b border-secondary-200 w-full bg-mid-gray"
             >
               <div className="col-span-1 flex flex-col">
-                <p className="">{el.surveyName}</p>
+                <p className="font-semibold">{el.surveyName}</p>
                 <p className="text-[13px] text-my-gray-200">{formatDate(el.surveyCreatedAt)}</p>
               </div>
               <button onClick={()=>router.push(`/admin/data/survey-responses?survey_id=${el.survey_id}`)} className="col-span-1 flex justify-center items-center">
@@ -134,18 +126,10 @@ function page() {
                   className="cursor-pointer"
                 />
               </p>
-              <p className="col-span-1 flex justify-center items-center">
-                <BsClipboardData size={24} />
-              </p>
-              <p className="col-span-1 flex justify-center items-center">
-                <BsListTask size={24} />
-              </p>
-              <p className="col-span-1 flex justify-center items-center">
-                <BsLayersHalf size={24} />
-              </p>
-              <p className="col-span-1 flex justify-center items-center">
-                <BsClipboardPlus size={24} />
-              </p>
+              <div className="col-span-1 flex justify-center items-center">
+                {!el.ac_list && <p></p>}
+                {el.ac_list && el.ac_list.length > 0 ? <p className="text-green-600 font-semibold">AC list included</p> : <p className="text-primary-300 font-semibold">AC list not included</p>}
+              </div>
             </div>
           )) : (
             <div className="flex justify-center items-center h-[30vh] w-full">

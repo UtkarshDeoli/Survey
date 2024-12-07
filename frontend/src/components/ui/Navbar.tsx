@@ -26,7 +26,7 @@ function Navbar() {
     }
   }, [router]);
   return (
-    <nav className="sticky z-50 top-0 flex px-8 py-[18px] h-[80px] shadow-md justify-between bg-white">
+    <nav className="sicky z-50 top-0 flex px-8 py-[18px] h-[80px] shadow-md justify-end gap-5 bg-white">
      
       {/* </ButtonBordered> */}
       {userData && (

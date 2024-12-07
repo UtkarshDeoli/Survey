@@ -60,14 +60,22 @@ function page() {
       setPage(page - 1);
     }
   };
-  const doNothing = async ({ id, status }: { id: string; status: string }) => {
-    const params = { id, status };
+  const doNothing = async ({
+    id,
+    status,
+    role,
+  }: {
+    id: string;
+    status: string;
+    role: string;
+  }) => {
+    const params = { id, status, role };
     await updateKaryakarta(params);
     getData();
   };
 
   return (
-    <div className="w-full bg-[#ECF0FA] text-sm h-full">
+    <div className="w-full bg-[#ECF0FA] text-sm">
       <nav className="h-16 w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">All Karyakarta</h1>
@@ -102,21 +110,22 @@ function page() {
               Search
             </ButtonFilled>
             <div className="flex space-x-3">
-              <ButtonBordered
+              <ButtonFilled
+                className="bg-dark-gray"
                 onClick={() => {
                   setSearchBarInput("");
                   setReset(!reset);
                 }}
               >
                 Reset
-              </ButtonBordered>
+              </ButtonFilled>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="w-full px-5 py-5 text-sm">
-        <div className="grid grid-cols-5 text-white bg-primary-300 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
+      <div className="w-[96%] mx-auto text-sm h-[70vh] overflow-auto vertical-scrollbar">
+        <div className="grid grid-cols-5 text-white bg-dark-gray sticky top-0 left-0 z-10 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1 flex justify-center items-center">Name</p>
           <p className="col-span-1 flex justify-center items-center">
             Username
@@ -137,7 +146,7 @@ function page() {
           users.map((user, index) => (
             <div
               key={index}
-              className="bg-white border grid px-8 py-[16px] grid-cols-5 text-center text-black"
+              className="bg-mid-gray border-2 grid p-2 grid-cols-5 text-center text-black"
             >
               <p className="col-span-1 flex justify-center items-center">
                 {user.name}
@@ -167,6 +176,7 @@ function page() {
                     doNothing({
                       id: user._id,
                       status: user.status === "active" ? "inactive" : "active",
+                      role: user.role[0]._id,
                     })
                   }
                   checked={user.status === "active" ? true : false}
@@ -187,80 +197,49 @@ function page() {
               </div>
             </div>
           ))}
-        {!loading && (
-          <div className="flex gap-3 items-center mt-4">
-            {/* Limit Select */}
-            <div>
-              <label htmlFor="limit-select" className="mr-2">
-                Show:
-              </label>
-              <select
-                id="limit-select"
-                value={limit}
-                onChange={handleLimitChange}
-                className="p-2 border rounded-md"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-
-            {/* Navigation Arrows */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handlePreviousPage}
-                disabled={page === 1}
-                className="p-2 border rounded-md disabled:opacity-50"
-              >
-                <IoIosArrowBack />
-              </button>
-              <span>
-                Page {page} of {totalPages}
-              </span>
-              <button
-                onClick={handleNextPage}
-                disabled={page === totalPages}
-                className="p-2 border rounded-md disabled:opacity-50"
-              >
-                <IoIosArrowForward />
-              </button>
-            </div>
-          </div>
-        )}
       </div>
-
-      {/* <CustomModal
-        open={publishModal}
-        closeModal={() => {
-          setPublishModal(false);
-          setSurveyToPublish(null);
-          setisSurveyPublished(null);
-        }}
-      >
-        <div className="flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
-          <h1 className="text-xl">
-            Do you want to {isSurveyPublished ? "Unpublish" : "Publish"} this
-            survey?
-          </h1>
-          <div className="flex gap-2">
-            <ButtonFilled onClick={handlePublishSurvey} className="w-40">
-              {isSurveyPublished ? "Unpublish" : "Publish"}
-            </ButtonFilled>
-            <ButtonFilled
-              onClick={() => {
-                setPublishModal(false);
-                setSurveyToPublish(null);
-                setisSurveyPublished(null);
-              }}
-              className="w-40"
+      {!loading && (
+        <div className="flex gap-3 items-center mt-4 ml-4 pb-4">
+          {/* Limit Select */}
+          <div>
+            <label htmlFor="limit-select" className="mr-2">
+              Show:
+            </label>
+            <select
+              id="limit-select"
+              value={limit}
+              onChange={handleLimitChange}
+              className="p-2 border rounded-md"
             >
-              No
-            </ButtonFilled>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
+
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowBack />
+            </button>
+            <span>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalPages}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowForward />
+            </button>
           </div>
         </div>
-      </CustomModal> */}
+      )}
     </div>
   );
 }

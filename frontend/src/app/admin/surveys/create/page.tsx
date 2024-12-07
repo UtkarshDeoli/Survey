@@ -1,28 +1,17 @@
 "use client";
 
-import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import Loader from "@/components/ui/Loader";
 import { createSurvey } from "@/networks/survey_networks";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 function Page() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [welcomeImagePreview, setWelcomeImagePreview] = useState<string | null>(
-    null
-  );
-  const [thankyouImagePreview, setThankyouImagePreview] = useState<
-    string | null
-  >(null);
-
-  const params = useSearchParams();
-  const name = params.get("name");
-  const AC_NO = params.get("ac_no")
-  const BOOTH_NO = params.get("booth_no")
-
+  const [name, setName] = useState<string>("");
+  const [acList, setAcList] = useState<any[]>([]); // Array of AC List entries
   const router = useRouter();
 
   const {
@@ -33,81 +22,48 @@ function Page() {
   } = useForm();
 
   useEffect(() => {
-    if (name) {
-      setValue("name", name);
-    }
-    if (AC_NO) {
-      setValue("ac_no", AC_NO);
-    }
-    if (BOOTH_NO) {
-      setValue("booth_no", BOOTH_NO);
-    }
-  }, [name, AC_NO, BOOTH_NO]);
+    const searchParams = new URLSearchParams(window.location.search);
 
-  function handleImageChange(e: any, type: string) {
-    const file = e.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
+    // Fetch 'name' and 'ac_list' from the search parameters
+    const nameParam = searchParams.get("name");
+    const acListParam = searchParams.get("ac_list");
 
-      // Update preview
-      if (type === "welcome_image") {
-        setWelcomeImagePreview(previewUrl);
-      } else if (type === "thankyou_image") {
-        setThankyouImagePreview(previewUrl);
+    if (nameParam) {
+      setName(nameParam);
+      setValue("name", nameParam);
+    }
+
+    if (acListParam) {
+      try {
+        const parsedAcList = JSON.parse(decodeURIComponent(acListParam));
+        console.log("parsedAC_LIST",parsedAcList)
+        setAcList(parsedAcList);
+      } catch (error) {
+        console.error("Failed to parse AC List:", error);
       }
-      console.log("setting type - ", type, " to ", e.target.files[0]);
-      setValue(type, [file]);
     }
-  }
+  }, [setValue]);
+
 
   async function submitHandler(data: any) {
-    console.log("Submitting form", data);
-    const formData = new FormData();
-    for (const key in data) {
-      if (key !== "welcome_image" && key !== "thankyou_image") {
-        const value = data[key] ?? "";
-        formData.append(key, value);
-      }
+    if(acList){
+      data.ac_list = acList;
     }
-    if (data.welcome_image && data.welcome_image[0]) {
-      formData.append("welcome_image", data.welcome_image[0]);
-    }
-    if (data.thankyou_image && data.thankyou_image[0]) {
-      formData.append("thankyou_image", data.thankyou_image[0]);
-    }
-
-    formData.append("created_by", "rohitchand490@gmail.com");
-
+    console.log("submitted data is ----->",data);
     setLoading(true);
 
     try {
-      const res = await createSurvey(formData);
-      console.log(res);
-      if (res.success) {
+      const response = await createSurvey(data)
+      if(response.success){
         toast.success("Survey created successfully!");
-        router.replace(
-          `/admin/surveys/questions?id=${
-            res.survey._id
-          }&created_by=${encodeURIComponent(res.survey.created_by)}`
-        );
-      } else {
-        toast.error("Failed to create survey.");
+        router.replace(`/admin/surveys/questions?name=${name}&id=${response.survey._id}`);
       }
     } catch (error) {
-      toast.error("Something went wrong.");
+      console.log("error in creating survey ---=-=-=->",error)
+      toast.error("Something went wrong while creating the survey.");
     } finally {
       setLoading(false);
     }
-  }
-
-  function handleImageDelete(type: string) {
-    console.log("deleted", type);
-    if (type === "welcome_image") {
-      setWelcomeImagePreview(null);
-    } else if (type === "thankyou_image") {
-      setThankyouImagePreview(null);
-    }
-    setValue(type, []);
   }
 
   if (loading) {
@@ -126,178 +82,83 @@ function Page() {
         </div>
       </header>
 
-      {/* form */}
       <form
-        className="grid grid-cols-2 m-10"
+        onSubmit={handleSubmit(submitHandler)}
+        className="grid grid-cols-2 m-10 border-2 bg-lighter-gray p-4 rounded-[20px]"
       >
-        {/* left */}
+        {/* Left section */}
         <div className="flex flex-col gap-5 w-full">
           <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">Name</label>
-            <input
-              value={name || ""}
-              disabled
-              {...register("name")}
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
-            />
-          </div>
-          {/* <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">
-              Header text
-            </label>
-            <input
-              {...register("header_text")}
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
-            />
-          </div>
-
-          <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">
-              Welcome image
-            </label>
-            <div className="col-span-2">
-              <label className="flex items-center justify-between max-w-[352px] min-h-[41px] rounded-md cursor-pointer hover:bg-secondary-50">
-                <div className="flex justify-between gap-2 bg-white h-full w-full">
-                  {welcomeImagePreview ? (
-                    <img
-                      src={welcomeImagePreview}
-                      alt="Welcome Preview"
-                      className="max-w-[60%] max-h-64 object-contain rounded-md"
-                    />
-                  ) : (
-                    <div className="h-[41px] w-[60%] bg-secondary-200 rounded-md"></div>
-                  )}
-                  <p className="border border-secondary-200 text-secondary-300 w-fit px-4 py-2 h-fit rounded-md flex items-center justify-center text-[14px]">
-                    Choose file
-                  </p>
-                </div>
-                <input
-                  {...register("welcome_image")}
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => handleImageChange(e, "welcome_image")}
-                />
-              </label>
-              {welcomeImagePreview && (
-                <ButtonBordered
-                  type="button"
-                  onClick={() => handleImageDelete("welcome_image")}
-                  className="text-red-500 border-red-500 hover:bg-red-500 mt-5 rounded-md flex justify-center items-center"
-                >
-                  Delete
-                </ButtonBordered>
-              )}
+            <label className="text-secondary-300 font-medium my-auto">Name</label>
+            <div className="col-span-2 w-[352px] h-[41px] px-4 py-[10px]">
+              {name}
             </div>
           </div>
-          <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">
-              Thank you image
-            </label>
-            <div className="col-span-2">
-              <label className="flex items-center justify-between w-[352px] min-h-[41px] rounded-md cursor-pointer hover:bg-secondary-50">
-                <div className="flex justify-between gap-2 bg-white h-full w-full">
-                  {thankyouImagePreview ? (
-                    <img
-                      src={thankyouImagePreview}
-                      alt="Thank You Preview"
-                      className="max-w-[60%] max-h-64 object-contain rounded-md"
-                    />
-                  ) : (
-                    <div className="h-[41px] w-[60%] bg-secondary-200 rounded-md"></div>
-                  )}
-                  <div className="flex flex-col gap-2">
-                    <p className="border border-secondary-200 text-secondary-300 w-fit px-4 py-2 h-fit rounded-md flex items-center justify-center text-[14px]">
-                      Choose file
-                    </p>
-                  </div>
-                </div>
-                <input
-                  {...register("thankyou_image")}
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => handleImageChange(e, "thankyou_image")}
-                />
-              </label>
-              {thankyouImagePreview && (
-                <ButtonBordered
-                  type="button"
-                  onClick={() => handleImageDelete("thankyou_image")}
-                  className="text-red-500 border-red-500 hover:bg-red-500 mt-5 rounded-md flex justify-center items-center"
-                >
-                  Delete
-                </ButtonBordered>
-              )}
+          <div className="grid grid-cols-3 ">
+            <label className="text-secondary-300 font-medium my-auto">AC List</label>
+            <div className="col-span-2 w-[352px] h-[100px] px-4 py-[10px] ">
+              <ul className="space-y-2">
+                {acList && acList.length > 0 ? (
+                  acList.map((item, index) => (
+                    <div className="flex flex-col">
+                      <span className="text-primary-300 font-bold">
+                        AC_NO: {item.ac_no}
+                      </span>
+                      <div className="flex gap-2">
+                        {
+                          item.booth_numbers.map((booth:string)=>booth.trim().length > 0 ? <span>{booth},</span>:null)
+                        }
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-secondary-300">No items available.</p>
+                )}
+              </ul>
             </div>
-          </div>
-
-          <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">
-              Time duration
-            </label>
-            <input
-              {...register("thank_time_duration")}
-              type="number"
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
-            />
-          </div> */}
-          <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">
-              AC_NO
-            </label>
-            <input
-              disabled={true}
-              {...register("ac_no")}
-              type="text"
-              // value={AC_NO||""}
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md"
-            />
-          </div>
-          <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">
-              BOOTH_NO
-            </label>
-            <input
-              disabled={true}
-              {...register("booth_no")}
-              type="text"
-              // value={BOOTH_NO||""}
-              className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md "
-            />
           </div>
         </div>
 
-        {/* right */}
+        {/* Right section */}
         <div className="flex flex-col gap-5 w-full">
-          <div className="grid grid-cols-3">
-            <label className="text-secondary-300 font-medium">Access pin</label>
+          <div className="grid grid-cols-3 ">
+            <label className="text-secondary-300 font-medium">Access Pin</label>
             <input
               type="number"
               {...register("access_pin")}
               className="col-span-2 w-[352px] h-[41px] border-secondary-200 px-4 py-[10px] focus:outline-none border rounded-md [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-3 ">
             <label className="text-secondary-300 font-medium">
-              Background location capture
+              Background Location Capture
             </label>
             <input
               type="checkbox"
               {...register("background_location_capture")}
-              className="border-secondary-200 focus:outline-none border rounded-md"
+              className="border-secondary-200 focus:outline-none border h-3/4 rounded-md"
             />
           </div>
         </div>
+
+        {/* Buttons */}
+        <div className="col-span-2 flex gap-4 justify-end mt-10">
+          <ButtonFilled
+            type="submit"
+            className="px-4 py-[10px] w-[95px]"
+            disabled={isSubmitting}
+          >
+            Save
+          </ButtonFilled>
+          <button
+            onClick={() => router.back()}
+            type="button"
+            className="px-4 py-[10px] w-[95px] border border-secondary-200 rounded-md"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
-      <div className="sticky bottom-0 left-0 py-2 px-5 bg-white col-span-2 flex gap-4 justify-end mt-[10%] border-t border-gray-200">
-        <ButtonFilled onClick={handleSubmit(submitHandler)} className="px-4 py-[10px] w-[95px]">Save</ButtonFilled>
-        <button
-          onClick={()=>router.back()}
-          type="button"
-          className="px-4 py-[10px] w-[95px] border border-secondary-200 rounded-md"
-        >
-          Cancel
-        </button>
-      </div>
     </section>
   );
 }

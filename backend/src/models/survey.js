@@ -3,36 +3,22 @@ const Schema = Mongoose.Schema;
 
 const surveySchema = new Schema(
   {
-    created_by: {
-      type: String,
-      required: true,
-    },
-    children_survey: [],
     name: {
       type: String,
       required: true,
     },
-    ac_no: {
-      type: String,
-      required: true,
-    },
-    booth_no: {
-      type: String,
-      required: true,
-    },
-    // header_text: {
-    //     type: String,
-    // },
-    // welcome_image: {
-    //     type: Buffer,
-    // },
-    // thankyou_image: {
-    //     type: Buffer,
-    // },
-    // thank_time_duration: {
-    //     type: Number,
-    //     required: false,
-    // },
+    ac_list:[
+      {
+        ac_no: {
+          type: String,
+        },
+        booth_numbers: [
+          {
+            type: String,
+          },
+        ],
+      }
+    ],
     access_pin: {
       type: String,
     },
@@ -55,16 +41,9 @@ const surveySchema = new Schema(
   },
   {
     timestamps: true,
-    // toJSON: { virtuals: true },
-    // toObject: { virtuals: true },
   },
 );
 
-// surveySchema.virtual("responses", {
-//   ref: "Response99",
-//   foreignField: "survey_id",
-//   localField: "_id",
-// });
 
 const Survey = Mongoose.model("Survey99", surveySchema);
 

@@ -8,6 +8,7 @@ import { getSurvey, updateSurvey } from "@/networks/survey_networks";
 import toast from "react-hot-toast";
 import Loader from "../ui/Loader";
 import { saveResponses } from "@/networks/response_networks";
+import ButtonFilled from "../ui/buttons/ButtonFilled";
 
 
 
@@ -93,8 +94,8 @@ function SurveyForm() {
   async function handleSubmitForm(data: any) {
     console.log(data);
     const questions = data.questions || [];
-    const formData = { created_by, questions };
-    const params = { _id, created_by, formData };
+    const formData = {questions };
+    const params = { _id, formData };
     const response = await updateSurvey(params);
     if (response.success) {
       toast.success("Questions updated in survey!");
@@ -283,12 +284,12 @@ function SurveyForm() {
         </form>
       </div>
       <div className="sticky bottom-0 left-0 w-full bg-white border-t border-gray-200 py-2 px-4 flex justify-end z-10">
-        <button
+        <ButtonFilled
           onClick={handleSubmit(handleSubmitForm)} // Trigger form submission
-          className="px-6 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
+          className="font-semibold"
         >
           Save Changes
-        </button>
+        </ButtonFilled>
       </div>
     </main>
   );

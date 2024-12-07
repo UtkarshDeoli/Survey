@@ -14,6 +14,7 @@ import {
   get_karyakarta,
   get_panna_pramukh,
   updateMultipleKaryakarta,
+  get_panna_pramukh_ac_list,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -281,6 +282,23 @@ export const getPannaPramukh= async (params: any) => {
         Authorization: `Bearer ${bearerToken}`,
       },
       params
+    };
+    const response = await axios.request(options);
+    return response.data.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+export const getPannaPramukhByAcList= async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "POST",
+      url: `${SERVER_URI}/${get_panna_pramukh_ac_list}`,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+      data:params
     };
     const response = await axios.request(options);
     return response.data.data;

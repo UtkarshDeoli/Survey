@@ -18,7 +18,8 @@ const config: Config = {
         "300": "300ms",
       },
       fontFamily:{
-        'nunito-sans':["Nunito Sans", "sans-serif"]
+        'nunito-sans':["Nunito Sans", "sans-serif"],
+        'montserrat':["Montserrat", "sans-serif"]
       },
       boxShadow:{
         floating: "0 35px 60px -15px rgba(0, 0, 0, 0.3)",
@@ -53,7 +54,8 @@ const config: Config = {
         "red-offline": "#f61818",
         "light-gray":"#F2F8FC",
         "dark-gray":"#525151",
-        "lighter-gray":"#FAFAFA"
+        "lighter-gray":"#FAFAFA",
+        "mid-gray":"#EAEAEA"
       },
     },
   },

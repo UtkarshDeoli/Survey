@@ -5,6 +5,7 @@ import Sidebar from "@/components/ui/Sidebar";
 import { Toaster } from "react-hot-toast";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { CreateSurveyContextProvider } from "@/store/createSurveyContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,7 +26,11 @@ function Layout({ children }: LayoutProps) {
       <Sidebar onSidebarToggle={handleToggle} sidebarOpen={sidebarOpen} />
       <div className={`flex flex-col flex-1`}>
         <Navbar />
-        <main className="flex-1 h-full overflow-auto">{children}</main>
+        <main className="flex-1 h-full overflow-auto">
+          <CreateSurveyContextProvider>
+            {children}
+          </CreateSurveyContextProvider>
+        </main>
       </div>
       {/* "w-[calc(100vw-250px)]"  */}
       <Toaster />

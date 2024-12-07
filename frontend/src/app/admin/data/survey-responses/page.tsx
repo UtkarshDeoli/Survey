@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import {
   getAllUsers,
   getPannaPramukh,
+  getPannaPramukhByAcList,
 } from "@/networks/user_networks";
 
 import { useRouter } from "next/navigation"; // For routing
@@ -60,7 +61,6 @@ function Page() {
   const [selectedPanna, setSelectedPanna] = useState<string | null>(null);
   const [surveyQuestions, setSurveyQuestions] = useState<any>(null);
   //response selection states
-  const [selectedResponses, setSelectedResponses] = useState<string[]>([]);
   const [dataToExport, setDataToExport] = useState<any>(null);
 
   //  pagination
@@ -70,13 +70,12 @@ function Page() {
 
   // downloading
   const [downloading,setDownloading] = useState<boolean>(false)
+  const [acList,setAcList] = useState<any>([]);
 
   
 
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
-  const ac_no = searchParams.get("ac_no");
-  const booth_no = searchParams.get("booth_no");
   const router = useRouter();
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -88,9 +87,12 @@ function Page() {
     getUsers();
   }, [reset,page,pageLimit]);
 
+
   useEffect(() => {
-    handleGetPannaPramukh();
-  }, [userSearch]);
+    if(acList.length > 0){
+      handleGetPannaPramukh();
+    }
+  }, [userSearch,acList]);
 
   async function getUserResponses() {
     let nStartDate, nEndDate;
@@ -134,8 +136,15 @@ function Page() {
 
   async function getQuestions() {
     const response = await getSurvey({ _id: surveyId });
-    const questions = response.data.questions.map((el: any) => el);
-    setSurveyQuestions(questions);
+    console.log("current survey-->",response);
+    if(response.success){
+      console.log("setting ac_list",response.data.ac_list)
+      setAcList(response.data.ac_list);
+      const questions = response.data.questions.map((el: any) => el);
+      setSurveyQuestions(questions);
+    }else{
+      toast.error("Error fetching the survey!")
+    }
   }
 
   async function getUsers() {
@@ -147,9 +156,9 @@ function Page() {
   }
   async function handleGetPannaPramukh() {
     setLoading(true);
-    const response = await getPannaPramukh({
-      ac_no,
-      booth_no,
+    console.log("ac list is coming  --->",acList)
+    const response = await getPannaPramukhByAcList({
+      ac_list:acList,
       filter: userSearch,
     });
     console.log("panna below-------->", response);
@@ -361,9 +370,13 @@ function Page() {
             </div>
 
             <div>
-              <ButtonFilled onClick={() => setUserModal(true)}>
-                Assign Data
-              </ButtonFilled>
+              {
+                acList && acList.length > 0 && (
+                  <ButtonFilled onClick={() => setUserModal(true)}>
+                    Assign Data
+                  </ButtonFilled>
+                )
+              }
             </div>
           </div>
         </div>

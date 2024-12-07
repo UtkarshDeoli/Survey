@@ -61,6 +61,7 @@ exports.addMultipleUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { user_id, ...userData } = req.body;
+    console.log("update user is hitting",req.body);
     console.log(req.body);
     if (!user_id) {
       return res.status(400).json({ error: "Username is required" });
@@ -336,35 +337,34 @@ exports.createKaryakarta = async (req, res) => {
   }
 };
 
-exports.updateMultipleKaryakarta = async (req, res) => { //for assigining data
+exports.updateMultipleKaryakarta = async (req, res) => {
+  //for assigining data
   try {
     const { id, surveyId, responses } = req.body;
     console.log(req.body);
-    const data = await Data.findOne({ survey_id: surveyId ,user_id:id});
-    console.log("data is --->",data)
-    if(data){
-      console.log("data existed")
+    const data = await Data.findOne({ survey_id: surveyId, user_id: id });
+    console.log("data is --->", data);
+    if (data) {
+      console.log("data existed");
       const finalLength = data.responses.length + responses.length;
-      if(finalLength > 4){
+      if (finalLength > 4) {
         return res.status(500).json({
-          success:false,
+          success: false,
           message: "Cannot assign more than 4 responses.",
-        })
+        });
+      } else {
+        data.responses = [...data.responses, ...responses];
+        await data.save();
       }
-      else{
-        data.responses = [...data.responses,...responses]
-        await data.save()
-      }
-    }
-    else{
-      if(responses.length > 4){
-        console.log("returned exceeded response")
+    } else {
+      if (responses.length > 4) {
+        console.log("returned exceeded response");
         return res.status(500).json({
-          success:false,
+          success: false,
           message: "Cannot assign more than 4 responses.",
-        })
+        });
       }
-      console.log("new data created")
+      console.log("new data created");
       await Data.create({ survey_id: surveyId, user_id: id, responses });
     }
 
@@ -378,7 +378,7 @@ exports.updateMultipleKaryakarta = async (req, res) => { //for assigining data
       .status(200)
       .json({ success: true, message: "succeessfuly created data" });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return res.status(500).json({
       success: false,
       message: "Error updating data",
@@ -406,10 +406,11 @@ exports.updateKaryakarta = async (req, res) => {
     console.log(req.body);
     const karyakartaRoles = await Role.find({ category: "karyakarta" });
     const validRoles = karyakartaRoles.map((el) => el._id);
+    console.log("valid roles are -->",validRoles)
     const roleExists = validRoles.filter(
       (el) => el.toString() === role.toString()
     );
-
+    console.log("role exists->>>>",roleExists);
     if (roleExists.length === 0) {
       return res.status(400).json({
         success: false,
@@ -442,28 +443,28 @@ exports.updateKaryakarta = async (req, res) => {
     }
 
     await karyakarta.save();
-    let updatedResponses;
-    if (responses) {
-      updatedResponses = responses.map((responseId) => {
-        new mongoose.Types.ObjectId(String(responseId));
-      });
-    }
+    // let updatedResponses;
+    // if (responses) {
+    //   updatedResponses = responses.map((responseId) => {
+    //     new mongoose.Types.ObjectId(String(responseId));
+    //   });
+    // }
 
-    if (updatedResponses) {
-      await Data.findOneAndUpdate(
-        {
-          survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-          user_id: karyakarta._id,
-        },
-        {
-          $set: {
-            survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-            user_id: karyakarta._id,
-            responses: responses,
-          },
-        }
-      );
-    }
+    // if (updatedResponses) {
+    //   await Data.findOneAndUpdate(
+    //     {
+    //       survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+    //       user_id: karyakarta._id,
+    //     },
+    //     {
+    //       $set: {
+    //         survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+    //         user_id: karyakarta._id,
+    //         responses: responses,
+    //       },
+    //     }
+    //   );
+    // }
 
     return res.status(200).json({
       success: true,
@@ -545,6 +546,50 @@ exports.getKaryakarta = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error fetching karyakarta" });
+  }
+};
+
+exports.getUsersByAcList = async (req, res) => {
+  // this controller only fetches panna pramukhs by default
+  try {
+    const { ac_list } = req.body;
+    console.log("query is --->", req.body);
+
+    if (!ac_list) {
+      return res
+        .status(400)
+        .json({ success: false, message: "ac_list is required" });
+    }
+    const pannaPramukhRole = await Role.findOne({
+      name: "Panna Pramukh",
+    });
+
+    // Construct a `$or` condition with `$and` for each `ac_no` and its corresponding `booth_numbers`
+    const conditions = ac_list.map(({ ac_no, booth_numbers }) => ({
+      $and: [
+        { ac_no: ac_no }, // Match the `ac_no`
+        { booth_no: { $in: booth_numbers } }, // Ensure `booth_no` is in the corresponding list
+      ],
+    }));
+
+    console.log("conditions are ===>",JSON.stringify(conditions,null,2))
+    console.log("role === >",pannaPramukhRole._id);
+
+    // Query to match users based on the constructed conditions
+    const users = await User.find({
+      role: { $in: [pannaPramukhRole._id] },
+      $or: conditions,
+    });
+
+    console.log(users)
+
+    return res.status(200).json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    console.error("error is ----> ",error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
