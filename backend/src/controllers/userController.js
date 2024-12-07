@@ -699,3 +699,22 @@ exports.getBoothAdhyaksh = async (req, res) => {
     });
   }
 };
+
+exports.saveToken = async (req, res) => {
+  try {
+    const { userId, token } = req.body;
+    const user = await User.findById(userId);
+    user.notification_token = token;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Token saved",
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({
+      success: false,
+      message: "Error saving token",
+    });
+  }
+};

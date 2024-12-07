@@ -259,6 +259,7 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
     console.log(findOptions);
 
     const total = await Survey.countDocuments(findOptions);
+    const totalPages = Math.ceil(total / limit);
 
     const surveys = await Survey.find(findOptions)
       .skip(skip)
@@ -274,10 +275,12 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      total,
-      page: Number(page),
-      limit: Number(limit),
-      totalPages: Math.ceil(total / limit),
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalSurveys: total,
+        surveyPerPage: limit,
+      },
       surveys,
     });
   } catch (error) {
