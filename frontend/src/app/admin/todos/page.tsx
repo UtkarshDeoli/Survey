@@ -17,7 +17,7 @@ import { getAllUsers } from "@/networks/user_networks";
 import Select from "react-select";
 import Flatpickr from "react-flatpickr";
 
-import "flatpickr/dist/themes/material_orange.css"
+import "flatpickr/dist/themes/material_orange.css";
 
 const borderColors: any = {
   Open: "border-blue-200",
@@ -48,9 +48,8 @@ function page() {
   const [user, setUser] = useState<{ label: string; value: string } | null>(
     null
   );
-  const [date,setDate] = useState<any>(null)
 
-  console.log("date is --->",filters);
+  console.log("date is --->", filters);
 
   console.log("selected user ----->", user);
 
@@ -178,7 +177,7 @@ function page() {
 
       {/* todos listing */}
       <section className="my-4">
-        <div className="w-[96%] mx-auto flex flex-col flex-1 h-[50vh] max-h-[70vh] rounded-lg">
+        <div className="w-[96%] mx-auto flex flex-col flex-1 h-[70vh] max-h-[70vh] rounded-lg">
           {/* headings */}
           <div className="grid bg-dark-gray grid-cols-6 gap-2 rounded-lg p-4 border-b-2">
             {[
@@ -198,7 +197,12 @@ function page() {
             <Flatpickr
               className="border px-4 py-2"
               value={filters.date} // Pass state as the value
-              onChange={(selectedDate) => setFilters((prev:any)=>({...prev,due_date:selectedDate[0].toLocaleDateString("en-CA")}))}
+              onChange={(selectedDate) =>
+                setFilters((prev: any) => ({
+                  ...prev,
+                  due_date: selectedDate[0],
+                }))
+              }
               options={{
                 dateFormat: "Y-m-d", // Customize the date format
                 minDate: "today", // Disable past dates
@@ -264,6 +268,7 @@ function page() {
               <button
                 onClick={() => {
                   setFilters({});
+                  setUser(null);
                   setReset(!reset);
                 }}
                 className="border rounded-md h-10 w-10 flex justify-center items-center bg-dark-gray text-white"
@@ -341,23 +346,26 @@ function page() {
                     }`}
                   >
                     {showData === task._id && (
-                      <div className="grid grid-cols-12 w-1/2 gap-3">
-                        <p className="col-span-2">Due Date: </p>
-                        <p className="col-span-10">
-                          {formatDate(task.due_date)}
-                        </p>
-                        <p className="col-span-2">Title: </p>
-                        <p className="col-span-10">{task.title}</p>
-                        <p className="col-span-2">Description:</p>
-                        <p className="col-span-10">{task.description}</p>
-                        <p className="col-span-2">Activity: </p>
-                        <p className="col-span-10">{task.activity}</p>
-                        <p className="col-span-2">Status:</p>
-                        <p className="col-span-10">{task.status}</p>
-                        <p className="col-span-2">Priority:</p>
-                        <p className="col-span-10"> {task.priority}</p>
-                        <p className="col-span-2">Assigned By:</p>
-                        <p className="col-span-10">{task.assigned_by.name}</p>
+                      <div className="w-full flex flex-col gap-2">
+                        <div className="w-full border border-dashed border-dark-gray"></div>
+                        <div className="grid grid-cols-12 w-3/4 gap-2">
+                          <p className="col-span-2 font-semibold text-dark-gray">Due Date: </p>
+                          <p className="col-span-10">
+                            {formatDate(task.due_date)}
+                          </p>
+                          <p className="col-span-2 font-semibold text-dark-gray">Title: </p>
+                          <p className="col-span-10">{task.title}</p>
+                          <p className="col-span-2 font-semibold text-dark-gray">Description:</p>
+                          <p className="col-span-10">{task.description}</p>
+                          <p className="col-span-2 font-semibold text-dark-gray">Activity: </p>
+                          <p className="col-span-10">{task.activity}</p>
+                          <p className="col-span-2 font-semibold text-dark-gray">Status:</p>
+                          <p className="col-span-10">{task.status}</p>
+                          <p className="col-span-2 font-semibold text-dark-gray">Priority:</p>
+                          <p className="col-span-10"> {task.priority}</p>
+                          <p className="col-span-2 font-semibold text-dark-gray">Assigned By:</p>
+                          <p className="col-span-10">{task.assigned_by.name}</p>
+                        </div>
                       </div>
                     )}
                   </div>

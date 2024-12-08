@@ -108,23 +108,25 @@ function AddTodo({
     if (editing) params.id = editing;
     const response = await getTodo(params);
     console.log("res of editing ----->", response);
-    // console.log("time is --->",format(response.data.due_date, 'HH:mm'))
-     // Convert UTC time to 'Asia/Kolkata' time zone
-      // Convert UTC time to 'Asia/Kolkata' time zone using toZonedTime
     const timeZone = 'Asia/Kolkata';
     const dueDateInIST = toZonedTime(response.data.due_date, timeZone);
-    console.log("due date--->",dueDateInIST)
-    // const reminderInIST = toZonedTime(response.data.reminder, timeZone);
-     
-     console.log("time is --->", format(dueDateInIST, 'HH:mm'));
 
     if (response.success) {
+      console.log("due date is ---->",response.data.due_date);
+      console.log("remider date is ---->",response.data.reminder);
+
+      const timeDifferenceMinutes = Math.floor(
+        (new Date(response.data.due_date).getTime() - 
+         new Date(response.data.reminder).getTime()) / 60000
+      );
+      
       setActivity(response.data.activity);
       setTitle(response.data.title);
       setStatus(response.data.status);
       setDescription(response.data.description);
       setPriority(response.data.priority);
-      setReminder(response.data.reminder);
+      // setReminder(response.data.reminder);
+      setReminder(timeDifferenceMinutes.toString());
       setAssignedUsers(
         response.data.assigned_to.map((el: any) => ({
           label: el.name,
@@ -132,7 +134,6 @@ function AddTodo({
         }))
       );
       setSelectedDate(new Date(response.data.due_date));
-      // setStartTime(dueDateInIST);
       setStartTime(format(dueDateInIST, "HH:mm"));
       setEndTime(format(response.data.end_date, "HH:mm"));
       setAssignedBy(response.data.assigned_by._id);
@@ -143,17 +144,45 @@ function AddTodo({
   }
   async function handleUpdateTodo() {
     const params: any = { id: editing };
+    if (!selectedDate || !startTime || !endTime) {
+      toast.error("Please select a due date and time.");
+      return;
+    }
+  
+    // Create the due date and end date objects using the selected date
+    const dueDateTime = new Date(selectedDate); // start time
+    const endDateTime = new Date(selectedDate); // end time
+  
+    // Parse the start and end times
+    const [startHours, startMinutes] = startTime.split(":");
+    const [endHours, endMinutes] = endTime.split(":");
+  
+    // Set hours and minutes for dueDateTime and endDateTime
+    dueDateTime.setHours(Number(startHours), Number(startMinutes));
+    endDateTime.setHours(Number(endHours), Number(endMinutes));
+
+    const reminderDate = new Date(dueDateTime); // reminder time
+    if (reminder) {
+      console.log("inside reminder editing");
+      const reminderMinutes = parseInt(reminder, 10);
+      console.log("reminder minutes are-->",reminderMinutes)
+      reminderDate.setMinutes(dueDateTime.getMinutes() - reminderMinutes);
+      console.log("new reminder minuutes are --->",reminderMinutes);                          
+    }
+
+    console.log("new reminder date is -->",reminderDate);
+
+
     const updates = {
       activity,
       title,
       status,
       description,
       priority,
-      // reminder,
+      reminder:reminderDate,
       assigned_to: assignedUsers.map((obj) => obj.value),
-      due_date: selectedDate,
-      // start_time: startTime,
-      // end_time: endTime,
+      due_date: dueDateTime,
+      end_date: endDateTime,
       assigned_by: assignedBy,
     };
     params.updates = updates;

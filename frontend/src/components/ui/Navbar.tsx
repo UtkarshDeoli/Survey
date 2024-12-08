@@ -18,11 +18,11 @@ function Navbar() {
   const [userData, setUserData] = useState<UserData | null>(null);
   useEffect(() => {
     const payload = checkToken();
-    console.log(payload);
-    if (payload) {
+    console.log("Logged in user data is --->",payload);
+    if (payload && payload.role.length > 0 && payload.role[0].category === 'admin') {
       setUserData(checkToken());
     } else {
-      router.push("/login");
+      router.push("/");
     }
   }, [router]);
   return (

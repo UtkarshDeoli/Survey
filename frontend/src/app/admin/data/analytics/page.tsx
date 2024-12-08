@@ -4,7 +4,7 @@ import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
 import { getSurvey, getSurveyResponseStats } from "@/networks/survey_networks";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import QuestionChart from "@/components/data/QuestionChart";
 import CustomModal from "@/components/ui/Modal";
@@ -42,6 +42,8 @@ function Page() {
     getQuestions()
     fetchSurveyData();
   }, []);
+
+  const router = useRouter()
 
   // event handlers
   const handleQuestionChange = (value: string) => {
@@ -118,26 +120,18 @@ function Page() {
             Analytics
           </p>
         </div>
-        <div className="flex space-x-2 text-black text-base">
-          <FilledGreyButton className="px-4 py-2">Response</FilledGreyButton>
-          <ButtonFilled className="px-4 py-2">Analytics</ButtonFilled>
-          <FilledGreyButton className="px-4 py-2">
-            Daily Report
-          </FilledGreyButton>
-          <FilledGreyButton className="px-4 py-2">
-            Summary Report
-          </FilledGreyButton>
-          <FilledGreyButton className="px-4 py-2">
-            Spatial Report
-          </FilledGreyButton>
-          <FilledGreyButton className="px-4 py-2">
-            Scoring Report
-          </FilledGreyButton>
-        </div>
+        <div className="flex space-x-2 items-center">
+            <ButtonFilled onClick={()=>router.push(`/admin/data/survey-responses?survey_id=${surveyID}`)} className="bg-dark-gray">
+              Responses
+            </ButtonFilled>
+            <ButtonFilled onClick={()=>setShowFilters(!showFilters)} className="">
+              Filters
+            </ButtonFilled>
+          </div>
       </nav>
 
-      <div className="p-5 font-semibold text-sm text-my-gray-200">
-        <div className="bg-white rounded-lg flex justify-between items-center px-4">
+      {/* <div className="p-5 font-semibold text-sm text-my-gray-200">
+        <div className="rounded-lg flex justify-between items-center px-4">
           <div className="p-2 h-16 flex items-center rounded-lg">
             <TwoDatePicker
               startDate={startDate}
@@ -146,13 +140,9 @@ function Page() {
               setEndDate={setEndDate}
             />
           </div>
-          <div className="flex space-x-2 items-center">
-            <ButtonFilled onClick={()=>setShowFilters(!showFilters)} className="">
-              Filters
-            </ButtonFilled>
-          </div>
+          
         </div>
-      </div>
+      </div> */}
       {
         showFilters && (
           <div className="p-4 w-full ">

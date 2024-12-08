@@ -2,7 +2,8 @@ import {
     SERVER_URI,
     login,
     forgot_password,
-    reset_password
+    reset_password,
+    admin_login
   } from "@/utils/constants";
   import axios from "axios";
 
@@ -35,6 +36,37 @@ import {
       }
     }
   };
+  export const loginAdmin = async (params: any) => {
+    try {
+      const options = {
+        method: "POST",
+        url: `${SERVER_URI}/${admin_login}`,
+        data: params,
+      };
+      const response = await axios.request(options);
+      return response.data; // Successful login
+    } catch (error: any) {
+      // Handle the error response correctly
+      if (error.response) {
+        // Error response from the backend (with status code and message)
+        return {
+          success: false,
+          message: error.response.data.message || "Something went wrong",
+          error: error.response.data, // Capture entire error object from backend
+        };
+      } else {
+        // Network error or other Axios error
+        return {
+          success: false,
+          message: "Network error. Please try again.",
+          error: error.message,
+        };
+      }
+    }
+  };
+
+
+
   
   export const forgotPassword = async (params: any) => {
     try {

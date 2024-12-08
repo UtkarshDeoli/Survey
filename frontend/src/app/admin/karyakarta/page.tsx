@@ -142,7 +142,7 @@ function page() {
         )}
         {!loading &&
           users &&
-          users.length !== 0 &&
+          users.length !== 0 ?
           users.map((user, index) => (
             <div
               key={index}
@@ -196,7 +196,7 @@ function page() {
                 </p>
               </div>
             </div>
-          ))}
+          )):<div className="flex justify-center items-center h-[20vh] w-full">No karyakartas found</div>}
       </div>
       {!loading && (
         <div className="flex gap-3 items-center mt-4 ml-4 pb-4">

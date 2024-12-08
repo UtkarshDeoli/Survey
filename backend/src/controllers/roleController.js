@@ -2,6 +2,7 @@ const Role = require("../models/role")
 
 exports.createRole = async(req,res)=>{
     const {name,category,permissions} = req.body;
+    if(category === 'admin') return res.status(400).json({success:false,message:"Not authorized"});
     try{
         const newRole = await Role.create({name,category,permissions})
         res.status(200).json({
@@ -59,6 +60,7 @@ exports.updateRole = async (req, res) => {
 
 exports.getRoles = async(req,res)=>{
     const { category } = req.query;
+    if(category ==='admin') return res.status(400).json({success:false,message:"Unauthorized"});
     try{
         const roles = await Role.find({category}).sort({createdAt:-1});
         return res.status(200).json({
@@ -75,7 +77,7 @@ exports.getRoles = async(req,res)=>{
 }
 exports.getAllRoles = async(req,res)=>{
     try{
-        const roles = await Role.find().sort({createdAt:-1});
+        const roles = await Role.find({category:{$ne:"admin"}}).sort({createdAt:-1});
         return res.status(200).json({
             success:true,
             roles

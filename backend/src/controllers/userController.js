@@ -117,7 +117,7 @@ exports.updateUsers = async (req, res) => {
       });
     });
 
-    const dbRes = await Promise.all(updatePromises);
+    const dbRes = await Promise.all(updatePromises);  
 
     return res.status(200).json({
       success: true,

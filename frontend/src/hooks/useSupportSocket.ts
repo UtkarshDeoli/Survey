@@ -43,6 +43,7 @@ const useSupportSocket = () => {
       selectedRole,
     }
     const res = await getAllChatsData(params);
+    console.log("all user chat response",res)
     setUserData(res.data);
     setTotalUsers(res.total);
   }

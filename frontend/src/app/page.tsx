@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser, forgotPassword } from "@/networks/auth_networks";
+import { loginUser, forgotPassword, loginAdmin } from "@/networks/auth_networks";
 import ReactModal from "react-modal";
 import toast, { Toaster } from "react-hot-toast";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
@@ -27,16 +27,18 @@ export default function login() {
   }, [router]);
 
   const handleSubmit = () => {
-    loginUser({ email: Email, password: password }).then((res) => {
-      localStorage.setItem("jwt_token", res.token);
+    loginAdmin({ email: Email, password: password }).then((res) => {
       if (res.success) {
         toast.success(res.message);
+        localStorage.setItem("jwt_token", res.token);
         router.push("/admin/surveys");
       } else {
         console.log(res);
-        toast.error(res.message);
+        toast.error("Invalid credentials or unauthorized user");
       }
-    });
+    }).catch((error)=>{
+      toast.error("Failed to Login as Admin")
+    })
   };
 
   const handleForgotPassword = async (email: string) => {
