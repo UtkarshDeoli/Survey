@@ -10,21 +10,23 @@ import CustomModal from "../ui/Modal";
 import Calendar from "./Calendar";
 import { createTodo, getTodo, updateTodo } from "@/networks/todo_networks";
 import toast from "react-hot-toast";
-import { getAllUsers } from "@/networks/user_networks";
 import Flatpickr from "react-flatpickr";
 import { CiClock2 } from "react-icons/ci";
 import { IoIosCall } from "react-icons/io";
+import { format } from "date-fns";
+import { toZonedTime } from 'date-fns-tz';
+
 
 interface props {
-  editing: string|null;
+  editing: string | null;
   scheduleModal: boolean;
-  setScheduleModal: (value: boolean)=>void;
-  setEditing: (value: string|null)=>void;
-  assignedBy:string|null;
-  setAssignedBy: (value: string)=>void;
-  handleGetAllTodos:()=>{}
-  users:any;
-  getUsers:()=>{}
+  setScheduleModal: (value: boolean) => void;
+  setEditing: (value: string | null) => void;
+  assignedBy: string | null;
+  setAssignedBy: (value: string) => void;
+  handleGetAllTodos: () => {};
+  users: any;
+  getUsers: () => {};
 }
 
 const formatTime = (date: any) => {
@@ -44,7 +46,17 @@ const activities = [
   },
 ];
 
-function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,setAssignedBy,handleGetAllTodos,getUsers,users}: props) {
+function AddTodo({
+  editing,
+  scheduleModal,
+  setScheduleModal,
+  setEditing,
+  assignedBy,
+  setAssignedBy,
+  handleGetAllTodos,
+  getUsers,
+  users,
+}: props) {
   const [activity, setActivity] = useState<string | null>("");
   const [title, setTitle] = useState<string | null>("");
   const [status, setStatus] = useState<string | null>("");
@@ -58,6 +70,8 @@ function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,
 
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
+
+  console.log("reminder is ---->", reminder);
 
   useEffect(() => {
     if (editing) {
@@ -94,6 +108,16 @@ function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,
     if (editing) params.id = editing;
     const response = await getTodo(params);
     console.log("res of editing ----->", response);
+    // console.log("time is --->",format(response.data.due_date, 'HH:mm'))
+     // Convert UTC time to 'Asia/Kolkata' time zone
+      // Convert UTC time to 'Asia/Kolkata' time zone using toZonedTime
+    const timeZone = 'Asia/Kolkata';
+    const dueDateInIST = toZonedTime(response.data.due_date, timeZone);
+    console.log("due date--->",dueDateInIST)
+    // const reminderInIST = toZonedTime(response.data.reminder, timeZone);
+     
+     console.log("time is --->", format(dueDateInIST, 'HH:mm'));
+
     if (response.success) {
       setActivity(response.data.activity);
       setTitle(response.data.title);
@@ -101,10 +125,16 @@ function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,
       setDescription(response.data.description);
       setPriority(response.data.priority);
       setReminder(response.data.reminder);
-      setAssignedUsers(response.data.assigned_to.map((el:any)=>({label:el.name,value:el._id})));
+      setAssignedUsers(
+        response.data.assigned_to.map((el: any) => ({
+          label: el.name,
+          value: el._id,
+        }))
+      );
       setSelectedDate(new Date(response.data.due_date));
-      // setStartTime(formatDate(response.data.start_time, 'HH:mm'));
-      // setEndTime(formatDate(response.data.end_time, 'HH:mm'));
+      // setStartTime(dueDateInIST);
+      setStartTime(format(dueDateInIST, "HH:mm"));
+      setEndTime(format(response.data.end_date, "HH:mm"));
       setAssignedBy(response.data.assigned_by._id);
       // setEditing(response.data._id);
     } else {
@@ -120,7 +150,7 @@ function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,
       description,
       priority,
       // reminder,
-      assigned_to: assignedUsers,
+      assigned_to: assignedUsers.map((obj) => obj.value),
       due_date: selectedDate,
       // start_time: startTime,
       // end_time: endTime,
@@ -139,52 +169,103 @@ function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,
     }
   }
 
+  // async function handleSubmit() {
+  //   if (!selectedDate || !startTime || !endTime) {
+  //     toast.error("Please select a due date and time.");
+  //     return;
+  //   }
+
+  //   // Create the due date and end date objects using the selected date
+  //   const dueDateTime = new Date(selectedDate); // start time
+  //   const endDateTime = new Date(selectedDate); // end time
+
+  //   // Parse the start and end times
+  //   const [startHours, startMinutes] = startTime.split(":");
+  //   const [endHours, endMinutes] = endTime.split(":");
+
+  //   // Set hours and minutes for dueDateTime and endDateTime
+  //   dueDateTime.setHours(Number(startHours), Number(startMinutes));
+  //   endDateTime.setHours(Number(endHours), Number(endMinutes));
+
+  //   // Convert to IST (UTC +5:30)
+  //   const istOffset = 5.5 * 60; // IST offset in minutes
+  //   dueDateTime.setMinutes(dueDateTime.getMinutes() + istOffset);
+  //   endDateTime.setMinutes(endDateTime.getMinutes() + istOffset);
+
+  //   // Create the reminder date
+  //   const reminderDate = new Date(dueDateTime); // reminder time
+  //   if (reminder) {
+  //     const reminderMinutes = parseInt(reminder, 10);
+  //     reminderDate.setMinutes(dueDateTime.getMinutes() - reminderMinutes);
+  //   }
+
+  //   // Prepare the parameters for submission
+  //   const assigned_to = assignedUsers.map((obj) => obj.value);
+  //   const params = {
+  //     title,
+  //     description,
+  //     due_date: dueDateTime.toISOString(),
+  //     end_date: endDateTime.toISOString(),
+  //     activity,
+  //     assigned_to,
+  //     assigned_by: assignedBy,
+  //     status,
+  //     priority,
+  //     reminder: reminder ? reminderDate.toISOString() : null,
+  //   };
+
+  //   console.log(params);
+  //   const response = await createTodo(params);
+  //   if (response.success) {
+  //     setScheduleModal(false);
+  //     empty();
+  //     handleGetAllTodos();
+  //   } else {
+  //     toast.error("Failed to create todo!");
+  //   }
+  // }
+
   async function handleSubmit() {
     if (!selectedDate || !startTime || !endTime) {
       toast.error("Please select a due date and time.");
       return;
     }
-
+  
     // Create the due date and end date objects using the selected date
     const dueDateTime = new Date(selectedDate); // start time
     const endDateTime = new Date(selectedDate); // end time
-
+  
     // Parse the start and end times
     const [startHours, startMinutes] = startTime.split(":");
     const [endHours, endMinutes] = endTime.split(":");
-
+  
     // Set hours and minutes for dueDateTime and endDateTime
     dueDateTime.setHours(Number(startHours), Number(startMinutes));
     endDateTime.setHours(Number(endHours), Number(endMinutes));
-
-    // Convert to IST (UTC +5:30)
-    const istOffset = 5.5 * 60; // IST offset in minutes
-    dueDateTime.setMinutes(dueDateTime.getMinutes() + istOffset);
-    endDateTime.setMinutes(endDateTime.getMinutes() + istOffset);
-
+  
     // Create the reminder date
     const reminderDate = new Date(dueDateTime); // reminder time
     if (reminder) {
       const reminderMinutes = parseInt(reminder, 10);
       reminderDate.setMinutes(dueDateTime.getMinutes() - reminderMinutes);
     }
-
+  
     // Prepare the parameters for submission
     const assigned_to = assignedUsers.map((obj) => obj.value);
     const params = {
       title,
       description,
-      due_date: dueDateTime.toISOString(),
-      end_date: endDateTime.toISOString(),
+      due_date: dueDateTime.toISOString(), // Send as UTC
+      end_date: endDateTime.toISOString(), // Send as UTC
       activity,
       assigned_to,
       assigned_by: assignedBy,
       status,
       priority,
-      reminder: reminder ? reminderDate.toISOString() : null,
+      reminder: reminder ? reminderDate.toISOString() : null, // Send as UTC
     };
-
-    console.log(params);
+  
+    console.log("todos data is --->",params);
     const response = await createTodo(params);
     if (response.success) {
       setScheduleModal(false);
@@ -194,6 +275,7 @@ function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,
       toast.error("Failed to create todo!");
     }
   }
+  
 
   return (
     <CustomModal
@@ -292,7 +374,7 @@ function AddTodo({ editing,scheduleModal,setScheduleModal,setEditing,assignedBy,
               <p>Assign to: </p>
               {users && (
                 <Select
-                  options={users.map((user:any) => ({
+                  options={users.map((user: any) => ({
                     label: user.name,
                     value: user._id, // Map `option` to `user._id`
                   }))}

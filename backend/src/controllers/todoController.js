@@ -1,4 +1,4 @@
-const { sendNotification } = require("../firebase");
+const { sendNotification,firebase } = require("../firebase");
 const Todos = require("../models/todo");
 
 exports.createTodo = async (req, res) => {
@@ -114,6 +114,20 @@ exports.getAllTodos = async (req, res) => {
 
     filters = typeof filters === "string" ? JSON.parse(filters) : filters;
     console.log(filters);
+
+    if (filters.due_date) {
+      console.log("Due date is there:", filters.due_date);
+      
+      const startOfDay = new Date(filters.due_date);
+      const endOfDay = new Date(startOfDay);
+      endOfDay.setDate(startOfDay.getDate() + 1);
+      filters.due_date = {
+        $gte: startOfDay, // Start of the day (inclusive)
+        $lt: endOfDay,    // End of the day (exclusive)
+      };
+    }
+
+    console.log("after editing ",filters);
 
     if (title) {
       filters.title = { $regex: title, $options: "i" };

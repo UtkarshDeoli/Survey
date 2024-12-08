@@ -217,7 +217,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   }
 
   return (
-    <div className="w-[96%] mt-5 mx-auto text-sm pb-5 max-h-[80vh] overflow-y-auto vertical-scrollbar">
+    <div className="w-[96%] mt-5 mx-auto text-sm pb-5 h-[50vh] max-h-[80vh] overflow-y-auto vertical-scrollbar">
       {/* surveys */}
       <div className="sticky top-0 z-10 grid grid-cols-8 text-white font-semibold bg-dark-gray px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
         <p className="col-span-2">All surveys</p>

@@ -32,12 +32,12 @@ const options: any = {
   },
 };
 
-const colors:any ={
-  Open:"text-green-400",
-  Rescheduled:"text-amber-500",
-  Cancelled:"text-red-500",
-  Completed:"text-blue-500",
-}
+const colors: any = {
+  Open: "text-green-400",
+  Rescheduled: "text-amber-500",
+  Cancelled: "text-red-500",
+  Completed: "text-blue-500",
+};
 function Page() {
   const [isClient, setIsClient] = useState(false);
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -54,47 +54,54 @@ function Page() {
   async function fetchDashboard() {
     setLoading(true);
     const response = await getDashboard();
+    console.log("response --->", response);
     if (response.success) {
       setDashboardData(response.data);
-      const userStats = response.data.userStats.find(
-        (user: any) => user._id === "user"
-      );
-      const userRoles = userStats.roles.map((role: any) => role.role.name);
-      const userRoleCounts = userStats.roles.map((role: any) => role.count);
+      if (response.data.userStats.length > 0) {
+        const userStats = response.data.userStats.find(
+          (user: any) => user._id === "user"
+        );
+        if(userStats){
+          const userRoles = userStats.roles.map((role: any) => role.role.name);
+          const userRoleCounts = userStats.roles.map((role: any) => role.count);
+          setUserData({
+            labels: userRoles,
+            datasets: [
+              {
+                label: "Users",
+                data: userRoleCounts,
+                borderColor: "",
+                borderWidth: 0,
+              },
+            ],
+          });
+        }
+        const karyakartaStats = response.data.userStats.find(
+          (user: any) => user._id === "karyakarta"
+        );
+        if (karyakartaStats) {
+          const karyakartaRoleCounts = karyakartaStats.roles.map(
+            (role: any) => role.count
+          );
+          const karyakartaRoles = karyakartaStats.roles.map(
+            (role: any) => role.role.name
+          );
 
-      const karyakartaStats = response.data.userStats.find(
-        (user: any) => user._id === "karyakarta"
-      );
-      const karyakartaRoleCounts = karyakartaStats.roles.map(
-        (role: any) => role.count
-      );
-      const karyakartaRoles = karyakartaStats.roles.map(
-        (role: any) => role.role.name
-      );
-
-      setUserData({
-        labels: userRoles,
-        datasets: [
-          {
-            label: "Users",
-            data: userRoleCounts,
-            borderColor: "",
-            borderWidth: 0,
-          },
-        ],
-      });
-      setKaryakartaData({
-        labels: karyakartaRoles,
-        datasets: [
-          {
-            label: "Karyakartas",
-            data: karyakartaRoleCounts,
-            borderColor: "",
-            borderWidth: 0,
-          },
-        ],
-      });
+          setKaryakartaData({
+            labels: karyakartaRoles,
+            datasets: [
+              {
+                label: "Karyakartas",
+                data: karyakartaRoleCounts,
+                borderColor: "",
+                borderWidth: 0,
+              },
+            ],
+          });
+        }
+      }
     }
+
     setLoading(false);
   }
 
@@ -150,11 +157,18 @@ function Page() {
                 </div>
                 {dashboardData.todos.length > 0 ? (
                   dashboardData.todos.map((todo: any) => (
-                    <div key={todo._id} className="grid grid-cols-4 w-full place-items-center text-[13px]">
-                      <p>{truncateText(todo._id,10)}</p>
+                    <div
+                      key={todo._id}
+                      className="grid grid-cols-4 w-full place-items-center text-[13px]"
+                    >
+                      <p>{truncateText(todo._id, 10)}</p>
                       <img src="/images/right.png" className="h-2" />
-                      <p className="text-dark-gray">{formatDate(todo.createdAt)}</p>
-                      <p className={`${colors[todo.status]} font-semibold`}>{todo.status}</p>
+                      <p className="text-dark-gray">
+                        {formatDate(todo.createdAt)}
+                      </p>
+                      <p className={`${colors[todo.status]} font-semibold`}>
+                        {todo.status}
+                      </p>
                     </div>
                   ))
                 ) : (
@@ -172,10 +186,15 @@ function Page() {
                 </div>
                 {dashboardData.todos.length > 0 ? (
                   dashboardData.surveys.map((survey: any) => (
-                    <div key={survey._id} className="grid grid-cols-3 w-full place-items-center text-[13px]">
-                      <p>{truncateText(survey.name,20)}</p>
+                    <div
+                      key={survey._id}
+                      className="grid grid-cols-3 w-full place-items-center text-[13px]"
+                    >
+                      <p>{truncateText(survey.name, 20)}</p>
                       <img src="/images/long-arrow.png" className="h-2" />
-                      <p className="text-dark-gray">{formatDate(survey.createdAt)}</p>
+                      <p className="text-dark-gray">
+                        {formatDate(survey.createdAt)}
+                      </p>
                     </div>
                   ))
                 ) : (

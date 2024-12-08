@@ -13,9 +13,10 @@ import Loader from "../ui/Loader";
 interface Props {
   modalIsOpen: boolean;
   closeModal: () => void;
+  setUpdated:any
 }
 
-function CreateSurveyModal({ modalIsOpen, closeModal }: Props) {
+function CreateSurveyModal({ modalIsOpen, closeModal,setUpdated}: Props) {
   const { ac_list, addAcEntry, name, removeAcEntry, setName } =
     useCreateSurveyContext();
   const [currentAcNo, setCurrentAcNo] = useState<string>("");
@@ -41,6 +42,7 @@ function CreateSurveyModal({ modalIsOpen, closeModal }: Props) {
         toast.success("Survey created successfully!");
         console.log("survey--------", response);
         closeModal();
+        setUpdated((prev:any)=>!prev)
         router.push(`/admin/surveys/edit?survey_id=${response.survey._id}`);
       }
     } catch (error) {

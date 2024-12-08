@@ -15,6 +15,9 @@ import AddTodo from "@/components/todo-list/AddTodo";
 import Loader from "@/components/ui/Loader";
 import { getAllUsers } from "@/networks/user_networks";
 import Select from "react-select";
+import Flatpickr from "react-flatpickr";
+
+import "flatpickr/dist/themes/material_orange.css"
 
 const borderColors: any = {
   Open: "border-blue-200",
@@ -42,6 +45,14 @@ function page() {
   const [totalResponsePages, setTotalResponsePages] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [users, setUsers] = useState<any[]>([]);
+  const [user, setUser] = useState<{ label: string; value: string } | null>(
+    null
+  );
+  const [date,setDate] = useState<any>(null)
+
+  console.log("date is --->",filters);
+
+  console.log("selected user ----->", user);
 
   const router = useRouter();
 
@@ -167,7 +178,7 @@ function page() {
 
       {/* todos listing */}
       <section className="my-4">
-        <div className="w-[96%] mx-auto flex flex-col flex-1 min-h-[50vh] rounded-lg">
+        <div className="w-[96%] mx-auto flex flex-col flex-1 h-[50vh] max-h-[70vh] rounded-lg">
           {/* headings */}
           <div className="grid bg-dark-gray grid-cols-6 gap-2 rounded-lg p-4 border-b-2">
             {[
@@ -184,7 +195,16 @@ function page() {
 
           {/* filters */}
           <div className="grid grid-cols-6 gap-2 mt-4">
-            <input type="date" className=" border px-4 py-2" />
+            <Flatpickr
+              className="border px-4 py-2"
+              value={filters.date} // Pass state as the value
+              onChange={(selectedDate) => setFilters((prev:any)=>({...prev,due_date:selectedDate[0].toLocaleDateString("en-CA")}))}
+              options={{
+                dateFormat: "Y-m-d", // Customize the date format
+                minDate: "today", // Disable past dates
+              }}
+              placeholder="Select a date"
+            />
             <select
               value={filters && filters.status ? filters.status : null}
               onChange={(e) =>
@@ -215,22 +235,29 @@ function page() {
               <option value="Call">Call</option>
               <option value="Task">Task</option>
             </select>
-            {/* <Select
+            <Select
               options={users.map((user: any) => ({
                 label: user.name,
                 value: user._id, // Map `option` to `user._id`
               }))}
-              value={} // Correct structure for `value`
-              onChange={} // Update selected users on change
-              isMulti={true}
+              value={user} // Correct structure for `value`
+              onChange={(selectedValue) => {
+                setUser(selectedValue);
+                if (selectedValue) {
+                  setFilters((prev: any) => ({
+                    ...prev,
+                    assigned_to: selectedValue.value,
+                  }));
+                }
+              }} // Update selected users on change
               className="basic-multi-select"
               classNamePrefix="select"
-              placeholder="Select users..."
-            /> */}
+              placeholder="Select user"
+            />
             <div className="flex gap-2 items-center col-start-7 text-xl">
               <button
                 onClick={handleGetAllTodos}
-                className="border rounded-md h-10 w-10 flex justify-center items-center"
+                className="border rounded-md h-10 w-10 flex justify-center items-center bg-dark-gray text-white"
               >
                 <FaFilter />
               </button>
@@ -239,7 +266,7 @@ function page() {
                   setFilters({});
                   setReset(!reset);
                 }}
-                className="border rounded-md h-10 w-10 flex justify-center items-center"
+                className="border rounded-md h-10 w-10 flex justify-center items-center bg-dark-gray text-white"
               >
                 <MdRestartAlt />
               </button>
@@ -247,8 +274,8 @@ function page() {
           </div>
 
           {/* TODO list */}
-          <div className="flex flex-col max-h-[60vh] overflow-y-auto vertical-scrollbar gap-2 mt-4">
-            {tasks &&
+          <div className="flex flex-col h-[50vh] max-h-[60vh] overflow-y-auto vertical-scrollbar gap-2 mt-4">
+            {tasks && tasks.length > 0 ? (
               tasks.map((task) => (
                 <div
                   onClick={() =>
@@ -281,7 +308,7 @@ function page() {
                   >
                     <BsThreeDots />
                     {showMenu === task._id && (
-                      <div className="flex flex-col gap-3 absolute right-[110%] top-0 px-4 w-32 bg-white shadow-md border-2 rounded-md">
+                      <div className="flex transition duration-300 ease-in-out flex-col gap-3 absolute right-[110%] top-0 px-4 w-32 bg-white shadow-md border-2 rounded-md">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -335,7 +362,12 @@ function page() {
                     )}
                   </div>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="h-[20vh] w-full flex justify-center items-center">
+                No todos found
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -48,7 +48,7 @@ function SurveyHeader({ setUpdated }: props) {
       </div>
 
       {/* modal */}
-      <CreateSurveyModal modalIsOpen={modalIsOpen} closeModal={closeModal}/>
+      <CreateSurveyModal setUpdated ={setUpdated} modalIsOpen={modalIsOpen} closeModal={closeModal}/>
       <ImportSurveyModal importModalOpen={importModalOpen} closeImportModal={closeImportModal}/>
       
     </header>
