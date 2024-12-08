@@ -10,6 +10,8 @@ import {
 import { truncateText, getDateAndMonth } from "@/utils/common_functions";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { PuffLoader } from "react-spinners";
+import { getAllRoles } from "@/networks/role_networks";
+import toast from "react-hot-toast";
 
 interface ChatCardProp {
   chat: UserDataInterface;
@@ -57,8 +59,8 @@ function ChatCard({ chat, onClick, isSelected }: ChatCardProp) {
 }
 
 interface RoleChipsProps {
-  Roles: string[];
-  selectedRole: string;
+  Roles: any;
+  selectedRole: any;
   handleRoleSelect: (role: string) => void;
 }
 
@@ -66,11 +68,11 @@ function RoleChips({ Roles, selectedRole, handleRoleSelect }: RoleChipsProps) {
   return (
     <div className="w-full h-fit mb-[18px] rounded-lg overflow-x-scroll no-scrollbar">
       <div className="flex justify-center items-center min-w-max">
-        {Roles.map((role) => {
-          const selected = selectedRole === role;
+        {Roles.map((role:any) => {  
+          const selected = selectedRole.name === role.name
           return (
             <p
-              key={role}
+              key={role._id}
               className={`flex flex-col h-full ${
                 selected
                   ? "bg-primary-300 border-2 border-primary-300 text-white"
@@ -78,7 +80,7 @@ function RoleChips({ Roles, selectedRole, handleRoleSelect }: RoleChipsProps) {
               } text-[15px] px-2 py-2 font-medium mr-2 rounded-full whitespace-nowrap cursor-pointer`}
               onClick={() => handleRoleSelect(role)}
             >
-              {role}
+              {role.name}
             </p>
           );
         })}
@@ -119,6 +121,11 @@ function SupportChatsList({
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
+  const [roles,setRoles] = useState<any>(null);
+
+  useEffect(()=>{
+    getRoles()
+  },[]);
 
   async function loadMoreChats() {
     const params = {
@@ -133,7 +140,15 @@ function SupportChatsList({
     setUserData(res.data);
     setPage(page + 1);
   }
-
+  async function getRoles(){
+    const response = await getAllRoles();
+    console.log("roles from chats are --->",response);
+    if(response.success){
+      setRoles(response.roles)
+    }else{
+      toast.error("error fetching roles")
+    }
+  }
   return (
     <div className="w-4/12 h-full bg-white  flex flex-col items-center px-[10px] py-2 rounded-lg ">
       <div className="relative w-full h-12 mb-[18px]">
@@ -149,12 +164,15 @@ function SupportChatsList({
           onChange={(e) => setSearchBarInput(e.target.value)}
         />
       </div>
-
-      <RoleChips
-        Roles={Roles}
-        selectedRole={selectedRole}
-        handleRoleSelect={handleRoleSelect}
-      />
+    {
+      roles && (
+        <RoleChips
+          Roles={roles}
+          selectedRole={selectedRole}
+          handleRoleSelect={handleRoleSelect}
+        />
+      )
+    }
 
       <div
         className="w-full h-full flex-1 flex-col overflow-y-scroll rounded-lg"

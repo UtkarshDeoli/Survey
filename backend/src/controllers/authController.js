@@ -27,6 +27,12 @@ exports.login = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid credentials" });
     }
+
+    if(user.status === 'inactive'){
+      return res
+       .status(401)
+       .json({ success: false, message: "User account is inactive" });
+    }
     // JWT token
     const token = jwt.sign(
       {
@@ -65,13 +71,25 @@ exports.adminLogin = async(req,res)=>{
         .json({ success: false, message: "User not found" });
     }
     const roles = user.role;
+    const operationTeam = roles.find(role=>role._id.toString() === "672bbdbfbdbe172165452e7d")
+    console.log("operation team",operationTeam)
     console.log(roles);
     if(roles.length > 0 && roles[0].category !== 'admin'){
-      return res.status(403).json({
+      if(!operationTeam){
+        return res.status(403).json({
+          success:false,
+          messsage:"Unauthorized user!"
+        })
+      }
+    }
+
+    if(user.status === 'inactive'){
+      return res.status(401).json({
         success:false,
-        messsage:"Unauthorized user!"
+        message:"User account is inactive"
       })
     }
+
     // Match Password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

@@ -14,6 +14,7 @@ interface props {
     setUserSearch: (val:string)=>void
 }
 function AssignPannaPramukhModal({pannaPramukh,setUserModal,selectedPanna,setSelectedPanna,setAssignMode,userModal,userSearch,setUserSearch}:props) {
+  console.log("pannapramukh are---->",pannaPramukh)
   return (
     <CustomModal
         open={userModal}
@@ -34,7 +35,7 @@ function AssignPannaPramukhModal({pannaPramukh,setUserModal,selectedPanna,setSel
             type="text"
           />
           <div className="grid mt-5 grid-cols-2 gap-3">
-            {pannaPramukh &&
+            {pannaPramukh && pannaPramukh.length > 0 ?
               pannaPramukh.map((us: any) => (
                 <label className="flex gap-5">
                   <input
@@ -45,7 +46,7 @@ function AssignPannaPramukhModal({pannaPramukh,setUserModal,selectedPanna,setSel
                   />
                   <p>{us.name}</p>
                 </label>
-              ))}
+              )) :<div className='h-full w-full flex justify-center items-center col-span-2 text-xs'>No panna pramukh avaialable for this survey ac_list</div>}
           </div>
           <ButtonFilled
             onClick={() => {

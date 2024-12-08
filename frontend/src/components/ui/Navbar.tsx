@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { checkToken } from "@/utils/common_functions";
 import Image from "next/image";
@@ -16,13 +16,19 @@ interface UserData {
 function Navbar() {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
+  const path = usePathname()
   useEffect(() => {
     const payload = checkToken();
     console.log("Logged in user data is --->",payload);
-    if (payload && payload.role.length > 0 && payload.role[0].category === 'admin') {
+    const operationTeam = payload?.role.find((el:any)=>el._id.toString() === "672bbdbfbdbe172165452e7d")
+    console.log("operation team ----->",operationTeam)
+    if (payload && payload.role.length > 0 && (payload.role[0].category === 'admin' || operationTeam)) {
+      if(operationTeam && ( path.includes('/users') || path.includes('/karyakarta'))){
+        router.replace('/admin/surveys');
+      }
       setUserData(checkToken());
     } else {
-      router.push("/");
+      router.replace("/");
     }
   }, [router]);
   return (

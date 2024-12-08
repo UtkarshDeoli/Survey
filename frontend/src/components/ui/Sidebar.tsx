@@ -69,26 +69,31 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
   ];
 
   // Filter out "Karyakarta" and "Users" tabs if the user has "operation team" role
-  if (user?.role && user.role.includes("Operation team")) {
-    SidebarScreens = SidebarScreens.filter(
-      (item: any) => item.name !== "Karyakarta" && item.name !== "Users"
-    );
-  } else {
-    // Add "Karyakarta" and "Users" if the user does not have "operation team" role
-    SidebarScreens.push(
-      {
-        icon: "/images/karyakarta.png",
-        name: "Karyakarta",
-        path: "/admin/karyakarta",
-        tooltip: "Karyakarta",
-      },
-      {
-        icon: "/images/survey-user.png",
-        name: "Users",
-        path: "/admin/users",
-        tooltip: "Users",
-      }
-    );
+  console.log("users from sidebar -->", user);
+  if (user?.role) {
+    const roleName = user.role.map((el: any) => el.name);
+    console.log("roleNmae are ---->", roleName);
+    if (roleName.includes("Operation team")) {
+      SidebarScreens = SidebarScreens.filter(
+        (item: any) => item.name !== "Karyakarta" && item.name !== "Users"
+      );
+    } else {
+      // Add "Karyakarta" and "Users" if the user does not have "operation team" role
+      SidebarScreens.push(
+        {
+          icon: "/images/karyakarta.png",
+          name: "Karyakarta",
+          path: "/admin/karyakarta",
+          tooltip: "Karyakarta",
+        },
+        {
+          icon: "/images/survey-user.png",
+          name: "Users",
+          path: "/admin/users",
+          tooltip: "Users",
+        }
+      );
+    }
   }
   function getSidebarButtonClass(el: any) {
     return `relative flex rounded-md ${
@@ -216,38 +221,35 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
               />
             </div>
           ))}
-         
         </div>
         <div className="mt-auto w-[96%] mx-auto relative flex justify-center items-center bg-[#fcbd95] h-32  rounded-lg transition-all duration-150 overflow-hidden before:content-[''] before:absolute before:rounded-full before:w-[40px] before:h-[40px] before:bg-[#eb7e3b] before:top-[10px] before:left-[10px] after:content-[''] after:absolute after:rounded-full after:w-[70px] after:h-[70px] after:bg-[#eb7e3b] after:top-[-20px] after:right-[-20px]">
-            <button
-              onClick={() => { 
-                localStorage.removeItem("jwt_token");
-                router.push("/");
-              }}
-              className={` relative z-20 rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-bold bg-primary-300 h-fit text-white ${
-                !sidebarOpen ? "w-fit" : "w-[150px]"
-              }`}
-            >
-              {!sidebarOpen && (
-                <div
-                  className="w-full"
-                  data-tooltip-id={`tooltip-logout`}
-                  data-tooltip-content={"Logout"}
-                  data-tooltip-place="right"
-                >
-                  <img src="/images/logout.png" className="w-[25px]" />
-                </div>
-              )}
-              {sidebarOpen && (
-                <IoMdLogOut className="text-[25px]" />
-              )}
-              {sidebarOpen && "Logout"}
-            </button>
-            <Tooltip
-              id={`tooltip-logout`}
-              style={{ zIndex: 30, position: "fixed" }}
-            />
-          </div>
+          <button
+            onClick={() => {
+              localStorage.removeItem("jwt_token");
+              router.push("/");
+            }}
+            className={` relative z-20 rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-bold bg-primary-300 h-fit text-white ${
+              !sidebarOpen ? "w-fit" : "w-[150px]"
+            }`}
+          >
+            {!sidebarOpen && (
+              <div
+                className="w-full"
+                data-tooltip-id={`tooltip-logout`}
+                data-tooltip-content={"Logout"}
+                data-tooltip-place="right"
+              >
+                <img src="/images/logout.png" className="w-[25px]" />
+              </div>
+            )}
+            {sidebarOpen && <IoMdLogOut className="text-[25px]" />}
+            {sidebarOpen && "Logout"}
+          </button>
+          <Tooltip
+            id={`tooltip-logout`}
+            style={{ zIndex: 30, position: "fixed" }}
+          />
+        </div>
       </div>
     </aside>
   );

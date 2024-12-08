@@ -531,10 +531,79 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
   }
 };
 
+// exports.getSurveyResponses = async (req, res) => {
+//   try {
+//     const { search, sortOrder = "desc" } = req.query;
+//     console.log("route is hitting --- >")
+
+//     const pipeline = [
+//       {
+//         $group: {
+//           _id: "$survey_id",
+//           responseCount: { $sum: 1 },
+//           latestResponseCreatedAt: { $max: "$createdAt" },
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "survey99",
+//           localField: "_id",
+//           foreignField: "_id",
+//           as: "surveyDetails",
+//         },
+//       },
+//       {
+//         $unwind: "$surveyDetails",
+//       },
+//       {
+//         $project: {
+//           _id: 0,
+//           survey_id: "$_id",
+//           surveyName: "$surveyDetails.name",
+//           ac_list:"$surveyDetails.ac_list",
+//           responseCount: 1,
+//           latestResponseCreatedAt: 1,
+//           surveyCreatedAt: "$surveyDetails.createdAt",
+//         },
+//       },
+//     ];
+
+//     if (search) {
+//       pipeline.push({
+//         $match: {
+//           surveyName: { $regex: search, $options: "i" },
+//         },
+//       });
+//     }
+
+//     pipeline.push({
+//       $sort: {
+//         latestResponseCreatedAt: sortOrder === "asc" ? 1 : -1,
+//       },
+//     });
+
+//     const results = await Responses.aggregate(pipeline);
+//     console.log("results are ----->",results);
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Responses grouped by survey retrieved successfully",
+//       data: results,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(400).json({ success: false, message: error.message });
+//   }
+// };
+
 exports.getSurveyResponses = async (req, res) => {
   try {
-    const { search, sortOrder = "desc" } = req.query;
-    console.log("route is hitting --- >")
+    const { search, sortOrder = "desc", page = 1, limit = 10 } = req.query; // Default values for page and limit
+    console.log("route is hitting --- >");
+
+    const pageNumber = Math.max(1, parseInt(page, 10)); // Ensure page is at least 1
+    const pageSize = Math.max(1, parseInt(limit, 10)); // Ensure limit is at least 1
+    const skip = (pageNumber - 1) * pageSize;
 
     const pipeline = [
       {
@@ -560,7 +629,7 @@ exports.getSurveyResponses = async (req, res) => {
           _id: 0,
           survey_id: "$_id",
           surveyName: "$surveyDetails.name",
-          ac_list:"$surveyDetails.ac_list",
+          ac_list: "$surveyDetails.ac_list",
           responseCount: 1,
           latestResponseCreatedAt: 1,
           surveyCreatedAt: "$surveyDetails.createdAt",
@@ -576,19 +645,40 @@ exports.getSurveyResponses = async (req, res) => {
       });
     }
 
-    pipeline.push({
-      $sort: {
-        latestResponseCreatedAt: sortOrder === "asc" ? 1 : -1,
+    pipeline.push(
+      {
+        $sort: {
+          latestResponseCreatedAt: sortOrder === "asc" ? 1 : -1,
+        },
       },
-    });
+      {
+        $skip: skip, // Skip the number of documents for pagination
+      },
+      {
+        $limit: pageSize, // Limit the number of documents for pagination
+      }
+    );
 
     const results = await Responses.aggregate(pipeline);
-    console.log("results are ----->",results);
+
+    // Get the total count of matching documents for calculating total pages
+    const countPipeline = pipeline.slice(0, -2); // Remove $skip and $limit stages for count
+    countPipeline.push({
+      $count: "totalCount",
+    });
+    const countResult = await Responses.aggregate(countPipeline);
+    const totalCount = countResult.length > 0 ? countResult[0].totalCount : 0;
+    const totalPages = Math.ceil(totalCount / pageSize);
 
     return res.status(200).json({
       success: true,
       message: "Responses grouped by survey retrieved successfully",
       data: results,
+      pagination: {
+        currentPage: pageNumber,
+        totalPages,
+        totalCount,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -596,100 +686,6 @@ exports.getSurveyResponses = async (req, res) => {
   }
 };
 
-// exports.getSurveyResponseStats = async (req, res) => {
-//   try {
-//     const { survey_id,startDate,endDate,filters } = req.query;
-
-//     if (!survey_id) {
-//       return res.status(400).json({ message: "Survey ID is required." });
-//     }
-//     const matchStage = {
-//       survey_id: new mongoose.Types.ObjectId(String(survey_id))
-//     }
-//     if (startDate && endDate) {
-//       if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
-//         return res
-//           .status(400)
-//           .json({ success: false, message: "Invalid date range." });
-//       }
-//       const startUtcDate = new Date(startDate);
-//       startUtcDate.setUTCHours(0, 0, 0, 0); // Start of the day at 12:00 AM UTC
-
-//       const endUtcDate = new Date(endDate);
-//       endUtcDate.setUTCHours(23, 59, 59, 999); // End of the day at 11:59 PM UTC
-
-//       console.log(startUtcDate);
-//       console.log(endUtcDate);
-//       matchStage.createdAt = {
-//         $gte: startUtcDate,
-//         $lte: endUtcDate,
-//       };
-//     }
-
-//     const stats = await Responses.aggregate([
-//       {
-//         $match: matchStage
-//       },
-//       {
-//         $unwind: "$responses",
-//       },
-//       {
-//         $group: {
-//           _id: "$responses.question_id",
-//           question: { $first: "$responses.question" },
-//           responses: {
-//             $push: {
-//               response: "$responses.response",
-//               question_type: "$responses.question_type",
-//             },
-//           },
-//           total_responses: { $sum: 1 },
-//         },
-//       },
-
-//       {
-//         $unwind: "$responses",
-//       },
-//       {
-//         $group: {
-//           _id: {
-//             question_id: "$_id",
-//             response_value: "$responses.response",
-//           },
-//           question: { $first: "$question" },
-//           response_count: { $sum: 1 },
-//           total_responses: { $first: "$total_responses" },
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: "$_id.question_id",
-//           question: { $first: "$question" },
-//           total_responses: { $first: "$total_responses" },
-//           responses: {
-//             $push: {
-//               response_value: "$_id.response_value",
-//               count: "$response_count",
-//             },
-//           },
-//         },
-//       },
-//       {
-//         $project: {
-//           _id: 0,
-//           question_id: "$_id",
-//           question: 1,
-//           total_responses: 1,
-//           responses: 1,
-//         },
-//       },
-//     ]);
-//     return res.status(200).json({ success: true, data: stats });
-//   } catch (error) {
-//     console.error("Error fetching survey response stats:", error);
-//     return res.status(500).json({ message: "Internal server error." });
-//   }
-// };
 
 exports.getSurveyResponseStats = async (req, res) => {
   try {

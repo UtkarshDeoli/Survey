@@ -34,7 +34,11 @@ export default function login() {
         router.push("/admin/surveys");
       } else {
         console.log(res);
-        toast.error("Invalid credentials or unauthorized user");
+        if(res.error){
+          toast.error(res.error.message)
+        }else{
+          toast.error("Invalid credentials or unauthorized user");
+        }
       }
     }).catch((error)=>{
       toast.error("Failed to Login as Admin")

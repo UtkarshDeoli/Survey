@@ -63,7 +63,7 @@ function page() {
     }
   };
   return (
-    <div className="w-full bg-[#ECF0FA] text-sm ">
+    <div className="w-full bg-[#ECF0FA] text-sm min-h-[calc(100vh-80px)]">
       <nav className="h-16 w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Users</h1>
@@ -122,7 +122,7 @@ function page() {
         </div>
       </div>
 
-      <div className="relative w-[96%] mx-auto text-sm h-[70vh] overflow-y-auto vertical-scrollbar">
+      <div className="relative w-[96%] mx-auto text-sm  max-h-[70vh] overflow-y-auto vertical-scrollbar">
         <div className="sticky top-0 left-0 z-10 grid grid-cols-5 text-white bg-dark-gray font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1 flex justify-center items-center">Name</p>
           <p className="col-span-1 flex justify-center items-center">
@@ -189,7 +189,7 @@ function page() {
           )):<div className="flex justify-center items-center h-[20vh] w-full">No user found</div>}
       </div>
       {!loading && (
-        <div className="flex gap-3 items-center mt-4 ml-4 pb-3">
+        <div className="flex gap-3 items-center mt-4 ml-4 pb-3 sticky bottom-0 left-0">
           {/* Limit Select */}
           <div>
             <label htmlFor="limit-select" className="mr-2">

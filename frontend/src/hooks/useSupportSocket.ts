@@ -19,10 +19,11 @@ const useSupportSocket = () => {
   const [currentUserData, setCurrentUserData] =
     useState<CurrentUserDataInterface>(currentUser);
   const [userData, setUserData] = useState<UserDataInterface[]>([]);
-  const [selectedRole, setSelectedRole] = useState<string>("");
+  const [selectedRole, setSelectedRole] = useState<any>("");
   const [searchBarInput, setSearchBarInput] = useState<string>("");
   const [totalUsers,setTotalUsers] = useState <number>(0)
-
+  const [loading,setlLoading] = useState<boolean>(false);
+  console.log("selected role --- >",selectedRole)
   useEffect(() => {
     // Create a new socket connection
     const newSocket = io(SERVER_URI, {
@@ -37,15 +38,17 @@ const useSupportSocket = () => {
   }, []);
 
   async function getAllChatData() {
+    // setlLoading(true);
     const params = {
       currentUserId:currentUserData?.id!,
       searchBarInput,
-      selectedRole,
+      selectedRole:selectedRole.name,
     }
     const res = await getAllChatsData(params);
     console.log("all user chat response",res)
     setUserData(res.data);
     setTotalUsers(res.total);
+    // setlLoading(false);
   }
 
   const handleRoomJoined = ({
@@ -120,8 +123,8 @@ const useSupportSocket = () => {
     }
   };
 
-  const handleRoleSelect = (role: string) => {
-    if (selectedRole === role) setSelectedRole("");
+  const handleRoleSelect = (role: any) => {
+    if (selectedRole.name === role.name) setSelectedRole("");
     else setSelectedRole(role);
   };
 
@@ -139,7 +142,8 @@ const useSupportSocket = () => {
     handleSearchClick,
     sendMessage,
     joinRoom,
-    setUserData
+    setUserData,
+    loading
   };
 };
 

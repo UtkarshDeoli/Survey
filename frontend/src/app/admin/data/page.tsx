@@ -9,6 +9,7 @@ import {
 import Loader from "@/components/ui/Loader";
 import { getAllSurveyResponses } from "@/networks/response_networks";
 import { formatDate } from "@/utils/common_functions";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 function page() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -16,24 +17,47 @@ function page() {
   const [searchValue,setSearchValue] = useState <string> ("")
   const [sortOrder,setSortOrder] = useState <string>('desc');
   const [reset,setReset] = useState <boolean>(false)
+  const [page,setPage] = useState<number>(1);
+  const [pageLimit,setPageLimit] = useState<number>(10);
+  const [totalResponsePages, setTotalResponsePages] = useState<number>(0);
   
   const router = useRouter();
   
  console.log(data)
   useEffect(()=>{
     getResponses()
-   },[sortOrder,reset])
+   },[sortOrder,reset,page,pageLimit])
 
   async function getResponses(){
-    const params ={search:searchValue,sortOrder}
+    const params ={search:searchValue,sortOrder,page,limit:pageLimit}
     setLoading(true)
     const response = await getAllSurveyResponses(params)
     if(response.success){
       console.log("response -----",response)
+      setTotalResponsePages(response.pagination.totalPages)
+      setPage(response.pagination.currentPage)
       setData(response.data)
     }
     setLoading(false)
   }
+
+  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLimit = parseInt(e.target.value, 10);
+    setPageLimit(newLimit);
+    setPage(1);
+  };
+
+  const handleNextPage = () => {
+    if (page < totalResponsePages) {
+      setPage(page + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
   return (
     <div className="w-full font-medium bg-[#ECF0FA] h-full">
       <nav className="h-16 w-full py-3 px-8 flex justify-between">
@@ -133,6 +157,49 @@ function page() {
             </div>
           )}
       </div>
+
+      {!loading && (
+        <div className="flex gap-3 items-center mt-4 ml-4 pb-3 sticky bottom-0 left-0">
+          {/* Limit Select */}
+          <div>
+            <label htmlFor="limit-select" className="mr-2">
+              Show:
+            </label>
+            <select
+              id="limit-select"
+              value={pageLimit}
+              onChange={handleLimitChange}
+              className="p-2 border rounded-md"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
+
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowBack />
+            </button>
+            <span>
+              Page {page} of {totalResponsePages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalResponsePages}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

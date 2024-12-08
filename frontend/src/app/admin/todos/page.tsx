@@ -143,8 +143,8 @@ function page() {
   };
   if (loading) return <Loader />;
   return (
-    <main>
-      <nav className="w-full sticky top-0 bg-white z-10 left-0 p-4 flex justify-between items-center">
+    <main className="min-h-[calc(100vh-80px)] bg-light-gray">
+      <nav className="w-full sticky top-0 bg-light-gray z-10 left-0 p-4 flex justify-between items-center">
         <h1 className="text-xl text-secondary-300">To-Do List</h1>
         <div className="flex gap-2">
           <ButtonFilled onClick={() => setScheduleModal(true)}>
@@ -177,7 +177,7 @@ function page() {
 
       {/* todos listing */}
       <section className="my-4">
-        <div className="w-[96%] mx-auto flex flex-col flex-1 h-[70vh] max-h-[70vh] rounded-lg">
+        <div className="w-[96%] mx-auto flex flex-col flex-1 max-h-[70vh] rounded-lg">
           {/* headings */}
           <div className="grid bg-dark-gray grid-cols-6 gap-2 rounded-lg p-4 border-b-2">
             {[
@@ -391,7 +391,7 @@ function page() {
         getUsers={getUsers}
       />
       {!loading && (
-        <div className="flex gap-3 items-center my-4 ml-3">
+        <div className="flex gap-3 items-center mt-4 pb-4 ml-3 sticky bottom-0 left-0">
           {/* Limit Select */}
           <div>
             <label htmlFor="limit-select" className="mr-2">
