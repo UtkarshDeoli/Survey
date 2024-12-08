@@ -17,27 +17,21 @@ const responseSchema = new Schema(
     },
     name: {
       type: String,
-      required: true,
     },
     ac_no: {
       type: String,
-      required: true,
     },
     booth_no: {
       type: String,
-      required: true,
     },
     house_no: {
       type: String,
-      required: true,
     },
     last_name: {
       type: String,
-      required: true,
     },
     phone_no: {
       type: String,
-      required: true,
     },
     response: {
       type: Schema.Types.Mixed,

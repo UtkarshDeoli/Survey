@@ -1,5 +1,10 @@
-const { sendNotification,firebase } = require("../firebase");
+const {
+  sendNotification,
+  firebase,
+  sendNotificationToMultipleTokens,
+} = require("../firebase");
 const Todos = require("../models/todo");
+const User = require("../models/user");
 
 exports.createTodo = async (req, res) => {
   try {
@@ -15,17 +20,6 @@ exports.createTodo = async (req, res) => {
       description,
       reminder,
     } = req.body;
-    console.log(req.body);
-
-    const notificationMessaging = firebase.messaging();
-    const todoCreatedMessage = {
-      notification: {
-        title: "New Todo",
-        body: "A new todo has been created and assigned to you",
-      },
-      token: "Device-token",
-    };
-
     const newTodo = new Todos({
       title,
       due_date: new Date(due_date),
@@ -39,15 +33,12 @@ exports.createTodo = async (req, res) => {
       reminder: reminder ? new Date(reminder) : null,
     });
 
+    const users = await User.find({ _id: { $in: assigned_to } });
+    const tokens = users.map((user) => user.notification_token);
+
     await newTodo.save();
-    notificationMessaging
-      .send(todoCreatedMessage)
-      .then((response) => {
-        console.log("Successfully sent message:", response);
-      })
-      .catch((error) => {
-        console.log("Error sending message:", error);
-      });
+
+    sendNotificationToMultipleTokens(tokens, "New todo is assigned to you");
 
     res.status(201).json({
       success: true,
@@ -117,17 +108,17 @@ exports.getAllTodos = async (req, res) => {
 
     if (filters.due_date) {
       console.log("Due date is there:", filters.due_date);
-      
+
       const startOfDay = new Date(filters.due_date);
       const endOfDay = new Date(startOfDay);
       endOfDay.setDate(startOfDay.getDate() + 1);
       filters.due_date = {
         $gte: startOfDay, // Start of the day (inclusive)
-        $lt: endOfDay,    // End of the day (exclusive)
+        $lt: endOfDay, // End of the day (exclusive)
       };
     }
 
-    console.log("after editing ",filters);
+    console.log("after editing ", filters);
 
     if (title) {
       filters.title = { $regex: title, $options: "i" };
