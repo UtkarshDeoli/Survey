@@ -146,6 +146,7 @@ function ResponseTable({
           <tr className="bg-dark-gray text-white sticky top-0">
             <td className="min-w-32 px-4 py-2 border-b text-center"></td>
             <td className="min-w-32 px-4 py-2 border-b text-center"></td>
+            {assignMode && <td className="min-w-32 px-4 py-2 border-b text-center"></td> }
 
             <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
               Panna pramukh
