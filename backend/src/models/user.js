@@ -82,7 +82,7 @@ const userSchema = new Schema(
       ref: "profilepictures99",
     },
     isOnline: { type: Boolean, default: false },
-    notification_token: String,
+    notification_token: { type: String, default: null },
   },
   { timestamps: true },
 );

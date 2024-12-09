@@ -5,6 +5,7 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const Role = require("../models/role");
 const Response = require("../models/response");
+const { sendNotificationToMultipleTokens } = require("../firebase");
 
 exports.addUsers = async (req, res) => {
   try {
@@ -61,7 +62,7 @@ exports.addMultipleUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { user_id, ...userData } = req.body;
-    console.log("update user is hitting",req.body);
+    console.log("update user is hitting", req.body);
     console.log(req.body);
     if (!user_id) {
       return res.status(400).json({ error: "Username is required" });
@@ -88,11 +89,17 @@ exports.updateUsers = async (req, res) => {
     const { users } = req.body;
     console.log(users);
 
+    let tokens = [];
+
     if (!Array.isArray(users) || users.length === 0) {
       return res.status(400).json({ error: "No users provided for update" });
     }
 
-    const updatePromises = users.map((user) => {
+    const updatePromises = users.map(async (user) => {
+      const fetchedUserData = await User.findById(user.user_id).select(
+        "notification_token",
+      );
+
       if (!user.user_id) {
         return Promise.reject(new Error("User ID is required for each user"));
       }
@@ -106,6 +113,9 @@ exports.updateUsers = async (req, res) => {
       if (user.role !== undefined) updateFields.role = user.role;
       if (user.assigned_survey !== undefined) {
         updateFields.$addToSet = { assigned_survey: user.assigned_survey };
+        if (fetchedUserData.notification_token) {
+          tokens.push(fetchedUserData.notification_token);
+        }
       }
       if (user.remove_survey !== undefined) {
         updateFields.$pull = { assigned_survey: user.remove_survey };
@@ -118,6 +128,9 @@ exports.updateUsers = async (req, res) => {
     });
 
     const dbRes = await Promise.all(updatePromises);  
+
+    console.log("Tokens are ===>", tokens);
+    sendNotificationToMultipleTokens(tokens, "A new survey is assigned to you");
 
     return res.status(200).json({
       success: true,
@@ -137,13 +150,13 @@ exports.updateUsers = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const _id = req.query.userId;
-    const assignedSurveys = req.query.assignedSurveys;
+    const returnAssignedSurveys = req.query.assignedSurveys;
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    if (assignedSurveys) {
+    if (returnAssignedSurveys) {
       const assignedSurveys = await User.findOne({ _id: _id })
         .populate({
           path: "assigned_survey",
@@ -172,7 +185,7 @@ exports.getUser = async (req, res) => {
     console.log(error);
     return res
       .status(400)
-      .json({ success: false, message: "something went wrong" });
+      .json({ success: false, message: "error in getting user" });
   }
 };
 
@@ -427,11 +440,11 @@ exports.updateKaryakarta = async (req, res) => {
     console.log(req.body);
     const karyakartaRoles = await Role.find({ category: "karyakarta" });
     const validRoles = karyakartaRoles.map((el) => el._id);
-    console.log("valid roles are -->",validRoles)
+    console.log("valid roles are -->", validRoles);
     const roleExists = validRoles.filter(
       (el) => el.toString() === role.toString(),
     );
-    console.log("role exists->>>>",roleExists);
+    console.log("role exists->>>>", roleExists);
     if (roleExists.length === 0) {
       return res.status(400).json({
         success: false,
@@ -593,8 +606,8 @@ exports.getUsersByAcList = async (req, res) => {
       ],
     }));
 
-    console.log("conditions are ===>",JSON.stringify(conditions,null,2))
-    console.log("role === >",pannaPramukhRole._id);
+    console.log("conditions are ===>", JSON.stringify(conditions, null, 2));
+    console.log("role === >", pannaPramukhRole._id);
 
     // Query to match users based on the constructed conditions
     const users = await User.find({
@@ -602,14 +615,14 @@ exports.getUsersByAcList = async (req, res) => {
       $or: conditions,
     });
 
-    console.log(users)
+    console.log(users);
 
     return res.status(200).json({
       success: true,
       data: users,
     });
   } catch (error) {
-    console.error("error is ----> ",error);
+    console.error("error is ----> ", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
