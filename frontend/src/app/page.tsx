@@ -6,6 +6,7 @@ import { loginUser, forgotPassword, loginAdmin } from "@/networks/auth_networks"
 import ReactModal from "react-modal";
 import toast, { Toaster } from "react-hot-toast";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
+import { checkToken } from "@/utils/common_functions";
 
 ReactModal.setAppElement("#main");
 
@@ -17,20 +18,17 @@ export default function login() {
   const [see,setSee] = useState<boolean>(false);
 
   useEffect(() => {
-    const checkToken = () => {
-      const token = localStorage.getItem("jwt_token");
-      if (token) {
-        router.push("/admin/surveys");
-      }
-    };
-    checkToken();
+    const token = checkToken();
+    if (token) {
+      router.push("/admin");
+    }
   }, [router]);
 
   const handleSubmit = () => {
     loginAdmin({ email: Email, password: password }).then((res) => {
       if (res.success) {
         toast.success(res.message);
-        localStorage.setItem("jwt_token", res.token);
+        localStorage.setItem("jwt", res.token);
         router.push("/admin/surveys");
       } else {
         console.log(res);

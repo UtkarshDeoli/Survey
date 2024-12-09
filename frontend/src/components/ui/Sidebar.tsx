@@ -225,7 +225,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
         <div className="mt-auto w-[96%] mx-auto relative flex justify-center items-center bg-[#fcbd95] h-32  rounded-lg transition-all duration-150 overflow-hidden before:content-[''] before:absolute before:rounded-full before:w-[40px] before:h-[40px] before:bg-[#eb7e3b] before:top-[10px] before:left-[10px] after:content-[''] after:absolute after:rounded-full after:w-[70px] after:h-[70px] after:bg-[#eb7e3b] after:top-[-20px] after:right-[-20px]">
           <button
             onClick={() => {
-              localStorage.removeItem("jwt_token");
+              localStorage.removeItem("jwt");
               router.push("/");
             }}
             className={` relative z-20 rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-bold bg-primary-300 h-fit text-white ${

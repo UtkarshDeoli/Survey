@@ -422,7 +422,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
     <h1 className="text-xl w-full text-center">Select survey collectors to assign the survey</h1>
     <input value={userSearch} onChange={(e)=>setUserSearch(e.target.value)} placeholder ="Search user" className="px-4 py-2 rounded-md border outline-none w-full"/>
     <div className="grid grid-cols-2 gap-4  w-full overflow-y-auto max-h-[60vh]">
-      {users && users.length > 0 ? (
+      {user && users && users.length > 0 ? (
         users.map(({ _id, email, name, assigned_survey }, index) => {
           if (user.id === _id) return null;
           return (

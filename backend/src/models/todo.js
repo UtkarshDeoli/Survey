@@ -41,6 +41,10 @@ const todoSchema = new mongoose.Schema({
     },
     reminder:{
         type:Date,
+    },
+    completed:{
+        type:Boolean,
+        default:false
     }
 
 },{timestamps:true})

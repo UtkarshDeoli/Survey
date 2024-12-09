@@ -20,15 +20,13 @@ function Navbar() {
   useEffect(() => {
     const payload = checkToken();
     console.log("Logged in user data is --->",payload);
+    if(!payload) router.replace('/')
     const operationTeam = payload?.role.find((el:any)=>el._id.toString() === "672bbdbfbdbe172165452e7d")
-    console.log("operation team ----->",operationTeam)
     if (payload && payload.role.length > 0 && (payload.role[0].category === 'admin' || operationTeam)) {
       if(operationTeam && ( path.includes('/users') || path.includes('/karyakarta'))){
         router.replace('/admin/surveys');
       }
-      setUserData(checkToken());
-    } else {
-      router.replace("/");
+      setUserData(payload);
     }
   }, [router]);
   return (

@@ -1,5 +1,5 @@
+"use client"
 import { FaRegEdit } from "react-icons/fa";
-import ButtonFilled from "../ui/buttons/ButtonFilled";
 
 function QuestionChartHeader({ question, onChartTypeChange }: any) {
   return (

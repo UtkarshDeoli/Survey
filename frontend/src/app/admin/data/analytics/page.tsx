@@ -113,7 +113,7 @@ function Page() {
   }
 
   return (
-    <div className="w-full bg-[#ECF0FA]  font-medium ">
+    <div className="w-full bg-[#ECF0FA]  min-h-[calc(100vh-80px)] font-medium ">
       <nav className="h-16 w-full py-3 px-8 flex justify-between font-semibold ">
         <div className="text-my-gray-200 items-center my-auto">
           <p className="text-sm ">
@@ -127,6 +127,7 @@ function Page() {
             <ButtonFilled onClick={()=>setShowFilters(!showFilters)} className="">
               Filters
             </ButtonFilled>
+            <ButtonFilled onClick={()=>router.back()} className="bg-dark-gray">Back</ButtonFilled>
           </div>
       </nav>
 
@@ -258,6 +259,9 @@ function Page() {
             );
           },
         )}
+        <div className="flex justify-center items-center h-[20vh] w-full">
+          <p className="text-sm"><span className="font-bold">Note:</span> The charts are only visible for questions like Radio buttons, checkboxes etc</p>
+        </div>
       </div>
       <CustomModal open={modal} closeModal={()=>setModal(false)}>
         <div className="min-w-[500px] h-[270px] flex flex-col">
