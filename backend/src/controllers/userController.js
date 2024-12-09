@@ -9,6 +9,15 @@ const { sendNotificationToMultipleTokens } = require("../firebase");
 
 exports.addUsers = async (req, res) => {
   try {
+    const existingUser = await User.find({email:req.body.email});
+    console.log("body is --->",req.body)
+    if(existingUser.length > 0){
+      console.log()
+      return res.status(400).json({
+        success:false,
+        message:"Email is already registered"
+      })
+    }
     console.log("add user Request");
     const hashedPass = await bcrypt.hash(req.body.password, 10);
     const data = { ...req.body };
@@ -314,6 +323,13 @@ exports.createKaryakarta = async (req, res) => {
       password,
       role,
     } = req.body;
+    const userExists = await User.find({email:email});
+    if(userExists.length > 0){
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
     const karyakartaRoles = await Role.find({ category: "karyakarta" });
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("ROLE ISS:", role);
@@ -340,22 +356,22 @@ exports.createKaryakarta = async (req, res) => {
       role: [role],
     });
 
-    const userId = newKaryakarta._id;
-    let responseIds;
-    if (responses) {
-      responseIds = responses.map(
-        (responseId) => new mongoose.Types.ObjectId(String(responseId)),
-      );
-    }
+    // const userId = newKaryakarta._id;
+    // let responseIds;
+    // if (responses) {
+    //   responseIds = responses.map(
+    //     (responseId) => new mongoose.Types.ObjectId(String(responseId)),
+    //   );
+    // }
 
-    let savedData;
-    if (responseIds) {
-      savedData = await Data.create({
-        survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-        user_id: userId,
-        responses: responses,
-      });
-    }
+    // let savedData;
+    // if (responseIds) {
+    //   savedData = await Data.create({
+    //     survey_id: new mongoose.Types.ObjectId(String(survey_id)),
+    //     user_id: userId,
+    //     responses: responses,
+    //   });
+    // }
 
     return res.status(200).json({
       success: true,

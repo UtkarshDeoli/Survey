@@ -123,7 +123,7 @@ export const addUsers = async (params: any) => {
     //     }
     //   );
     console.log(response);
-    return response.data.success;
+    return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }

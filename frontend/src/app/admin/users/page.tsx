@@ -189,7 +189,7 @@ function page() {
           )):<div className="flex justify-center items-center h-[20vh] w-full">No user found</div>}
       </div>
       {!loading && (
-        <div className="flex gap-3 items-center mt-4 ml-4 pb-3 sticky bottom-0 left-0">
+        <div className="flex gap-3 items-center mt-4 pl-4 pb-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
           {/* Limit Select */}
           <div>
             <label htmlFor="limit-select" className="mr-2">

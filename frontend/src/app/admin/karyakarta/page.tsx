@@ -200,7 +200,7 @@ function page() {
       </div>
       
       {!loading && (
-        <div className="flex gap-3 items-center mt-4 ml-4 pb-4 sticky bottom-0 left-0">
+        <div className="flex gap-3 items-center mt-4 pl-4 pb-4 sticky bottom-0 left-0 bg-[#ECF0FA]">
           {/* Limit Select */}
           <div>
             <label htmlFor="limit-select" className="mr-2">

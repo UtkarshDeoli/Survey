@@ -139,8 +139,16 @@ function Page() {
     } else {
       res = await createKaryakarta(params);
     }
-    if (res) {
+    console.log("response after creating karyakarta --->",res);
+    if (res.success) {
+      toast.success("Karyakarta created successfully!");
       router.replace("/admin/karyakarta");
+    }else{
+      if(res.error){
+        toast.error(res.error.response.data.message)
+      }else{
+        toast.error("Failed to create karyakarta!")
+      }
     }
     console.log("data----->", data);
   };

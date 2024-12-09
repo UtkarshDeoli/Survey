@@ -74,11 +74,13 @@ function Page() {
 
       res = await addUsers(params);
     }
-    if (res) {
+    console.log("response of adding user --->",res)
+    if (res.success) {
       toast.success("Success");
       router.replace("/admin/users");
     } else {
-      toast.error("Failed");
+      if(res.error) toast.error(res.error.response.data.message);
+      else toast.error("Failed");
     }
   };
 
@@ -125,8 +127,8 @@ function Page() {
   }
   if(rolesLoading) return <Loader/>
   return (
-    <div className="w-full bg-my-gray-100">
-      <nav className="bg-mid-gray w-full py-3 px-8 shadow-md ">
+    <div className="w-full bg-my-gray-100 h-[calc(100vh-80px)]">
+      <nav className="bg-mid-gray w-full flex items-center h-20 px-4 shadow-md ">
         <div>
           <h1 className="text-2xl font-bold">Add User</h1>
         </div>
@@ -136,7 +138,7 @@ function Page() {
         <div className="justify-center items-center bg-lighter-gray">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="border-2  shadow-lg p-6 rounded-[20px]"
+            className="border-2  shadow-lg p-6 rounded-[20px] h-full"
           >
             <div className="flex gap-10 space-x-4">
               {/* Left Section */}
@@ -297,7 +299,7 @@ function Page() {
                 )}
                 {/* Permissions */}
 
-                <div className="space-y-2 mt-3 w-full rounded-[20px] border-2 p-4">
+                {/* <div className="space-y-2 mt-3 w-full rounded-[20px] border-2 p-4">
                   {[
                     { label: "Auto Assign Survey", name: "auto_assign_survey" },
                     {
@@ -344,7 +346,7 @@ function Page() {
                       </div>
                     </div>
                   ))}
-                </div>
+                </div> */}
               </div>
             </div>
 
