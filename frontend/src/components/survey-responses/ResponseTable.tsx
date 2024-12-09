@@ -272,7 +272,7 @@ function ResponseTable({
         </tbody>
       </table>
       {assignMode && (
-        <div className="flex gap-2 mt-5 ml-3 sticky left-3">
+        <div className="flex gap-2 mt-5 ml-3 sticky bottom-0 bg-white left-3">
           <ButtonFilled
             onClick={() => {
               updatePannaPramukhs();
