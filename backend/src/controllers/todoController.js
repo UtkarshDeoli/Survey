@@ -58,6 +58,7 @@ exports.createTodo = async (req, res) => {
 exports.updateTodo = async (req, res) => {
   try {
     const { id, updates } = req.body;
+    console.log(id);
 
     const todo = await Todos.findById(id);
     if (!todo) {
@@ -79,7 +80,6 @@ exports.updateTodo = async (req, res) => {
     if (updates.priority) todo.priority = updates.priority;
     if (updates.description) todo.description = updates.description;
     if (updates.reminder) todo.reminder = updates.reminder;
-    if(updates.completed) todo.completed = updates.completed; 
     if (updates.assigned_to && Array.isArray(updates.assigned_to))
       todo.assigned_to = updates.assigned_to;
 
@@ -157,12 +157,16 @@ exports.getTodosByUserId = async (req, res) => {
     );
 
     if (!todos || todos.length === 0) {
-      return res.status(404).json({ message: "No todos found for this user" });
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No todos found for this user",
+      });
     }
 
     res.status(200).json({
       success: true,
-      message: "Survey updated successfully",
+      message: "Todos retrieved successfully",
       data: todos,
     });
   } catch (error) {
