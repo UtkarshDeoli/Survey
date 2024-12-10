@@ -6,6 +6,8 @@ import { Toaster } from "react-hot-toast";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { CreateSurveyContextProvider } from "@/store/createSurveyContext";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -31,7 +33,11 @@ function Layout({ children }: LayoutProps) {
             sidebarOpen ? "w-[calc(100vw-300px)]" : "w-[calc(100vw-75px)]"
           }`}
         >
-          <CreateSurveyContextProvider>{children}</CreateSurveyContextProvider>
+          <CreateSurveyContextProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              {children}
+            </LocalizationProvider>
+          </CreateSurveyContextProvider>
         </main>
       </div>
       {/* "w-[calc(100vw-250px)]"  */}

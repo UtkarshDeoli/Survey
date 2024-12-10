@@ -391,7 +391,7 @@ function page() {
         getUsers={getUsers}
       />
       {!loading && (
-        <div className="flex gap-3 items-center mt-4 pb-4 ml-3 sticky bottom-0 left-0">
+        <div className="flex gap-3 items-center mt-4 pb-4 bg-light-gray ml-3 sticky bottom-0 left-0">
           {/* Limit Select */}
           <div>
             <label htmlFor="limit-select" className="mr-2">

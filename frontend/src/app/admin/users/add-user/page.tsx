@@ -19,7 +19,7 @@ function Page() {
   const [filter, setFilter] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [rolesData, setRolesData] = useState<any>([]);
-  const [rolesLoading,setRolesLoading] = useState<boolean>(false);
+  const [rolesLoading, setRolesLoading] = useState<boolean>(false);
   const {
     register,
     watch,
@@ -51,7 +51,7 @@ function Page() {
         }
       } catch (error) {
         console.error("Error fetching roles:", error);
-      }finally{
+      } finally {
         setRolesLoading(false);
       }
     };
@@ -61,6 +61,16 @@ function Page() {
 
   const router = useRouter();
   const onSubmit: SubmitHandler<IUser> = async (data: any) => {
+    if(data.password && data.confirm_password){
+      if(data.password.length === 0){
+        toast.error("Password cannot be empty!");
+        return;
+      }
+      else if(data.password!== data.confirm_password){
+        toast.error("Passwords do not match!");
+        return;
+      }
+    }
     delete data.confirm_password;
     if (userId) delete data._id;
     const params: any = data;
@@ -74,12 +84,12 @@ function Page() {
 
       res = await addUsers(params);
     }
-    console.log("response of adding user --->",res)
+    console.log("response of adding user --->", res);
     if (res.success) {
       toast.success("Success");
       router.replace("/admin/users");
     } else {
-      if(res.error) toast.error(res.error.response.data.message);
+      if (res.error) toast.error(res.error.response.data.message);
       else toast.error("Failed");
     }
   };
@@ -111,6 +121,7 @@ function Page() {
     if (userData) {
       console.log("userData::", userData);
       Object.keys(userData).forEach((key: any) => {
+        if (key === "password") return;
         setValue(key, userData[key]);
       });
     }
@@ -125,7 +136,7 @@ function Page() {
       // toast.error("something went wrong")
     }
   }
-  if(rolesLoading) return <Loader/>
+  if (rolesLoading) return <Loader />;
   return (
     <div className="w-full bg-my-gray-100 h-[calc(100vh-80px)]">
       <nav className="bg-mid-gray w-full flex items-center h-20 px-4 shadow-md ">
@@ -177,7 +188,7 @@ function Page() {
                       placeholder: "Confirm password",
                     },
                   ].map((field, index) => (
-                    <div className="flex w-full space-y-2" key={index}>
+                    <div className="flex w-full space-y-2 gap-3" key={index}>
                       <div className="w-[20%] py-2">
                         <label className="block  font-medium">
                           {field.label}
@@ -185,21 +196,29 @@ function Page() {
                       </div>
                       <div className="w-[80%]">
                         <input
-                          disabled={
-                            userId
-                              ? field.name === "confirm_password" ||
-                                field.name === "password"
-                              : false
-                          }
+                          // disabled={
+                          //   userId
+                          //     ? field.name === "confirm_password" ||
+                          //       field.name === "password"
+                          //     : false
+                          // }
                           type={field.type}
                           placeholder={field.placeholder}
                           {...register(field.name as keyof IUser, {
                             required: userId
-                              ? field.name !== "confirm_password"
+                              ? !['confirm_password','password'].includes(field.name)
                               : true,
                           })}
                           className="border border-gray-300 rounded-md p-3 w-full outline-none focus:ring-2 focus:ring-primary-50"
                         />
+                        {userId && field.name === "password" && (
+                          <p className="text-sm">
+                            <span className="font-bold">Note: </span>Entering a
+                            new password will result in <strong>overriding</strong> the older
+                            password. Leave the password and confirm password
+                            empty to avoid any change.
+                          </p>
+                        )}
                         {errors[field.name as keyof IUser] && (
                           <p className="text-red-500">This field is required</p>
                         )}
@@ -359,7 +378,7 @@ function Page() {
                 {userId ? "Update" : "Save"}
               </button>
               <button
-                onClick={()=>router.back()}
+                onClick={() => router.back()}
                 type="button"
                 className="bg-white border-[#7C7C7C] border-2  py-2 px-4 rounded-md "
               >

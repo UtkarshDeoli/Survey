@@ -15,6 +15,7 @@ import {
 import { getDashboard } from "@/networks/dashboard_networks";
 import Loader from "@/components/ui/Loader";
 import { formatDate, truncateText } from "@/utils/common_functions";
+import { useRouter } from "next/navigation";
 
 ChartJS.register(Title, Tooltip, Legend, Colors, ArcElement);
 
@@ -45,6 +46,7 @@ function Page() {
 
   const [userData, setUserData] = useState<any>(null);
   const [karyakartaData, setKaryakartaData] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -61,7 +63,7 @@ function Page() {
         const userStats = response.data.userStats.find(
           (user: any) => user._id === "user"
         );
-        if(userStats){
+        if (userStats) {
           const userRoles = userStats.roles.map((role: any) => role.role.name);
           const userRoleCounts = userStats.roles.map((role: any) => role.count);
           setUserData({
@@ -118,14 +120,20 @@ function Page() {
         <div className="flex flex-col gap-10 p-5">
           <div className="flex justify-around">
             <div className="flex flex-col min-h-200px justify-between py-2">
-              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[300px]">
+              <div
+                onClick={() => router.push("/admin/surveys")}
+                className="cursor-pointer flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[300px]"
+              >
                 <h2 className="text-[20px] font-bold">Total survey</h2>
                 <img src="/images/right.png" className="h-3" />
                 <h2 className="text-[20px] font-bold">
                   {dashboardData.surveysCount}
                 </h2>
               </div>
-              <div className="flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[300px]">
+              <div
+                onClick={() => router.push("/admin/data")}
+                className="cursor-pointer flex justify-between items-center shadow-md rounded-[25px] px-10 py-10 bg-white min-w-[300px]"
+              >
                 <h2 className="text-[20px] font-bold">Total responses</h2>
                 <img src="/images/right.png" className="h-3" />
                 <h2 className="text-[20px] font-bold">
@@ -133,13 +141,13 @@ function Page() {
                 </h2>
               </div>
             </div>
-            <div className="flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-5 py-8 bg-white ">
+            <div onClick= {()=>router.push('/admin/karyakarta')} className="cursor-pointer flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-5 py-8 bg-white ">
               <h2 className="text-[20px] font-bold ">Number of karyakarta</h2>
               {karyakartaData && (
                 <Pie data={karyakartaData} options={options} />
               )}
             </div>
-            <div className="flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-10 py-8 bg-white ">
+            <div onClick={()=>router.push('/admin/users')} className="cursor-pointer flex flex-col p-5 gap-4 shadow-md rounded-[25px] px-10 py-8 bg-white ">
               <h2 className="text-[20px] font-bold ">Number of Users</h2>
               {userData && <Pie data={userData} options={options} />}
             </div>
@@ -159,7 +167,8 @@ function Page() {
                   dashboardData.todos.map((todo: any) => (
                     <div
                       key={todo._id}
-                      className="grid grid-cols-4 w-full place-items-center text-[13px]"
+                      onClick={() => router.push("/admin/todos")}
+                      className="cursor-pointer grid grid-cols-4 w-full place-items-center text-[13px]"
                     >
                       <p>{truncateText(todo._id, 10)}</p>
                       <img src="/images/right.png" className="h-2" />
@@ -187,8 +196,13 @@ function Page() {
                 {dashboardData.todos.length > 0 ? (
                   dashboardData.surveys.map((survey: any) => (
                     <div
+                      onClick={() =>
+                        router.push(
+                          `/admin/surveys/edit?survey_id=${survey._id}`
+                        )
+                      }
                       key={survey._id}
-                      className="grid grid-cols-3 w-full place-items-center text-[13px]"
+                      className="cursor-pointer grid grid-cols-3 w-full place-items-center text-[13px]"
                     >
                       <p>{truncateText(survey.name, 20)}</p>
                       <img src="/images/long-arrow.png" className="h-2" />

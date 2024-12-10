@@ -72,26 +72,42 @@ exports.updateUser = async (req, res) => {
   try {
     const { user_id, ...userData } = req.body;
     console.log("update user is hitting", req.body);
-    console.log(req.body);
+    console.log("userData is --->", userData);
+
     if (!user_id) {
-      return res.status(400).json({ error: "Username is required" });
+      return res.status(400).json({ error: "User ID is required" });
     }
-    console.log("usrData is --->", userData);
-    const dbRes = await User.findOneAndUpdate(
+
+    // Check if password exists and is not an empty string
+    if (userData.password && userData.password.trim() !== "") {
+      const hashedPass = await bcrypt.hash(userData.password, 10);
+      userData.password = hashedPass;
+    } else {
+      // If password is empty, remove it from the userData
+      delete userData.password;
+    }
+
+    // Update user without changing password if it's not provided or is empty
+    const updatedUser = await User.findOneAndUpdate(
       { _id: user_id },
       { $set: userData },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
-    return res
-      .status(200)
-      .json({ success: true, message: "User updated successfully" });
+
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: updatedUser, // Optional: Include updated user data in the response
+    });
   } catch (error) {
     console.log(error);
-    return res
-      .status(400)
-      .json({ success: false, message: "something went wrong" });
+    return res.status(400).json({
+      success: false,
+      message: "Something went wrong while updating user",
+    });
   }
 };
+
 
 exports.updateUsers = async (req, res) => {
   try {
@@ -306,7 +322,7 @@ exports.getProfilePicture = async (req, res) => {
   }
 };
 
-// karyakarta API'S
+// karyakarta API'S////////////////////////////////////////////////////
 
 exports.createKaryakarta = async (req, res) => {
   try {
@@ -323,7 +339,7 @@ exports.createKaryakarta = async (req, res) => {
       password,
       role,
     } = req.body;
-    const userExists = await User.find({email:email});
+    const userExists = await User.find  ({email:email});
     if(userExists.length > 0){
       return res.status(400).json({
         success: false,
@@ -448,8 +464,6 @@ exports.updateKaryakarta = async (req, res) => {
       booth_no,
       district,
       password,
-      survey_id,
-      responses,
       role,
       status,
     } = req.body;

@@ -6,6 +6,9 @@ import { CiImport } from "react-icons/ci";
 import CreateSurveyModal from "./CreateSurveyModal";
 import ImportSurveyModal from "./ImportSurveyModal";
 import { useCreateSurveyContext } from "@/hooks/contextHooks/useCreateSurvey";
+import ButtonFilled from "../ui/buttons/ButtonFilled";
+import { IoIosAddCircle } from "react-icons/io";
+import { CgImport } from "react-icons/cg";
 
 interface props {
   setUpdated: any;
@@ -30,20 +33,20 @@ function SurveyHeader({ setUpdated }: props) {
       <div className="h-16 w-full py-3 px-8 flex justify-between ">
         <h3 className="text-secondary-300 text-2xl">Surveys</h3>
         <div className="flex gap-2">
-          <ButtonBordered
+          <ButtonFilled
             onClick={openModal}
-            className="bg-white font-semibold"
+            className=" font-semibold gap-2"
           >
             {" "}
-            + Create survey
-          </ButtonBordered>
-          <ButtonBordered
+          <p className="text-2xl"><IoIosAddCircle /></p> <p>Create survey</p>
+          </ButtonFilled>
+          <ButtonFilled
             onClick={openImportModal}
-            className="flex gap-2 items-center bg-white font-semibold"
+            className="flex gap-2 items-center  font-semibold"
           >
-            <CiImport className="tex-xl" />
-            Import survey
-          </ButtonBordered>
+            <CgImport className="text-2xl"/>
+            <p>Import survey</p>
+          </ButtonFilled>
         </div>
       </div>
 

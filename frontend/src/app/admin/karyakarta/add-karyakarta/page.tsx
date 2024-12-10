@@ -120,8 +120,16 @@ function Page() {
   const onSubmit = async (data: any) => {
     if (selectedSurvey) data.survey_id = selectedSurvey;
     if (selectedResponses) data.responses = selectedResponses;
-    if (data.password.trim().length > 0) {
-      if (data.password !== data.confirm_password) {
+    if (data.password) {
+      if(!data.confirm_password){
+        toast.error("Please confirm password");
+        return;
+      }
+      else if(data.password.trim().length === 0){
+        toast.error("Password should contain valid characters");
+        return;
+      }
+      else if(data.password !== data.confirm_password) {
         toast.error("Passwords donot match!");
         return;
       }
@@ -130,6 +138,7 @@ function Page() {
     if (user) {
       data.created_by = user.email;
     }
+    console.log("submitted data is  ---->", data);
     const params = data;
     let res;
     if (userId) {
@@ -141,7 +150,7 @@ function Page() {
     }
     console.log("response after creating karyakarta --->",res);
     if (res.success) {
-      toast.success("Karyakarta created successfully!");
+      toast.success("Success!");
       router.replace("/admin/karyakarta");
     }else{
       if(res.error){
@@ -199,7 +208,7 @@ function Page() {
           <form className="bg-lighter-gray border-2 p-6 rounded-[20px] h-full">
             <div className="flex gap-8 space-x-4">
               {/* Left Section */}
-              <div className="w-1/2 ">
+              <div className="w-[60%] ">
                 {/* user details */}
                 <div className="w-full">
                   {inputs.map((field, index) => (
@@ -218,6 +227,14 @@ function Page() {
                           })}
                           className="border border-gray-300 rounded-md p-2 w-full outline-none focus:ring-2 focus:ring-primary-50"
                         />
+                        {userId && field.name === "password" && (
+                          <p className="text-sm">
+                            <span className="font-bold">Note: </span>Entering a
+                            new password will result in <strong>overriding</strong> the older
+                            password. Leave the password and confirm password
+                            empty to avoid any change.
+                          </p>
+                        )}
                         {errors[field.name] && (
                           <p className="text-red-500">This field is required</p>
                         )}
@@ -272,7 +289,7 @@ function Page() {
                   </div>
                 </div>
               </div>
-              <div className="w-1/2">
+              <div className="w-[40%]">
                 {/* Roles */}
                 <div className="flex flex-col gap-4">
                   <div className="text-lg font-medium">Role</div>

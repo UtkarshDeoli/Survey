@@ -30,7 +30,7 @@ export const updateUsers = async (params: any) => {
       data: params,
     };
     const response = await axios.request(options);
-    return response.data.success;
+    return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }
