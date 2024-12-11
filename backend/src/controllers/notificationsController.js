@@ -2,15 +2,15 @@ const Notifications = require("../models/notifications");
 
 exports.getUnreadCount = async (req, res) => {
   try {
-    const { userId } = req.query;
-    if (!userId) {
+    const { user_id } = req.query;
+    if (!user_id) {
       return res.status(400).json({
         success: false,
         message: "User Id is required",
       });
     }
     const userNotificationsDoc = await Notifications.findOne({
-      user_id: userId,
+      user_id: user_id,
     });
     if (!userNotificationsDoc) {
       return res.status(404).json({
@@ -18,6 +18,7 @@ exports.getUnreadCount = async (req, res) => {
         message: "No notifications found for this user",
       });
     }
+    console.log(userNotificationsDoc);
     return res.status(200).json({
       success: true,
       message: "Unread count retrieved successfully",
@@ -33,15 +34,15 @@ exports.getUnreadCount = async (req, res) => {
 
 exports.getAllNotifications = async (req, res) => {
   try {
-    const { userId } = req.query;
-    if (!userId) {
+    const { user_id } = req.query;
+    if (!user_id) {
       return res.status(400).json({
         success: false,
         message: "User Id is required",
       });
     }
     const userNotificationsDoc = await Notifications.findOne({
-      user_id: userId,
+      user_id: user_id,
     });
     if (!userNotificationsDoc) {
       return res.status(404).json({
@@ -64,15 +65,15 @@ exports.getAllNotifications = async (req, res) => {
 
 exports.clearNotifications = async (req, res) => {
   try {
-    const { userId } = req.query;
-    if (!userId) {
+    const { user_id } = req.query;
+    if (!user_id) {
       return res.status(400).json({
         success: false,
         message: "User Id is required",
       });
     }
     const userNotificationsDoc = await Notifications.findOne({
-      user_id: userId,
+      user_id: user_id,
     });
     userNotificationsDoc.notifications = [];
     userNotificationsDoc.unread_count = 0;
