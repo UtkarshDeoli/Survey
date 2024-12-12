@@ -41,13 +41,7 @@ export default function login() {
             validRoles.includes(el._id.toString())
           );
           console.log("isAuthorized ----->",isAuthorized)
-          if(isAdmin) router.replace("/admin");
-          else if(isAuthorized){
-            if(isAuthorized.name === "Operation Team" || isAuthorized.name === "Survey Manager") router.replace("/admin/surveys")
-            else if(isAuthorized.name === "Quality Check") router.replace("/admin/quality-check-surveys")
-            else if(isAuthorized.name === "Supervisor") router.replace("/admin/collectors")
-          }
-          // router.push("/admin/surveys");
+          router.push("/admin/surveys");
         } else {
           console.log("res ----->", res);
           if (res.error) {
