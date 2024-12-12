@@ -15,6 +15,7 @@ import {
   get_panna_pramukh,
   updateMultipleKaryakarta,
   get_panna_pramukh_ac_list,
+  get_supervisor_collectors,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -58,13 +59,14 @@ export const getUser = async (params: any) => {
     const bearerToken = localStorage.getItem("token");
     const options = {
       method: "GET",
-      url: `${SERVER_URI}/${get_user}?userId=${params}`,
+      url: `${SERVER_URI}/${get_user}`,
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
+      params
     };
     const response = await axios.request(options);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }
@@ -305,5 +307,26 @@ export const getPannaPramukhByAcList= async (params: any) => {
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }
+}
+
+export const getSupervisorCollectors= async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "GET",
+      url: `${SERVER_URI}/${get_supervisor_collectors}`,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+      params
+    };
+    const response = await axios.request(options);
+    console.log("from network--->",response)
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
 };
+
+
 

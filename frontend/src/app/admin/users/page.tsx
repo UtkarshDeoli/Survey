@@ -100,12 +100,6 @@ function page() {
             value={searchBarInput}
             onChange={(e) => setSearchBarInput(e.target.value)}
           />
-          {/*
-            <div className="flex space-x-4 items-center me-20">
-              <div className="bg-[#2A4999] w-8 h-8  "></div>
-              <p className="text-sm font-medium">Hide Disabled Users</p>
-            </div>
-            */}
           <div className="flex space-x-3">
             <ButtonFilled
               onClick={() => {
@@ -122,7 +116,7 @@ function page() {
         </div>
       </div>
 
-      <div className="relative w-[96%] mx-auto text-sm  max-h-[70vh] overflow-y-auto vertical-scrollbar">
+      <div className="relative w-[96%] mx-auto text-sm  max-h-[60vh] overflow-y-auto vertical-scrollbar">
         <div className="sticky top-0 left-0 z-10 grid grid-cols-5 text-white bg-dark-gray font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1 flex justify-center items-center">Name</p>
           <p className="col-span-1 flex justify-center items-center">
@@ -144,18 +138,18 @@ function page() {
           users.map((user, index) => (
             <div
               key={index}
-              className="bg-mid-gray border-2 grid p-2 grid-cols-5 text-center text-black"
+              className="bg-mid-gray border-2 grid p-2 grid-cols-5 gap-2 text-center text-black"
             >
-              <p className="col-span-1 flex justify-center items-center font-semibold">
+              <p className="col-span-1 flex justify-center items-center font-semibold ">
                 {user.name}
               </p>
-              <p className="col-span-1 flex justify-center items-center">
+              <p className="col-span-1 flex justify-center items-center ">
                 {user.username}
               </p>
-              <p className="col-span-1 flex justify-center items-center">
+              <p className="col-span-1 flex justify-center items-center ">
                 {user.email}
               </p>
-              <div className="col-span-1 flex justify-center items-center">
+              <div className="col-span-1 flex justify-center items-center ">
                 <div className="flex flex-wrap gap-1 justify-center">
                   {user.role.map((role: any, roleIndex: number) => (
                     <span key={roleIndex} className="whitespace-nowrap">
@@ -189,7 +183,7 @@ function page() {
           )):<div className="flex justify-center items-center h-[20vh] w-full">No user found</div>}
       </div>
       {!loading && (
-        <div className="flex gap-3 items-center mt-4 pl-4 pb-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
+        <div className="flex gap-3 items-center mt-4 pl-4 py-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
           {/* Limit Select */}
           <div>
             <label htmlFor="limit-select" className="mr-2">

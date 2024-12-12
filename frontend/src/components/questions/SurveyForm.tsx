@@ -11,6 +11,19 @@ import { saveResponses } from "@/networks/response_networks";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 
 
+interface Question {
+  question_id: number;
+  type: string|number;
+  parameters: Record<string, any>; // Replace `any` with a specific type if known
+  children: number[];
+  dependency: Array<{ question: string }>; // Adjust type as per your actual structure
+  randomize: boolean;
+}
+
+interface FormData {
+  questions: Question[];
+}
+
 
 function SurveyForm() {
   // search params
@@ -39,8 +52,11 @@ function SurveyForm() {
     setValue,
     getValues,
     control,
-    formState: { isSubmitting },
-  } = useForm();
+    formState: { isSubmitting,isDirty },
+  } = useForm<any>({defaultValues:{questions:[]}});
+
+  console.log("is form dirty ??? ======",isDirty)
+ 
   const { fields, append, move, remove } = useFieldArray({
     control,
     name: "questions",
@@ -81,6 +97,7 @@ function SurveyForm() {
           setValue(
             `questions.${index}.parameters[${parameter}]`,
             question.parameters[parameter],
+            {shouldDirty:false}
           ),
         );
       });
@@ -92,7 +109,7 @@ function SurveyForm() {
 
   // Handle form submission
   async function handleSubmitForm(data: any) {
-    console.log(data);
+    console.log("submitted data is ---->",data);
     const questions = data.questions || [];
     const formData = {questions };
     const params = { _id, formData };
@@ -146,6 +163,7 @@ function SurveyForm() {
         randomize: true,
         children: [],
         dependency: [],
+        parameters:{}
       });
       setQuestId((prev) => prev + 1);
     }
@@ -231,6 +249,7 @@ function SurveyForm() {
       randomize: true,
       children: [],
       dependency: [],
+      parameters:{}
     });
     setQuestId((prev) => prev + 1);
   }

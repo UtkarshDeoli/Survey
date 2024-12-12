@@ -39,7 +39,6 @@ function Page() {
   const [filters, setFilters] = useState<
     { question: string; operator: string; response: string }[]
   >([]);
-  const [userId, setUserId] = useState<string>("");
   const [question, setQuestion] = useState<string>("");
   const [operator, setOperator] = useState<string>("");
   const [response, setResponse] = useState<string>("");
@@ -73,8 +72,8 @@ function Page() {
   
 
   const searchParams = useSearchParams();
-  const userData = useUser()
   const surveyId = searchParams.get("survey_id");
+  const collectorId = searchParams.get("collector_id");
   const router = useRouter();
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -105,11 +104,12 @@ function Page() {
       surveyId,
       startDate: nStartDate,
       endDate: nEndDate,
-      userId,
+      userId:collectorId,
       filters: appliedFilters,
       limit:pageLimit,
       page
     };
+    console.log("params are -->",params);
     setLoading(true);
     const response = await getSurveyResponses(params);
     setResponses(response.data);
@@ -192,7 +192,7 @@ function Page() {
         surveyId,
         startDate: nStartDate,
         endDate: nEndDate,
-        userId,
+        userId:collectorId,
         filters: appliedFilters,
         download:true
       };
@@ -238,7 +238,7 @@ function Page() {
   };
 
   return (
-    <div className="flex flex-col w-full font-medium bg-light-gray">
+    <div className="flex flex-col min-h-[calc(100vh-80px)] w-full font-medium bg-light-gray">
       <nav className="w-full py-3 px-8 flex flex-col gap-10 font-semibold">
         <h3 className="text-[24px] font-semibold">Survey Response</h3>
 
@@ -305,27 +305,12 @@ function Page() {
             </div>
 
             <div className="flex gap-5 items-center">
-              {/* Selected User */}
-              <div className="flex flex-col space-y-2 w-[352px]">
-                <Select
-                  value={options.find((option) => option.value === userId)}
-                  onChange={(selectedOption) =>
-                    setUserId(selectedOption?.value || "")
-                  }
-                  options={options}
-                  placeholder="Select user"
-                  classNamePrefix="react-select"
-                  isSearchable={true} // Enables search
-                />
-              </div>
-
               {/* Action Buttons */}
               <div className="flex space-x-4">
                 <FilledGreyButton
                   onClick={() => {
                     setStartDate(null);
                     setEndDate(null);
-                    setUserId("");
                     setAppliedFilters([]);
                     setReset(!reset);
                   }}
@@ -336,7 +321,6 @@ function Page() {
                 <ButtonFilled
                   disabled={
                     appliedFilters.length === 0 &&
-                    !userId.trim() &&
                     !startDate &&
                     !endDate
                   }
@@ -353,16 +337,6 @@ function Page() {
                   Apply
                 </ButtonFilled>
               </div>
-            </div>
-
-            <div>
-              {
-                acList && acList.length > 0 && (
-                  <ButtonFilled onClick={() => setUserModal(true)}>
-                    Assign Data
-                  </ButtonFilled>
-                )
-              }
             </div>
           </div>
         </div>
@@ -388,7 +362,7 @@ function Page() {
       ) : (
         !loading && (
           <div className="flex w-full justify-center items-center h-[30vh]">
-            <p>No responses found</p>
+            <p>No responses from collector</p>
           </div>
         )
       )}

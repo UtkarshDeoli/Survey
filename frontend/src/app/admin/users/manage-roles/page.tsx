@@ -58,6 +58,13 @@ const customPermissions: any = {
     "View survey",
     "Edit survey",
   ],
+  "Supervisor":[
+    "View survey collectors",
+    "View survey collector data"
+  ],
+  "Quality Check" :[
+    "Accept/Reject data"
+  ]
 };
 
 function Page() {

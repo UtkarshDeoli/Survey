@@ -31,7 +31,7 @@ export default function login() {
         localStorage.setItem("jwt", res.token);
         router.push("/admin/surveys");
       } else {
-        console.log(res);
+        console.log("res ----->",res);
         if(res.error){
           toast.error(res.error.message)
         }else{

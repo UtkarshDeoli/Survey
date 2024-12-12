@@ -1,49 +1,60 @@
 "use client";
 import React, { Suspense, useEffect, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { FaQuestionCircle } from "react-icons/fa";
+import { useForm, SubmitHandler,Controller } from "react-hook-form";
 import { IUser } from "@/types/user_interfaces";
-import { addUsers, updateUsers } from "@/networks/user_networks";
+import { addUsers, getAllUsers, updateUsers } from "@/networks/user_networks";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getAllSurveys } from "@/networks/survey_networks";
 import { getUser } from "@/networks/user_networks";
 import { getRoles } from "@/networks/role_networks";
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/Loader";
+import { supervisorId } from "@/utils/constants";
+import Select from "react-select"
 
 function Page() {
-  const [surveys, setSurveys] = useState<{ name: string }[]>([]);
-  const [pageNo, setPageNo] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
   const [userData, setUserData] = useState<any>();
-  const [filter, setFilter] = useState<string>("");
   const [userId, setUserId] = useState<string | null>(null);
   const [rolesData, setRolesData] = useState<any>([]);
   const [rolesLoading, setRolesLoading] = useState<boolean>(false);
+  const [supervisors,setSupervisors] = useState<any>(null);
   const {
     register,
     watch,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm<IUser>({ defaultValues: userData });
   const searchParams = useSearchParams();
-  const assignedSurveys = watch("assigned_survey") || [];
-
-  const isAllSelected = assignedSurveys.length === surveys?.length;
-
-  useEffect(() => {
-    setValue("selectAll", isAllSelected);
-  }, [assignedSurveys, setValue, isAllSelected]);
+  const role = watch("role");
+  const supervisor = watch("supervisor");
+  let collectorRoleId;
+  if (rolesData.length > 0) {
+    const collector = rolesData.find(
+      (el: any) => el.name === "Survey Collector"
+    );
+    collectorRoleId = collector._id;
+  }
+  console.log("supervisor selected is ---->", supervisor);
+  // console.log("role is --->", role);
 
   useEffect(() => {
     const user_Id = searchParams.get("_id");
     setUserId(user_Id);
 
-    const fetchRoles = async () => {
+    const fetchRolesAndSupervisors = async () => {
       try {
         setRolesLoading(true);
         const response = await getRoles({ category: "user" });
+        const userResponse = await getAllUsers({selectedRole:supervisorId});
+        if(userResponse.success){
+          console.log("supervisors from response --->",userResponse.data)
+          const options = userResponse.data.map((el:any)=>({label:el.name,value:el._id}))
+          setSupervisors(options)
+        }
+        else{
+          toast.error("Error fetching users!");
+        }
         if (response.success) {
           setRolesData(response.roles);
         } else {
@@ -56,17 +67,21 @@ function Page() {
       }
     };
 
-    fetchRoles();
+    fetchRolesAndSupervisors();
   }, []);
 
   const router = useRouter();
   const onSubmit: SubmitHandler<IUser> = async (data: any) => {
-    if(data.password && data.confirm_password){
-      if(data.password.length === 0){
-        toast.error("Password cannot be empty!");
+    console.log(data);
+    if (data.password){
+      if(!data.confirm_password){
+        toast.error("Please confirm password!")
         return;
       }
-      else if(data.password!== data.confirm_password){
+      else if (data.password.length === 0) {
+        toast.error("Password cannot be empty!");
+        return;
+      } else if (data.password !== data.confirm_password) {
         toast.error("Passwords do not match!");
         return;
       }
@@ -94,22 +109,6 @@ function Page() {
     }
   };
 
-  async function getSurveys(page: number = 1) {
-    const res = await getAllSurveys({
-      page: page,
-      filter: filter,
-      created_by: "rohitchand490@gmail.com",
-    });
-    // console.log(res.survey);
-    setTotalPages(res.totalPages);
-    console.log("res::", res);
-    setSurveys(res.survey);
-  }
-
-  useEffect(() => {
-    getSurveys(pageNo);
-  }, [pageNo]);
-
   useEffect(() => {
     if (userId) {
       console.log("user_id::");
@@ -128,12 +127,12 @@ function Page() {
   }, [userData]);
 
   async function getUserData() {
-    const response = await getUser(userId);
+    const response = await getUser({userId:userId});
     console.log("ressese:://", response);
-    if (response) {
-      setUserData(response);
+    if (response.success) {
+      setUserData(response.data);
     } else {
-      // toast.error("something went wrong")
+      toast.error("something went wrong");
     }
   }
   if (rolesLoading) return <Loader />;
@@ -196,17 +195,13 @@ function Page() {
                       </div>
                       <div className="w-[80%]">
                         <input
-                          // disabled={
-                          //   userId
-                          //     ? field.name === "confirm_password" ||
-                          //       field.name === "password"
-                          //     : false
-                          // }
                           type={field.type}
                           placeholder={field.placeholder}
                           {...register(field.name as keyof IUser, {
                             required: userId
-                              ? !['confirm_password','password'].includes(field.name)
+                              ? !["confirm_password", "password"].includes(
+                                  field.name
+                                )
                               : true,
                           })}
                           className="border border-gray-300 rounded-md p-3 w-full outline-none focus:ring-2 focus:ring-primary-50"
@@ -214,9 +209,10 @@ function Page() {
                         {userId && field.name === "password" && (
                           <p className="text-sm">
                             <span className="font-bold">Note: </span>Entering a
-                            new password will result in <strong>overriding</strong> the older
-                            password. Leave the password and confirm password
-                            empty to avoid any change.
+                            new password will result in{" "}
+                            <strong>overriding</strong> the older password.
+                            Leave the password and confirm password empty to
+                            avoid any change.
                           </p>
                         )}
                         {errors[field.name as keyof IUser] && (
@@ -225,24 +221,41 @@ function Page() {
                       </div>
                     </div>
                   ))}
+                  {/* only display this if role is collector */}
+                  {
+                    role && role.includes(collectorRoleId) && (
+                      <div className="flex w-full space-y-2 gap-3">
+                        <div className="w-[20%] py-2">
+                          <label className="block  font-medium">
+                            Supervisor
+                          </label>
+                        </div>
+                        <div className="w-[80%]">
+                          <Controller
+                           name="supervisor" 
+                           control={control}
+                           rules={{ required: role.includes(collectorRoleId) }}
+                           render={({ field }) => (
+                            <Select
+                              {...field} // Spread field props to ensure full integration
+                              options={supervisors} // Options for the Select
+                              isSearchable
+                              value={supervisors.find((option:any) => option.value === field.value)} // Set value to match form state
+                              onChange={(selectedValue) => {
+                                console.log("Selected value --->", selectedValue);
+                                setValue('supervisor', selectedValue?.value || null); // Update form state
+                              }}
+                            />
+                            
+                          )}
+                          />
+                          {errors.supervisor && <p className="text-red-500">This field is required</p>}
+                        </div>
+                      </div>
+                    )
+                  }
                 </div>
 
-                {/* user status active/ inactive */}
-                {/* <div className="flex space-y-2 items-center mt-3 space-x-2 w-full">
-                  <div className="w-[20%] font-medium">User Status</div>
-                  <div className="w-[80%]">
-                    <select
-                      {...register("status", { required: true })}
-                      className="border border-gray-300 w-full text-center rounded-md p-3 outline-none focus:ring-2 focus:ring-primary-50"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                    {errors.status && (
-                      <p className="text-red-500">User status is required</p>
-                    )}
-                  </div>
-                </div> */}
                 <div className="flex space-y-2 items-center mt-3 space-x-2 w-full">
                   <div className="w-[20%] font-medium">User Status</div>
                   <div className="w-[80%]">

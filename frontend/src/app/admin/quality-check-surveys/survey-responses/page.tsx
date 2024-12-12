@@ -28,6 +28,7 @@ import survey_analytics_calender from "/public/images/calendar_new.png";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { surveyCollectorId } from "@/utils/constants";
 import useUser from "@/hooks/useUser";
+import ResponseGrid from "@/components/qualityCheck/ResponseGrid";
 
 function Page() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -354,16 +355,6 @@ function Page() {
                 </ButtonFilled>
               </div>
             </div>
-
-            <div>
-              {
-                acList && acList.length > 0 && (
-                  <ButtonFilled onClick={() => setUserModal(true)}>
-                    Assign Data
-                  </ButtonFilled>
-                )
-              }
-            </div>
           </div>
         </div>
       </div>
@@ -371,7 +362,7 @@ function Page() {
         <Loader className="h-[30vh] w-full flex justify-center items-center" />
       )}
       {!loading && responses && responses.length > 0 ? (
-        <ResponseTable
+        <ResponseGrid
           selectedPanna={selectedPanna}
           more={more}
           responses={responses}
@@ -460,13 +451,6 @@ function Page() {
         selectedResponse={selectedResponse}
         setResponseModalIsOpen={setResponseModalIsOpen}
         users={users}
-      />
-
-      {/* map modal */}
-      <MapModal
-        isLoaded={isLoaded}
-        mapModalIsOpen={mapModalIsOpen}
-        setMapModalIsOpen={setMapModalIsOpen}
       />
 
       {/* Modal for assigning panna pramukh */}

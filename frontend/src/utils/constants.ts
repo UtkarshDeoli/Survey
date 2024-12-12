@@ -9,6 +9,7 @@ export const add_multiple_users = "api/user/addMultipleUsers";
 export const update_user = "api/user/updateUser";
 export const update_users = "api/user/updateUsers";
 export const get_all_chats_data = "api/chatroom/getAllChatsData";
+export const get_supervisor_collectors = "api/user/getSupervisorCollectors"
 
 // karyakartas
 export const get_all_karyakartas = "api/user/getAllKaryakarta"
@@ -65,3 +66,10 @@ export const get_all_todos = "api/todo/todos"
 export const update_todo = "api/todo/update"
 export const delete_todo = "api/todo/delete"
 
+
+// variables
+export const supervisorId = "675985aaa6b36c1fa78d5517"
+export const surveyCollectorId = "671f997d38863c2bfc859e76"
+export const surveyManagerId = "671f999c38863c2bfc859e7a"
+export const qualityCheckId = "675a92c24bbe3577d16bcb64"
+export const validRoles = ["675985aaa6b36c1fa78d5517","672bbdbfbdbe172165452e7d","671f999c38863c2bfc859e7a","675a92c24bbe3577d16bcb64"]

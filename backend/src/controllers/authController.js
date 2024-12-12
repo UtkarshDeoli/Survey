@@ -71,14 +71,18 @@ exports.adminLogin = async(req,res)=>{
         .json({ success: false, message: "User not found" });
     }
     const roles = user.role;
-    const operationTeam = roles.find(role=>role._id.toString() === "672bbdbfbdbe172165452e7d")
-    console.log("operation team",operationTeam)
+    console.log("roles are --->",roles);
+    
+    const validRoles = ["675985aaa6b36c1fa78d5517","672bbdbfbdbe172165452e7d","671f999c38863c2bfc859e7a","675a92c24bbe3577d16bcb64"]
+
+    const isAuthorized = roles.find(role=>validRoles.includes(role._id.toString()));
+    console.log("user ---->",isAuthorized)
     console.log(roles);
     if(roles.length > 0 && roles[0].category !== 'admin'){
-      if(!operationTeam){
+      if(!isAuthorized){
         return res.status(403).json({
           success:false,
-          messsage:"Unauthorized user!"
+          message:"Unauthorized user!"
         })
       }
     }

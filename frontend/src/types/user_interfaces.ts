@@ -21,4 +21,5 @@ export interface IUser {
   _id: string;
   filter?: string;
   userDetails?: any;
+  supervisor:string
 }

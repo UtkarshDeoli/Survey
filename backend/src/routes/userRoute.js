@@ -9,6 +9,8 @@ router.post("/addMultipleUsers", userController.addMultipleUsers);
 router.post("/updateUser", userController.updateUser);
 router.post("/updateUsers", userController.updateUsers);
 router.post("/uploadProfilePicture", userController.uploadProfilePicture);
+router.get("/getSupervisorCollectors", userController.getSupervisorCollectors);
+
 
 // karyakarta
 router.post("/createKaryakarta", userController.createKaryakarta);

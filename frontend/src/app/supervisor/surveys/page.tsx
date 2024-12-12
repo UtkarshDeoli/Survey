@@ -6,7 +6,6 @@ import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import filter from "../../../../public/icons/Filter.png";
 import Image from "next/image";
 import AllSurveys from "@/components/surveys/AllSurveys";
-import useUser from "@/hooks/useUser";
 
 interface Params {
   page: number;
@@ -34,11 +33,6 @@ function Page() {
   const [published, setPublished] = useState("all");
   const [sortSelect, setSortSelect] = useState("dateDesc");
   const [updated,setUpdatd] = useState(false)
-
-  const userData = useUser();
-  const isSurveyManager = userData?.role
-    .map((el: any) => el.name)
-    .includes("Survey Manager");
   
 
   useEffect(() => {}, [queryParams]);
@@ -63,7 +57,7 @@ function Page() {
 
   return (
     <section className=" bg-[#ECF0FA] min-h-[calc(100vh-80px)] w-full flex flex-col">
-      {!isSurveyManager && <SurveyHeader setUpdated={setUpdatd}/>}
+      {/* <SurveyHeader setUpdated={setUpdatd}/> */}
 
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
         <div className="flex gap-10 justify-between items-center">

@@ -174,6 +174,7 @@ exports.updateUsers = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
+    console.log(req.query)
     const _id = req.query.userId;
     const returnAssignedSurveys = req.query.assignedSurveys;
 
@@ -322,6 +323,25 @@ exports.getProfilePicture = async (req, res) => {
   }
 };
 
+
+exports.getSupervisorCollectors = async(req,res)=>{
+  try{
+    const {supervisor_id,name} = req.query;
+    const filters = {supervisor:supervisor_id};
+    if(name) filters.name = {$regex : name ,$options:"i"}
+    const collectors = await User.find(filters).populate('role');
+    return res.status(200).json({
+      success: true,
+      data: collectors,
+    });
+  }catch(error){
+    console.log(error);
+    return res.status(400).json({
+      success: false,
+      message: "something went wrong while fetching supervisor collectors",
+    });
+  }
+}
 // karyakarta API'S////////////////////////////////////////////////////
 
 exports.createKaryakarta = async (req, res) => {
@@ -507,28 +527,6 @@ exports.updateKaryakarta = async (req, res) => {
     }
 
     await karyakarta.save();
-    // let updatedResponses;
-    // if (responses) {
-    //   updatedResponses = responses.map((responseId) => {
-    //     new mongoose.Types.ObjectId(String(responseId));
-    //   });
-    // }
-
-    // if (updatedResponses) {
-    //   await Data.findOneAndUpdate(
-    //     {
-    //       survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-    //       user_id: karyakarta._id,
-    //     },
-    //     {
-    //       $set: {
-    //         survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-    //         user_id: karyakarta._id,
-    //         responses: responses,
-    //       },
-    //     }
-    //   );
-    // }
 
     return res.status(200).json({
       success: true,

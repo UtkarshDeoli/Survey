@@ -1,14 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BsBookFill, BsSpeedometer, BsTable } from "react-icons/bs";
-import { ImUser } from "react-icons/im";
 import { usePathname, useRouter } from "next/navigation";
 import { Tooltip } from "react-tooltip";
-import Image from "next/image";
-import { RiCalendarTodoFill } from "react-icons/ri";
 import { checkToken } from "@/utils/common_functions";
-import surveyProfile from "/public/images/survey_profile.png";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { IoMdLogOut } from "react-icons/io";
 
@@ -60,12 +55,6 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       path: "/admin/support",
       tooltip: "Support",
     },
-    // {
-    //   icon: "/images/settings.png",
-    //   name: "Settings",
-    //   path: "/admin/settings",
-    //   tooltip: "Settings",
-    // },
   ];
 
   // Filter out "Karyakarta" and "Users" tabs if the user has "operation team" role
@@ -77,8 +66,25 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name !== "Karyakarta" && item.name !== "Users"
       );
+    } else if(roleName.includes("Supervisor")){
+      SidebarScreens.push( {
+        icon: "/images/karyakarta.png",
+        name: "Collectors",
+        path: "/admin/collectors",
+        tooltip: "Collectors",
+      },)
+      SidebarScreens = SidebarScreens.filter(
+        (item: any) => item.name === "Collectors"
+      );
+    } else if(roleName.includes("Survey Manager")){
+      SidebarScreens = SidebarScreens.filter(
+        (item: any) => item.name === "Surveys"
+      );
+    }else if(roleName.includes("Quality Check")){
+      SidebarScreens = SidebarScreens.filter(
+        (item: any) => item.name === "Surveys"
+      );
     } else {
-      // Add "Karyakarta" and "Users" if the user does not have "operation team" role
       SidebarScreens.push(
         {
           icon: "/images/karyakarta.png",

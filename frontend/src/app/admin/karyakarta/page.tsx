@@ -124,7 +124,7 @@ function page() {
         </div>
       </div>
 
-      <div className="w-[96%] mx-auto text-sm max-h-[70vh] overflow-auto vertical-scrollbar">
+      <div className="w-[96%] mx-auto text-sm max-h-[60vh] overflow-auto vertical-scrollbar">
         <div className="grid grid-cols-5 text-white bg-dark-gray sticky top-0 left-0 z-10 font-semibold py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-1 flex justify-center items-center">Name</p>
           <p className="col-span-1 flex justify-center items-center">

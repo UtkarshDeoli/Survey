@@ -83,6 +83,11 @@ const userSchema = new Schema(
     },
     isOnline: { type: Boolean, default: false },
     notification_token: { type: String, default: null },
+    supervisor:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User99",
+      required: false,
+    }
   },
   { timestamps: true },
 );
