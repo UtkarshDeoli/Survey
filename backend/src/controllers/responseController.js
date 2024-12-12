@@ -853,7 +853,7 @@ exports.getMediaResource = async (req, res) => {
 };
 
 exports.updateResponse = async (req, res) => {
-  console.log("updating response");
+  console.log("Updating response");
   try {
     const {
       response_id,
@@ -867,9 +867,24 @@ exports.updateResponse = async (req, res) => {
       booth_no,
       house_no,
       last_name,
+      status,
       family_id,
       save_mode,
     } = req.body;
+
+    const updateFields = {};
+
+    // Add fields to updateFields only if they are present in the request body
+    if (survey_id) updateFields.survey_id = survey_id;
+    if (user_id) updateFields.user_id = user_id;
+    if (responses) updateFields.responses = responses;
+    if (location_data) updateFields.location_data = location_data;
+    if (name) updateFields.name = name;
+    if (ac_no) updateFields.ac_no = ac_no;
+    if (booth_no) updateFields.booth_no = booth_no;
+    if (house_no) updateFields.house_no = house_no;
+    if (last_name) updateFields.last_name = last_name;
+    if (status) updateFields.status = status;
 
     if (media_responses) {
       Object.entries(media_responses).map(([key, value]) => {
@@ -889,23 +904,12 @@ exports.updateResponse = async (req, res) => {
         }
       });
     }
-    let responseToUpdate = {
-      survey_id,
-      user_id,
-      responses,
-      location_data,
-      ac_no,
-      booth_no,
-      house_no,
-      name,
-      last_name,
-    };
+
+    // Perform the update
     const response = await Responses.findByIdAndUpdate(
       response_id,
-      responseToUpdate,
-      {
-        new: true,
-      },
+      { $set: updateFields },
+      { new: true },
     );
 
     if (!response) {
@@ -922,6 +926,7 @@ exports.updateResponse = async (req, res) => {
     return res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 exports.markAsContacted = async (req, res) => {
   try {
