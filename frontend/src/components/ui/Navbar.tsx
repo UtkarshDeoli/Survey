@@ -34,9 +34,11 @@ function Navbar() {
       (payload.role[0].category === "admin" || isAuthorized)
     ) {
       if (
-        isAuthorized &&
-        isAuthorized.name === "Operation Team" &&
-        (path.includes("/users") || path.includes("/karyakarta"))
+        (isAuthorized &&
+          isAuthorized.name === "Operation Team" &&
+          (path.includes("/users") || path.includes("/karyakarta"))) ||
+        path.includes("/collectors") ||
+        path.includes("/quality-check-surveys")
       ) {
         router.replace("/admin/surveys");
       } else if (isAuthorized && isAuthorized.name === "Supervisor") {
@@ -51,15 +53,29 @@ function Navbar() {
         ) {
           router.replace("/admin/collectors");
         }
-      }else if(isAuthorized && isAuthorized.name === "Survey Manager"){
+      } else if (isAuthorized && isAuthorized.name === "Survey Manager") {
         if (
           path.includes("/users") ||
           path.includes("/karyakarta") ||
           path.includes("/todos") ||
           path === "/admin" ||
-          path.startsWith("/admin/data")
+          path.startsWith("/admin/data") ||
+          path.includes("/collectors")
         ) {
           router.replace("/admin/surveys");
+        }
+      } else if (isAuthorized && isAuthorized.name === "Quality Check") {
+        if (
+          path.includes("/users") ||
+          path.includes("/karyakarta") ||
+          path.includes("/todos") ||
+          path === "/admin" ||
+          path.startsWith("/admin/data") ||
+          path.includes("/surveys") ||
+          path.includes("/data") ||
+          path.includes("/collectors")
+        ) {
+          router.replace("/admin/quality-check-surveys");
         }
       }
       setUserData(payload);

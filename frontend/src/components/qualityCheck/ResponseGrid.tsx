@@ -3,12 +3,14 @@
 import { truncateText, formatDate } from "@/utils/common_functions";
 import React, { useState } from "react";
 import { FaEye } from "react-icons/fa";
-import { FaLocationDot } from "react-icons/fa6";
+import { FaCircleXmark, FaLocationDot } from "react-icons/fa6";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import toast from "react-hot-toast";
 import { updateKaryakartas } from "@/networks/user_networks";
 import { useSearchParams } from "next/navigation";
 import Response from "../survey-responses/Response";
+import { updateResponse } from "@/networks/response_networks";
+import { GoCheckCircleFill } from "react-icons/go";
 
 interface ResponseTableProps {
   responses: any;
@@ -30,15 +32,25 @@ interface ResponseTableProps {
 function ResponseGrid({
   responses,
   users,
-  assignMode,
   setSelectedResponse,
   setResponseModalIsOpen,
-  setMapModalIsOpen,
   setMore,
   more,
+  getUserResponses
 }: ResponseTableProps) {
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
+  async function updateStatus(response_id:string,status:string,e:any){
+    e.stopPropagation();
+    const params = {response_id,status}
+    const response = await updateResponse(params);
+    if(response.success){
+      toast.success("Successfully updated!")
+      getUserResponses();
+    }else{
+      toast.error("Failed to update!")
+    }
+  }
 
   return (
     <div
@@ -47,12 +59,8 @@ function ResponseGrid({
     >
       <table className="w-full table-auto">
         <thead className="">
-          <tr className="bg-dark-gray text-white sticky top-0">
+          <tr className="bg-dark-gray text-white sticky top-0 left-0 z-10">
             <td className="min-w-32 px-4 py-2 border-b text-center"></td>
-            {assignMode && (
-              <td className="min-w-32 px-4 py-2 border-b text-center"></td>
-            )}
-
             <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
               Panna pramukh
             </td>
@@ -112,10 +120,18 @@ function ResponseGrid({
                 key={rowIndex}
               >
                 <td className="min-w-32 px-4 py-4 border-b h-full sticky left-0 bg-white w-full text-center">
-                    <div className="flex gap-3">
-                        <button className="bg-green-500 p-2 rounded-md text-white">Accept</button>
-                        <button className="bg-red-400 p-2 rounded-md text-white">Reject</button>
-                    </div>
+                  {
+                    response.status === "Pending" ? (
+                      <div className="flex gap-3">
+                          <button onClick={(e)=>updateStatus(response._id,"Approved",e)} className="bg-green-500 p-2 rounded-md text-white"><GoCheckCircleFill /></button>
+                          <button onClick={(e)=>updateStatus(response._id,"Rejected",e)} className="bg-red-400 p-2 rounded-md text-white"><FaCircleXmark /></button>
+                      </div>
+                    ) : response.status === "Approved" ? (
+                      <p className="bg-green-500 p-2 rounded-md flex gap-2 items-center w-fit text-white"><GoCheckCircleFill /> Approved</p>
+                    ) :(
+                      <p className="bg-red-400 p-2 rounded-md flex gap-2 items-center w-fit text-white"><FaCircleXmark /> Rejected</p>
+                    )
+                  }
                 </td>
                 <td className="min-w-32 px-4 py-4 border-b text-center">
                   {response.panna_pramukh_assigned

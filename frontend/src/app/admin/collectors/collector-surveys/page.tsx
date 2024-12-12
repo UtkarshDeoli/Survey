@@ -5,7 +5,7 @@ import Loader from "@/components/ui/Loader";
 import { getUser } from "@/networks/user_networks";
 import { formatDate } from "@/utils/common_functions";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 function Page() {
@@ -87,4 +87,10 @@ function Page() {
   );
 }
 
-export default Page;
+const SuspendedCreateSurveyPage = () => (
+  <Suspense>
+    <Page />
+  </Suspense>
+);
+
+export default SuspendedCreateSurveyPage;

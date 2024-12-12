@@ -2,11 +2,16 @@
 
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser, forgotPassword, loginAdmin } from "@/networks/auth_networks";
+import {
+  loginUser,
+  forgotPassword,
+  loginAdmin,
+} from "@/networks/auth_networks";
 import ReactModal from "react-modal";
 import toast, { Toaster } from "react-hot-toast";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import { checkToken } from "@/utils/common_functions";
+import { validRoles } from "@/utils/constants";
 
 ReactModal.setAppElement("#main");
 
@@ -15,7 +20,7 @@ export default function login() {
   const [password, setPassword] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const router = useRouter();
-  const [see,setSee] = useState<boolean>(false);
+  const [see, setSee] = useState<boolean>(false);
 
   useEffect(() => {
     const token = checkToken();
@@ -25,22 +30,36 @@ export default function login() {
   }, [router]);
 
   const handleSubmit = () => {
-    loginAdmin({ email: Email, password: password }).then((res) => {
-      if (res.success) {
-        toast.success(res.message);
-        localStorage.setItem("jwt", res.token);
-        router.push("/admin/surveys");
-      } else {
-        console.log("res ----->",res);
-        if(res.error){
-          toast.error(res.error.message)
-        }else{
-          toast.error("Invalid credentials or unauthorized user");
+    loginAdmin({ email: Email, password: password })
+      .then((res) => {
+        if (res.success) {
+          toast.success(res.message);
+          localStorage.setItem("jwt", res.token);
+          const user = checkToken();
+          const isAdmin = user.role[0].category === "admin";
+          const isAuthorized = user?.role.find((el: any) =>
+            validRoles.includes(el._id.toString())
+          );
+          console.log("isAuthorized ----->",isAuthorized)
+          if(isAdmin) router.replace("/admin");
+          else if(isAuthorized){
+            if(isAuthorized.name === "Operation Team" || isAuthorized.name === "Survey Manager") router.replace("/admin/surveys")
+            else if(isAuthorized.name === "Quality Check") router.replace("/admin/quality-check-surveys")
+            else if(isAuthorized.name === "Supervisor") router.replace("/admin/collectors")
+          }
+          // router.push("/admin/surveys");
+        } else {
+          console.log("res ----->", res);
+          if (res.error) {
+            toast.error(res.error.message);
+          } else {
+            toast.error("Invalid credentials or unauthorized user");
+          }
         }
-      }
-    }).catch((error)=>{
-      toast.error("Failed to Login as Admin")
-    })
+      })
+      .catch((error) => {
+        toast.error("Failed to Login as Admin");
+      });
   };
 
   const handleForgotPassword = async (email: string) => {
@@ -95,7 +114,9 @@ export default function login() {
       </ReactModal>
       <div className="relative h-screen flex flex-col items-center justify-center bg-[url('/images/semi-circle.png')] bg-cover bg-center w-[55%]">
         <img src="/images/map.png" className="h-[450px] " />
-        <h1 className="absolute bottom-8 left-4 w-[200px] text-[30px] text-white font-bold">BHARAT DEMOGRAPHIC RESEARCH</h1>
+        <h1 className="absolute bottom-8 left-4 w-[200px] text-[30px] text-white font-bold">
+          BHARAT DEMOGRAPHIC RESEARCH
+        </h1>
       </div>
 
       <div
@@ -106,9 +127,7 @@ export default function login() {
           <h2 className="text-center text-[25px] font-semibold">
             WELCOME BACK
           </h2>
-          <h2 className="text-center text-xl font-semibold mb-6">
-             Login
-          </h2>
+          <h2 className="text-center text-xl font-semibold mb-6">Login</h2>
         </div>
         <div className="w-full">
           <div className="mb-4">
@@ -130,7 +149,11 @@ export default function login() {
               className="w-full px-6 py-4 h-full focus:outline-none"
               required
             />
-            <img onClick={()=>setSee(!see)} src="/images/eye.png" className="w-[25px]  object-contain cursor-pointer"/>
+            <img
+              onClick={() => setSee(!see)}
+              src="/images/eye.png"
+              className="w-[25px]  object-contain cursor-pointer"
+            />
           </div>
 
           <div className="flex justify-between items-center mb-6">

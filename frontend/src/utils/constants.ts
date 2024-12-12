@@ -37,6 +37,7 @@ export const get_all_survey_responses = "api/response/getAllSurveyResponses"
 export const get_survey_responses = "api/response/getAllResponses"
 export const get_survey_responses_stats = "api/response/getSurveyResponseStats"
 export const get_survey_responses_by_family = "api/response/getGroupedByFamily"
+export const update_response = "api/response/updateResponse"
 
 
 // questions

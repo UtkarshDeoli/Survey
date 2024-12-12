@@ -1,4 +1,4 @@
-import { get_all_survey_responses, get_survey_responses, get_survey_responses_by_family, save_responses, SERVER_URI } from "@/utils/constants";
+import { get_all_survey_responses, get_survey_responses, get_survey_responses_by_family, save_responses, SERVER_URI, update_response } from "@/utils/constants";
 import axios, { AxiosRequestConfig } from "axios";
 
 
@@ -72,3 +72,18 @@ export const downloadResponses = async (params:any) => {
       return { success: false, message: "Something Went Wrong", error };
     }
   };
+
+export const updateResponse = async(params:any) =>{
+  try {
+    const options :AxiosRequestConfig = {
+      method: "POST",
+      url: `${SERVER_URI}/${update_response}`,
+      data:params
+    };
+    const response = await axios.request(options);
+    console.log("response --->",response)
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+}
