@@ -173,6 +173,7 @@ exports.getAllResponses = async (req, res) => {
       startDate,
       endDate,
       filters,
+      statusFilter,
       page = 1,
       limit = 4,
     } = req.query;
@@ -188,6 +189,12 @@ exports.getAllResponses = async (req, res) => {
     const matchStage = {};
 
     matchStage.survey_id = new mongoose.Types.ObjectId(String(surveyId));
+
+    console.log("statusFilter ---------->", statusFilter);
+    if (statusFilter) {
+      matchStage.status = statusFilter;
+    }
+
     if (userId) {
       matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
     }
@@ -322,7 +329,10 @@ exports.getAllResponses = async (req, res) => {
                   if: {
                     $regexMatch: {
                       input: { $toString: "$responses.response" },
-                      regex: new RegExp(escapeRegex("$responses.response"), "i")
+                      regex: new RegExp(
+                        escapeRegex("$responses.response"),
+                        "i",
+                      ),
                     },
                   },
                   then: { $toDouble: "$responses.response" },
@@ -656,7 +666,7 @@ exports.getSurveyResponses = async (req, res) => {
       },
       {
         $limit: pageSize, // Limit the number of documents for pagination
-      }
+      },
     );
 
     const results = await Responses.aggregate(pipeline);
@@ -685,7 +695,6 @@ exports.getSurveyResponses = async (req, res) => {
     return res.status(400).json({ success: false, message: error.message });
   }
 };
-
 
 exports.getSurveyResponseStats = async (req, res) => {
   try {

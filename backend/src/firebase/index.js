@@ -1,6 +1,8 @@
 const firebase = require("firebase-admin");
 
 const serviceAccount = require("./serviceAccountKeys.json");
+const Notifications = require("../models/notifications");
+const mongoose = require("mongoose");
 
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
@@ -65,8 +67,37 @@ async function sendNotificationToMultipleTokens(tokens, message) {
   }
 }
 
+const storeNotification = async ({ userId, title, content }) => {
+  try {
+    console.log("Storing notification for user:", userId);
+    let userNotificationsDoc;
+    userNotificationsDoc = await Notifications.findOne({
+      user_id: new mongoose.Types.ObjectId(String(userId)),
+    });
+    console.log(userNotificationsDoc);
+
+    if (!userNotificationsDoc) {
+      userNotificationsDoc = new Notifications({
+        user_id: userId,
+        notifications: [],
+      });
+    }
+    console.log("Doc!!!", userNotificationsDoc);
+
+    userNotificationsDoc.notifications.unshift({
+      title: title,
+      content: content,
+    });
+    userNotificationsDoc.unread_count += 1;
+    userNotificationsDoc.save();
+  } catch (error) {
+    console.error("Error storing notification:", error);
+  }
+};
+
 module.exports = {
   firebase,
   sendNotification,
   sendNotificationToMultipleTokens,
+  storeNotification,
 };

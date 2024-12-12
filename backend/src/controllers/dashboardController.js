@@ -2,6 +2,7 @@ const Survey = require("../models/survey");
 const Response = require("../models/response");
 const User = require("../models/user");
 const Todo = require("../models/todo");
+const mongoose = require("mongoose");
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -95,5 +96,115 @@ exports.getDashboard = async (req, res) => {
       success: false,
       message: "Unable to fetch dashboard data",
     });
+  }
+};
+
+exports.getResponsesStatusCount = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User Id is required" });
+    }
+
+    const approvedCount = await Response.countDocuments({
+      user_id: new mongoose.Types.ObjectId(String(user_id)),
+      status: "Approved",
+    });
+    const rejectedCount = await Response.countDocuments({
+      user_id: new mongoose.Types.ObjectId(String(user_id)),
+      status: "Rejected",
+    });
+    const pendingCount = await Response.countDocuments({
+      user_id: new mongoose.Types.ObjectId(String(user_id)),
+      status: "Pending",
+    });
+
+    const responseObject = {
+      total: approvedCount + rejectedCount + pendingCount,
+      approved: approvedCount,
+      rejected: rejectedCount,
+      pending: pendingCount,
+    };
+
+    res.status(200).json({ success: true, data: responseObject });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+exports.getResponsesByStatus = async (req, res) => {
+  try {
+    const { user_id, status } = req.query;
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User Id is required" });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const groupedResponses = await Response.aggregate([
+      {
+        $match: {
+          user_id: new mongoose.Types.ObjectId(String(user_id)),
+          status: status,
+        },
+      },
+      {
+        $group: {
+          _id: "$survey_id",
+          responses: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "survey99",
+          localField: "_id",
+          foreignField: "_id",
+          as: "surveyDetails",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$surveyDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $facet: {
+          // Paginated results
+          paginatedResults: [{ $skip: skip }, { $limit: limit }],
+          // Total count of matching documents
+          totalSurveys: [{ $count: "count" }],
+        },
+      },
+    ]);
+
+    // Extract paginated results and total count
+    const paginatedResults = groupedResponses[0].paginatedResults;
+    const totalSurveys = groupedResponses[0].totalSurveys[0]?.count || 0;
+    const totalPages = Math.ceil(totalSurveys / limit);
+
+    res.status(200).json({
+      success: true,
+      data: paginatedResults,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalSurveys: totalSurveys,
+        surveyPerPage: limit,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

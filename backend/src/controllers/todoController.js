@@ -2,9 +2,12 @@ const {
   sendNotification,
   firebase,
   sendNotificationToMultipleTokens,
+  storeNotification,
 } = require("../firebase");
+const Notifications = require("../models/notifications");
 const Todos = require("../models/todo");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 exports.createTodo = async (req, res) => {
   try {
@@ -35,6 +38,14 @@ exports.createTodo = async (req, res) => {
 
     const users = await User.find({ _id: { $in: assigned_to } });
     const tokens = users.map((user) => user.notification_token);
+
+    users.forEach(async (user) => {
+      await storeNotification({
+        userId: user._id,
+        title: "Todo Assigned",
+        content: `${title} has been assigned to you`,
+      });
+    });
 
     await newTodo.save();
 
@@ -216,9 +227,30 @@ exports.deleteTodo = async (req, res) => {
 
 exports.dummyNotification = async (req, res) => {
   try {
-    const { token } = req.query;
+    const { userId, token } = req.query;
 
     sendNotification(token, "A new todo has been created and assigned to you");
+
+    let userNotificationsDoc;
+    userNotificationsDoc = await Notifications.findOne({
+      user_id: new mongoose.Types.ObjectId(String(userId)),
+    });
+    console.log(userNotificationsDoc);
+
+    if (!userNotificationsDoc) {
+      userNotificationsDoc = new Notifications({
+        user_id: userId,
+        notifications: [],
+      });
+    }
+    console.log("Doc!!!", userNotificationsDoc);
+
+    userNotificationsDoc.notifications.push({
+      title: "Todo",
+      content: " has been created and assigned to you",
+    });
+    userNotificationsDoc.unread_count += 1;
+    userNotificationsDoc.save();
 
     res.status(200).json({ success: true, message: "Notification sent" });
   } catch (error) {

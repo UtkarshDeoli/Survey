@@ -57,6 +57,11 @@ const responseSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "CallRecordings99",
     },
+    status: {
+      type: String,
+      enum: ["Approved", "Rejected", "Pending"],
+      default: "Pending",
+    },
   },
   { strict: false, timestamps: true },
 );

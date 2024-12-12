@@ -5,18 +5,21 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const Role = require("../models/role");
 const Response = require("../models/response");
-const { sendNotificationToMultipleTokens } = require("../firebase");
+const {
+  sendNotificationToMultipleTokens,
+  storeNotification,
+} = require("../firebase");
 
 exports.addUsers = async (req, res) => {
   try {
-    const existingUser = await User.find({email:req.body.email});
-    console.log("body is --->",req.body)
-    if(existingUser.length > 0){
-      console.log()
+    const existingUser = await User.find({ email: req.body.email });
+    console.log("body is --->", req.body);
+    if (existingUser.length > 0) {
+      console.log();
       return res.status(400).json({
-        success:false,
-        message:"Email is already registered"
-      })
+        success: false,
+        message: "Email is already registered",
+      });
     }
     console.log("add user Request");
     const hashedPass = await bcrypt.hash(req.body.password, 10);
@@ -91,7 +94,7 @@ exports.updateUser = async (req, res) => {
     const updatedUser = await User.findOneAndUpdate(
       { _id: user_id },
       { $set: userData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     return res.status(200).json({
@@ -107,7 +110,6 @@ exports.updateUser = async (req, res) => {
     });
   }
 };
-
 
 exports.updateUsers = async (req, res) => {
   try {
@@ -138,6 +140,11 @@ exports.updateUsers = async (req, res) => {
       if (user.role !== undefined) updateFields.role = user.role;
       if (user.assigned_survey !== undefined) {
         updateFields.$addToSet = { assigned_survey: user.assigned_survey };
+        await storeNotification({
+          userId: user.user_id,
+          title: "Survey Assigned",
+          content: "A new survey is assigned to you",
+        });
         if (fetchedUserData.notification_token) {
           tokens.push(fetchedUserData.notification_token);
         }
@@ -152,7 +159,7 @@ exports.updateUsers = async (req, res) => {
       });
     });
 
-    const dbRes = await Promise.all(updatePromises);  
+    const dbRes = await Promise.all(updatePromises);
 
     console.log("Tokens are ===>", tokens);
     sendNotificationToMultipleTokens(tokens, "A new survey is assigned to you");
@@ -359,8 +366,8 @@ exports.createKaryakarta = async (req, res) => {
       password,
       role,
     } = req.body;
-    const userExists = await User.find  ({email:email});
-    if(userExists.length > 0){
+    const userExists = await User.find({ email: email });
+    if (userExists.length > 0) {
       return res.status(400).json({
         success: false,
         message: "Email already registered",
