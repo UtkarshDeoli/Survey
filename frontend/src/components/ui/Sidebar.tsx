@@ -81,8 +81,14 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
         (item: any) => item.name === "Surveys"
       );
     }else if(roleName.includes("Quality Check")){
+      SidebarScreens.push( {
+        icon: "/images/karyakarta.png",
+        name: "All surveys",
+        path: "/admin/quality-check-surveys",
+        tooltip: "All surveys",
+      },)
       SidebarScreens = SidebarScreens.filter(
-        (item: any) => item.name === "Surveys"
+        (item: any) => item.name === "All surveys"
       );
     } else if(roleName.includes("Data Analyst") || roleName.includes("Data Manager")){
       SidebarScreens = SidebarScreens.filter(
