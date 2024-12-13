@@ -19,6 +19,7 @@ export default function login() {
   const [Email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading,setLoading] = useState<boolean>(false);
   const router = useRouter();
   const [see, setSee] = useState<boolean>(false);
 
@@ -30,6 +31,7 @@ export default function login() {
   }, [router]);
 
   const handleSubmit = () => {
+    setLoading(true);
     loginAdmin({ email: Email, password: password })
       .then((res) => {
         if (res.success) {
@@ -50,8 +52,10 @@ export default function login() {
             toast.error("Invalid credentials or unauthorized user");
           }
         }
+        setLoading(false);
       })
       .catch((error) => {
+        setLoading(false)
         toast.error("Failed to Login as Admin");
       });
   };
@@ -159,6 +163,7 @@ export default function login() {
             </a>
           </div>
           <ButtonFilled
+            loading={loading} 
             onClick={handleSubmit}
             className="w-full py-2 bg-orange-500 text-white  hover:bg-orange-600"
           >
