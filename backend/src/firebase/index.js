@@ -67,7 +67,7 @@ async function sendNotificationToMultipleTokens(tokens, message) {
   }
 }
 
-const storeNotification = async ({ userId, title, content }) => {
+const storeNotification = async ({ userId, title, content, type }) => {
   try {
     console.log("Storing notification for user:", userId);
     let userNotificationsDoc;
@@ -87,6 +87,7 @@ const storeNotification = async ({ userId, title, content }) => {
     userNotificationsDoc.notifications.unshift({
       title: title,
       content: content,
+      notification_type: type,
     });
     userNotificationsDoc.unread_count += 1;
     userNotificationsDoc.save();

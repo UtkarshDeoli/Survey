@@ -12,19 +12,19 @@ exports.getUnreadCount = async (req, res) => {
     const userNotificationsDoc = await Notifications.findOne({
       user_id: user_id,
     });
-    if (!userNotificationsDoc) {
-      return res.status(404).json({
-        success: false,
-        message: "No notifications found for this user",
-      });
-    }
+
+    const unreadCount = userNotificationsDoc
+      ? userNotificationsDoc.unread_count
+      : 0;
+
     console.log(userNotificationsDoc);
     return res.status(200).json({
       success: true,
       message: "Unread count retrieved successfully",
-      data: userNotificationsDoc.unread_count,
+      data: unreadCount,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -44,9 +44,11 @@ exports.getAllNotifications = async (req, res) => {
     const userNotificationsDoc = await Notifications.findOne({
       user_id: user_id,
     });
+
     if (!userNotificationsDoc) {
-      return res.status(404).json({
-        success: false,
+      return res.status(200).json({
+        success: true,
+        data: { notifications: [] },
         message: "No notifications found for this user",
       });
     }
@@ -56,6 +58,7 @@ exports.getAllNotifications = async (req, res) => {
       data: userNotificationsDoc,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -75,16 +78,17 @@ exports.clearNotifications = async (req, res) => {
     const userNotificationsDoc = await Notifications.findOne({
       user_id: user_id,
     });
+
+    if (!userNotificationsDoc) {
+      return res.status(200).json({
+        success: true,
+        message: "No notifications found for this user",
+      });
+    }
     userNotificationsDoc.notifications = [];
     userNotificationsDoc.unread_count = 0;
     userNotificationsDoc.save();
 
-    if (!userNotificationsDoc) {
-      return res.status(404).json({
-        success: false,
-        message: "No notifications found for this user",
-      });
-    }
     return res.status(200).json({
       success: true,
       message: "Notifications cleared successfully",

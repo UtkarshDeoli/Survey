@@ -44,6 +44,7 @@ exports.createTodo = async (req, res) => {
         userId: user._id,
         title: "Todo Assigned",
         content: `${title} has been assigned to you`,
+        type: "todo",
       });
     });
 

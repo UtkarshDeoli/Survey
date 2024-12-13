@@ -12,6 +12,7 @@ const notificationsSchema = new Schema({
       type: {
         title: String,
         content: String,
+        notification_type: String,
       },
     },
   ],

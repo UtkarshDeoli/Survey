@@ -195,6 +195,7 @@ exports.getAllResponses = async (req, res) => {
       matchStage.status = statusFilter;
     }
 
+    console.log("user id ---------->", userId);
     if (userId) {
       matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
     }
