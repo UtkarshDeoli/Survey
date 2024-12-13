@@ -73,4 +73,11 @@ export const supervisorId = "675985aaa6b36c1fa78d5517"
 export const surveyCollectorId = "671f997d38863c2bfc859e76"
 export const surveyManagerId = "671f999c38863c2bfc859e7a"
 export const qualityCheckId = "675a92c24bbe3577d16bcb64"
-export const validRoles = ["675985aaa6b36c1fa78d5517","672bbdbfbdbe172165452e7d","671f999c38863c2bfc859e7a","675a92c24bbe3577d16bcb64"]
+export const validRoles = [
+    "675985aaa6b36c1fa78d5517",
+    "672bbdbfbdbe172165452e7d",
+    "671f999c38863c2bfc859e7a",
+    "675a92c24bbe3577d16bcb64",
+    "675bece5305e5a3192324a7a",
+    "675bed08305e5a3192324a7c",
+  ];

@@ -41,7 +41,7 @@ export default function login() {
             validRoles.includes(el._id.toString())
           );
           console.log("isAuthorized ----->",isAuthorized)
-          router.push("/admin/surveys");
+          router.push("/admin");
         } else {
           console.log("res ----->", res);
           if (res.error) {

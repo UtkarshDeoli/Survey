@@ -7,32 +7,58 @@ import { getSupervisorCollectors } from "@/networks/user_networks";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 function Page() {
   const [searchBarInput, setSearchBarInput] = useState<string>("");
   const [users, setUsers] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [reset,setReset] = useState<boolean>(true);
+  const [reset, setReset] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
+  const [pageLimit, setPageLimit] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const userData = useUser();
-  const router = useRouter()
+  const router = useRouter();
   useEffect(() => {
     getCollectors();
-  }, [userData,reset]);
+  }, [userData, reset,page,pageLimit]);
   async function getCollectors() {
     if (userData) {
       setLoading(true);
       const response = await getSupervisorCollectors({
         supervisor_id: userData.id,
-        name:searchBarInput
+        name: searchBarInput,
+        page,
+        limit:pageLimit
       });
       if (response.success) {
         setUsers(response.data);
+        setPage(response.pagination.page);
+        setTotalPages(response.pagination.totalPages);
       } else {
         toast.error("Error fetching collectors");
       }
       setLoading(false);
     }
   }
+
+  const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newLimit = parseInt(e.target.value, 10);
+      setPageLimit(newLimit);
+      setPage(1);
+    };
+  
+    const handleNextPage = () => {
+      if (page < totalPages) {
+        setPage(page + 1);
+      }
+    };
+  
+    const handlePreviousPage = () => {
+      if (page > 1) {
+        setPage(page - 1);
+      }
+    };
   return (
     <div className="w-full bg-[#ECF0FA] text-sm min-h-[calc(100vh-80px)]">
       {/* header */}
@@ -61,10 +87,15 @@ function Page() {
               Search
             </ButtonFilled>
             <div className="flex space-x-3">
-              <ButtonFilled onClick={()=>{
-                setSearchBarInput("");
-                setReset(!reset)
-              }} className="bg-dark-gray">Reset</ButtonFilled>
+              <ButtonFilled
+                onClick={() => {
+                  setSearchBarInput("");
+                  setReset(!reset);
+                }}
+                className="bg-dark-gray"
+              >
+                Reset
+              </ButtonFilled>
             </div>
           </div>
         </div>
@@ -109,7 +140,16 @@ function Page() {
                   ))}
                 </div>
               </div>
-              <ButtonFilled onClick={()=>router.push(`/admin/collectors/collector-surveys?collector_id=${user._id}`)} className="w-fit mx-auto">View survey</ButtonFilled>
+              <ButtonFilled
+                onClick={() =>
+                  router.push(
+                    `/admin/collectors/collector-surveys?collector_id=${user._id}`
+                  )
+                }
+                className="w-fit mx-auto"
+              >
+                View survey
+              </ButtonFilled>
             </div>
           ))
         ) : (
@@ -118,6 +158,49 @@ function Page() {
           </div>
         )}
       </div>
+
+      {!loading && (
+        <div className="flex gap-3 items-center mt-4 ml-4 pb-3 sticky bottom-0 left-0">
+          {/* Limit Select */}
+          <div>
+            <label htmlFor="limit-select" className="mr-2">
+              Show:
+            </label>
+            <select
+              id="limit-select"
+              value={pageLimit}
+              onChange={handleLimitChange}
+              className="p-2 border rounded-md"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
+
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowBack />
+            </button>
+            <span>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalPages}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

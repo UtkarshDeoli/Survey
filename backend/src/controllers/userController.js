@@ -331,24 +331,41 @@ exports.getProfilePicture = async (req, res) => {
 };
 
 
-exports.getSupervisorCollectors = async(req,res)=>{
-  try{
-    const {supervisor_id,name} = req.query;
-    const filters = {supervisor:supervisor_id};
-    if(name) filters.name = {$regex : name ,$options:"i"}
-    const collectors = await User.find(filters).populate('role');
+exports.getSupervisorCollectors = async (req, res) => {
+  try {
+    const { supervisor_id, name, page = 1, limit = 10 } = req.query;
+
+    const filters = { supervisor: supervisor_id };
+    if (name) filters.name = { $regex: name, $options: "i" };
+
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
+    const collectors = await User.find(filters)
+      .populate('role')
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
+    const total = await User.countDocuments(filters);
+
     return res.status(200).json({
       success: true,
       data: collectors,
+      pagination: {
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(total / limitNumber),
+      },
     });
-  }catch(error){
+  } catch (error) {
     console.log(error);
     return res.status(400).json({
       success: false,
-      message: "something went wrong while fetching supervisor collectors",
+      message: "Something went wrong while fetching supervisor collectors",
     });
   }
-}
+};
 // karyakarta API'S////////////////////////////////////////////////////
 
 exports.createKaryakarta = async (req, res) => {

@@ -16,7 +16,7 @@ function QuestionDataCard({ questionTitle, responses, totalResponses }: Props) {
     "column",
   );
   return (
-    <div className="flex flex-col w-full h-full bg-white p-5 mb-5 rounded-lg gap-4">
+    <div className="chart-container flex flex-col w-full h-full bg-white p-5 mb-5 rounded-lg gap-4">
       <QuestionChartHeader
         question={questionTitle}
         onChartTypeChange={setChartType}

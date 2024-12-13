@@ -64,6 +64,12 @@ const customPermissions: any = {
   ],
   "Quality Check" :[
     "Accept/Reject data"
+  ],
+  "Data Analyst":[
+    "Access report"
+  ],
+  "Data Manager":[
+    "Download report"
   ]
 };
 

@@ -12,7 +12,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).populate("role");
-    const roles = user.role.map(el=>el.name);
+    const roles = user.role.map((el) => el.name);
     console.log(roles);
     // Check if user exists
     if (!user) {
@@ -28,10 +28,10 @@ exports.login = async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
     }
 
-    if(user.status === 'inactive'){
+    if (user.status === "inactive") {
       return res
-       .status(401)
-       .json({ success: false, message: "User account is inactive" });
+        .status(401)
+        .json({ success: false, message: "User account is inactive" });
     }
     // JWT token
     const token = jwt.sign(
@@ -41,9 +41,9 @@ exports.login = async (req, res) => {
         ac_no: user.ac_no,
         booth_no: user.booth_no,
         name: user.name,
-        role: roles
+        role: roles,
       },
-      JWT_SECRET,
+      JWT_SECRET
     );
 
     // Response sending back the token too for frontend to store
@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.adminLogin = async(req,res)=>{
+exports.adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).populate("role");
@@ -71,27 +71,36 @@ exports.adminLogin = async(req,res)=>{
         .json({ success: false, message: "User not found" });
     }
     const roles = user.role;
-    console.log("roles are --->",roles);
-    
-    const validRoles = ["675985aaa6b36c1fa78d5517","672bbdbfbdbe172165452e7d","671f999c38863c2bfc859e7a","675a92c24bbe3577d16bcb64"]
+    console.log("roles are --->", roles);
 
-    const isAuthorized = roles.find(role=>validRoles.includes(role._id.toString()));
-    console.log("user ---->",isAuthorized)
+    const validRoles = [
+      "675985aaa6b36c1fa78d5517",
+      "672bbdbfbdbe172165452e7d",
+      "671f999c38863c2bfc859e7a",
+      "675a92c24bbe3577d16bcb64",
+      "675bece5305e5a3192324a7a",
+      "675bed08305e5a3192324a7c",
+    ];
+
+    const isAuthorized = roles.find((role) =>
+      validRoles.includes(role._id.toString())
+    );
+    console.log("user ---->", isAuthorized);
     console.log(roles);
-    if(roles.length > 0 && roles[0].category !== 'admin'){
-      if(!isAuthorized){
+    if (roles.length > 0 && roles[0].category !== "admin") {
+      if (!isAuthorized) {
         return res.status(403).json({
-          success:false,
-          message:"Unauthorized user!"
-        })
+          success: false,
+          message: "Unauthorized user!",
+        });
       }
     }
 
-    if(user.status === 'inactive'){
+    if (user.status === "inactive") {
       return res.status(401).json({
-        success:false,
-        message:"User account is inactive"
-      })
+        success: false,
+        message: "User account is inactive",
+      });
     }
 
     // Match Password
@@ -109,9 +118,9 @@ exports.adminLogin = async(req,res)=>{
         ac_no: user.ac_no,
         booth_no: user.booth_no,
         name: user.name,
-        role: roles
+        role: roles,
       },
-      JWT_SECRET,
+      JWT_SECRET
     );
 
     // Response sending back the token too for frontend to store
@@ -126,7 +135,7 @@ exports.adminLogin = async(req,res)=>{
       .status(500)
       .json({ success: false, message: "Internal server error", error: error });
   }
-}
+};
 
 exports.signup = async (req, res) => {
   try {

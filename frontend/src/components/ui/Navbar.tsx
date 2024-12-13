@@ -22,11 +22,12 @@ function Navbar() {
   useEffect(() => {
     const payload = checkToken();
     console.log("Logged in user data is --->", payload);
-    if (!payload) router.replace("/");
+    if (!payload) router.replace("/");  
 
     const isAuthorized = payload?.role.find((el: any) =>
       validRoles.includes(el._id.toString())
     );
+    console.log("isAuthorized -=-=-=-=-=--=-=-=",isAuthorized)
 
     if (
       payload &&
@@ -51,6 +52,7 @@ function Navbar() {
           path.startsWith("/admin/surveys") ||
           path.startsWith("/admin/data")
         ) {
+          console.log("this is invalid route");    
           router.replace("/admin/collectors");
         }
       } else if (isAuthorized && isAuthorized.name === "Survey Manager") {
@@ -73,9 +75,23 @@ function Navbar() {
           path.startsWith("/admin/data") ||
           path.includes("/surveys") ||
           path.includes("/data") ||
-          path.includes("/collectors")
+          path.includes("/collectors") 
         ) {
           router.replace("/admin/quality-check-surveys");
+        }
+      } else if (isAuthorized && (isAuthorized.name === "Data Analyst" ||  isAuthorized.name === "Data Manager")) {
+        if (
+          path.includes("/users") ||
+          path.includes("/karyakarta") ||
+          path.includes("/todos") ||
+          path === "/admin" ||
+          path.startsWith("/admin/data") ||
+          path.includes("/surveys") ||
+          path.includes("/data") ||
+          path.includes("/collectors")||
+          path.includes("/quality-check-surveys")
+        ) {
+          router.replace("/admin/data");
         }
       }
       setUserData(payload);

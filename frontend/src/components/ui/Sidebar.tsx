@@ -84,6 +84,10 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name === "Surveys"
       );
+    } else if(roleName.includes("Data Analyst") || roleName.includes("Data Manager")){
+      SidebarScreens = SidebarScreens.filter(
+        (item: any) => item.name === "Data"
+      );
     } else {
       SidebarScreens.push(
         {

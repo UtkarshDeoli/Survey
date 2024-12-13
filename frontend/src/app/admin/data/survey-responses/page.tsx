@@ -84,7 +84,7 @@ function Page() {
     getQuestions();
     getUserResponses();
     getUsers();
-  }, [reset,page,pageLimit]);
+  }, [reset,page,pageLimit,userId,appliedFilters]);
 
 
   useEffect(() => {
@@ -300,7 +300,7 @@ function Page() {
                 className=" flex justify-center items-center h-fit self-end"
                 onClick={openModal}
               >
-                Data filter +
+                Advanced data filter +
               </ButtonFilled>
             </div>
 
