@@ -19,6 +19,7 @@ exports.saveSurvey = async (req, res) => {
       background_location_capture,
       thank_time_duration,
       questions,
+      response_count
     } = req.body;
 
     console.log("body is----->", req.body);
@@ -42,7 +43,7 @@ exports.saveSurvey = async (req, res) => {
       ac_list,
       background_location_capture,
       thank_time_duration,
-      response_count: 0,
+      response_count: response_count || 0,
     });
     if (questions && Array.isArray(questions) && questions.length > 0) {
       survey.questions = questions;
