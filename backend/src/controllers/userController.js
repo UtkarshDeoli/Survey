@@ -144,6 +144,7 @@ exports.updateUsers = async (req, res) => {
           userId: user.user_id,
           title: "Survey Assigned",
           content: "A new survey is assigned to you",
+          type: "survey",
         });
         if (fetchedUserData.notification_token) {
           tokens.push(fetchedUserData.notification_token);
@@ -197,12 +198,25 @@ exports.getUser = async (req, res) => {
         })
         .select("assigned_survey _id");
 
-      const totalSurveys = assignedSurveys.assigned_survey.length;
+      const assignedSurveysWithCount = await Promise.all(
+        assignedSurveys.assigned_survey.map(async (survey) => {
+          const collectedCount = await Response.countDocuments({
+            survey_id: survey._id,
+            user_id: _id,
+          });
+          return { ...survey.toObject(), collected_count: collectedCount };
+        }),
+      );
+
+      const totalSurveys = assignedSurveysWithCount.length;
       const totalPages = Math.ceil(totalSurveys / limit);
 
       return res.status(200).json({
         success: true,
-        data: assignedSurveys,
+        data: {
+          ...assignedSurveys.toObject(),
+          assigned_survey: assignedSurveysWithCount,
+        },
         pagination: {
           currentPage: page,
           totalPages: totalPages,
