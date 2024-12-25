@@ -27,9 +27,10 @@ const responseSchema = new Schema(
     house_no: {
       type: String,
     },
-    last_name: {
-      type: String,
-    },
+    // OLD FEATURE -- last name
+    // last_name: {
+    //   type: String,
+    // },
     phone_no: {
       type: String,
     },

@@ -19,10 +19,11 @@ const familySchema = new Schema(
       type: String,
       required: true,
     },
-    last_name: {
-      type: String,
-      required: true,
-    },
+    // OLD FEATURE -- last name
+    // last_name: {
+    //   type: String,
+    //   required: true,
+    // },
     family_head: {
       type: Schema.Types.ObjectId,
       ref: "User99",
