@@ -25,7 +25,7 @@ exports.saveResponse = async (req, res) => {
       ac_no,
       booth_no,
       house_no,
-      last_name,
+      // last_name,
       phone_no,
       family_id,
       save_mode,
@@ -63,7 +63,7 @@ exports.saveResponse = async (req, res) => {
       booth_no,
       house_no,
       name,
-      last_name,
+      // last_name,
       phone_no,
     };
 
@@ -74,7 +74,7 @@ exports.saveResponse = async (req, res) => {
         ac_no,
         booth_no,
         house_no,
-        last_name,
+        // last_name,
       });
 
       console.log("already exists", alreadyExists);
@@ -87,7 +87,7 @@ exports.saveResponse = async (req, res) => {
           ac_no,
           booth_no,
           house_no,
-          last_name,
+          // last_name,
         });
         createdNewFamily = true;
         responseToSave.family_id = newFamily._id;
@@ -310,7 +310,7 @@ exports.getAllResponses = async (req, res) => {
           booth_no: 1,
           house_no: 1,
           name: 1,
-          last_name: 1,
+          // last_name: 1,
           location_data: 1,
           createdAt: 1,
           audio_recording_path: 1,
@@ -365,7 +365,7 @@ exports.getAllResponses = async (req, res) => {
           booth_no: { $first: "$booth_no" },
           house_no: { $first: "$house_no" },
           name: { $first: "$name" },
-          last_name: { $first: "$last_name" },
+          // last_name: { $first: "$last_name" },
           location_data: { $first: "$location_data" },
           survey_id: { $first: "$survey_id" },
           createdAt: { $first: "$createdAt" },
@@ -499,7 +499,7 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
           survey_id: { $first: "$survey_id" },
           ac_no: { $first: "$ac_no" },
           booth_no: { $first: "$booth_no" },
-          last_name: { $first: "$last_name" },
+          // last_name: { $first: "$last_name" },
           createdAt: { $first: "$createdAt" },
           responses: {
             $push: {
@@ -867,7 +867,7 @@ exports.updateResponse = async (req, res) => {
       ac_no,
       booth_no,
       house_no,
-      last_name,
+      // last_name,
       status,
       family_id,
       save_mode,
@@ -884,7 +884,7 @@ exports.updateResponse = async (req, res) => {
     if (ac_no) updateFields.ac_no = ac_no;
     if (booth_no) updateFields.booth_no = booth_no;
     if (house_no) updateFields.house_no = house_no;
-    if (last_name) updateFields.last_name = last_name;
+    // if (last_name) updateFields.last_name = last_name;
     if (status) updateFields.status = status;
 
     if (media_responses) {
@@ -927,7 +927,6 @@ exports.updateResponse = async (req, res) => {
     return res.status(400).json({ success: false, message: error.message });
   }
 };
-
 
 exports.markAsContacted = async (req, res) => {
   try {

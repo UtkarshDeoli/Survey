@@ -4,38 +4,42 @@ const mongoose = require("mongoose");
 
 exports.getFamily = async (req, res) => {
   try {
-    const { house_no, last_name, survey_id } = req.query;
+    // const { house_no, last_name, survey_id } = req.query;
+    const { house_no, survey_id } = req.query;
 
     const filterOptions = { survey_id, house_no };
-    if (last_name) {
-      console.log("with last name");
-      filterOptions.last_name = { $regex: last_name, $options: "i" };
-      const families = await Family.find(filterOptions);
-      const responses = await Response.find(filterOptions);
-      // Transform responses to match the aggregation pipeline format
-      const transformedResponses = [
-        {
-          _id: last_name,
-          total_responses: responses.length,
-          house_no: house_no,
-          member_data: responses.map((response) => ({
-            name: response.name,
-            response_id: response._id,
-          })),
-        },
-      ];
-      const paddedResponses = [...transformedResponses];
-      while (paddedResponses.length < families.length) {
-        paddedResponses.push(null);
-      }
 
-      return res.status(200).json({
-        success: true,
-        families,
-        responses: paddedResponses,
-      });
-    }
-    console.log("no last name");
+    // OLD FEATURE --- Last Name
+    // if (last_name) {
+    //   console.log("with last name");
+    //   filterOptions.last_name = { $regex: last_name, $options: "i" };
+    //   const families = await Family.find(filterOptions);
+    //   const responses = await Response.find(filterOptions);
+    //   // Transform responses to match the aggregation pipeline format
+    //   const transformedResponses = [
+    //     {
+    //       _id: last_name,
+    //       total_responses: responses.length,
+    //       house_no: house_no,
+    //       member_data: responses.map((response) => ({
+    //         name: response.name,
+    //         response_id: response._id,
+    //       })),
+    //     },
+    //   ];
+    //   const paddedResponses = [...transformedResponses];
+    //   while (paddedResponses.length < families.length) {
+    //     paddedResponses.push(null);
+    //   }
+    //
+    //   return res.status(200).json({
+    //     success: true,
+    //     families,
+    //     responses: paddedResponses,
+    //   });
+    // }
+    // console.log("no last name");
+
     const aggregationPipeline = [
       {
         $match: {
@@ -45,7 +49,7 @@ exports.getFamily = async (req, res) => {
       },
       {
         $group: {
-          _id: "$last_name",
+          _id: "$house_no",
           total_responses: { $sum: 1 },
           house_no: { $first: "$house_no" },
           member_data: { $push: { name: "$name", response_id: "$_id" } },
@@ -57,7 +61,7 @@ exports.getFamily = async (req, res) => {
         },
       },
     ];
-    const families = await Family.find(filterOptions).sort({ last_name: 1 });
+    const families = await Family.find(filterOptions);
     const responses = await Response.aggregate(aggregationPipeline);
 
     while (responses.length < families.length) {
@@ -105,10 +109,12 @@ exports.getFamilyResponse = async (req, res) => {
 
 exports.updateFamily = async (req, res) => {
   try {
-    const { family_id, house_no, last_name } = req.body;
+    // const { family_id, house_no, last_name } = req.body;
+    const { family_id, house_no } = req.body;
+
     const updatedFamily = {};
     if (house_no) updatedFamily.house_no = house_no;
-    if (last_name) updatedFamily.last_name = last_name;
+    // if (last_name) updatedFamily.last_name = last_name;
 
     const family = await Family.findByIdAndUpdate(family_id, updatedFamily, {
       new: true,
