@@ -31,7 +31,7 @@ const chatEvents = (socket, io) => {
       // Check if the user is already in a room and leave it
       const currentRoomId = socket.currentRoomId;
       console.log("currentRoomId was", currentRoomId);
-      if (currentRoomId) {
+      if (currentRoomId && currentRoomId !== room._id.toString()) {
         console.log(`User leaving room: ${currentRoomId}`);
         const currentRoom = await ChatRoom.findById(currentRoomId);
         if (currentRoom && currentRoom.messages.length === 0) {
