@@ -9,7 +9,7 @@
     text-wrap: balance;
   }
   .scrollbar::-webkit-scrollbar {
-    height: 5px;
+    height: 10px;
     width:100%
   }
 

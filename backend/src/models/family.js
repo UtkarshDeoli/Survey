@@ -28,7 +28,7 @@ const familySchema = new Schema(
       ref: "User99",
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Family = mongoose.model("Family99", familySchema);

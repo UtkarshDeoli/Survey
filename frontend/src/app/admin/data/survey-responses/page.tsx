@@ -395,7 +395,7 @@ function Page() {
        {/* Pagination Controls */}
        {
         !loading && (
-          <div className="flex gap-3 items-center my-4 ml-3">
+          <div className="flex gap-3 items-center mt-4 pl-4 py-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
             {/* Limit Select */}
             <div>
               <label htmlFor="limit-select" className="mr-2">

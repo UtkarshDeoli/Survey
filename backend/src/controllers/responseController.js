@@ -137,7 +137,7 @@ exports.saveResponses = async (req, res) => {
         .json({ success: false, message: "Invalid input data" });
     }
     await Responses.insertMany(responsesArray);
-
+    console.log("response array is ----> ",responsesArray);
     return res.status(201).json({
       success: true,
       message: `${responsesArray.length} responses saved successfully`,

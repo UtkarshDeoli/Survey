@@ -59,7 +59,7 @@ function page() {
     }
   };
   return (
-    <div className="w-full font-medium bg-[#ECF0FA] h-full">
+    <div className="w-full font-medium bg-[#ECF0FA]">
       <nav className="h-16 w-full py-3 px-8 flex justify-between">
         <div className="text-my-gray-200">
           <h1 className="text-2xl">Surveys Data</h1>
@@ -159,7 +159,7 @@ function page() {
       </div>
 
       {!loading && (
-        <div className="flex gap-3 items-center mt-4 ml-4 pb-3 sticky bottom-0 left-0">
+        <div className="flex gap-3 items-center mt-4 pl-4 py-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
           {/* Limit Select */}
           <div>
             <label htmlFor="limit-select" className="mr-2">

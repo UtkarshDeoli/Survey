@@ -50,7 +50,7 @@ const downloadExcel = async (data, res) => {
       status: item.contacted ? "Contacted" : "Not Contacted",
       remark: item.remark || "No Remark",
       response_date: item.updatedAt || item.createdAt || "N/A",
-      user: item.user_id.name || "Unknown",
+      user: item.user_id?.name || "Unknown",
     };
 
     // Populate response answers in the corresponding columns
