@@ -111,6 +111,42 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+exports.assignBoothToUsers = async (req, res) => {
+  const { survey_id ,userId, ac_list } = req.body;
+
+  try {
+    // Find the user by userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Update the user's AC list
+    user.assigned_survey.push(survey_id);
+    user.ac_list = ac_list;
+    await user.save();
+
+    // Build filter criteria for the responses
+    const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
+      booth_numbers.map((booth_no) => ({ ac_no, booth_no }))
+    );
+
+    // Update responses in a single operation
+    await Response.updateMany(
+      { $or: filterCriteria },
+      { $set: { user_id: userId } }
+    );
+
+    return res.status(200).json({
+      success:true,
+      message: "Booths assigned to user and responses updated successfully",
+    });
+  } catch (error) {
+    console.error("Error in assigning booths to users:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 exports.updateUsers = async (req, res) => {
   try {
     const { users } = req.body;

@@ -19,6 +19,22 @@ const userSchema = new Schema(
     ac_no: String,
     booth_no: String,
     district: String,
+    ac_list:[
+      {
+        survey_id:{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Survey99",
+        },
+        ac_no: {
+          type: String,
+        },
+        booth_numbers: [
+          {
+            type: String,
+          },
+        ],
+      }
+    ],
     email: {
       type: String,
       required: true,

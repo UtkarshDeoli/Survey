@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>मतदान कार्ड</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .card {
+      border: 1px solid #ccc;
+      padding: 20px;
+      width: 600px;
+      margin: auto;
+      background: #fff;
+    }
+    h2 {
+      text-align: center;
+    }
+    .info {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>मतदान कार्ड</h2>
+    <div class="info">Name : <%= name %></div>
+    <div class="info">AC_NO : <%= ac_no %></div>
+    <div class="info">BOOTH_NO :  <%= booth_no %></div>
+    <div class="info">House no. : <%= house_no %></div>
+    <div class="info">Phone no. : <%= phone_no %></div>
+  </div>
+</body>
+</html>

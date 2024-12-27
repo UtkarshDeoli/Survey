@@ -19,6 +19,10 @@ const surveySchema = new Schema(
         ],
       }
     ],
+    imported:{
+      type: Boolean,
+      default: false,
+    },
     access_pin: {
       type: String,
     },

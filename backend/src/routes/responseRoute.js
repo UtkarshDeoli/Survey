@@ -31,6 +31,8 @@ router.post(
 
 router.get("/getAllResponses", responseController.getAllResponses);
 router.get("/getResponse", responseController.getResponse);
+// 
+router.get("/downloadVoter", responseController.downloadVoter);
 
 router.post("/saveResponses", responseController.saveResponses);
 router.get("/getCount", responseController.getCount);

@@ -16,6 +16,7 @@ exports.saveSurvey = async (req, res) => {
       header_text,
       access_pin,
       ac_list,
+      imported,
       background_location_capture,
       thank_time_duration,
       questions,
@@ -43,6 +44,7 @@ exports.saveSurvey = async (req, res) => {
       ac_list,
       background_location_capture,
       thank_time_duration,
+      imported:imported || false,
       response_count: response_count || 0,
     });
     if (questions && Array.isArray(questions) && questions.length > 0) {
