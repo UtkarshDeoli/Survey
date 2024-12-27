@@ -106,7 +106,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } }
+        { $set: { family_head: response._id } },
       );
     }
 
@@ -114,7 +114,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      }
+      },
     );
     if (!survey) {
       return res
@@ -172,7 +172,7 @@ exports.saveResponses = async (req, res) => {
       const acNo = response.ac_no || null;
       const boothNo = response.booth_no || null;
       const houseNo = response.responses.find(
-        (r) => r.question === "C_HOUSE_NO"
+        (r) => r.question === "C_HOUSE_NO",
       )?.response;
 
       if (acNo && boothNo && houseNo) {
@@ -194,8 +194,8 @@ exports.saveResponses = async (req, res) => {
           .map((family) => [
             `${family.ac_no}-${family.booth_no}-${family.house_no}`,
             family,
-          ])
-      ).values()
+          ]),
+      ).values(),
     );
 
     // Save families, ensuring no duplicates
@@ -212,7 +212,7 @@ exports.saveResponses = async (req, res) => {
       }
     }
     console.log(
-      `${responsesArray.length} responses saved successfully, families processed.`
+      `${responsesArray.length} responses saved successfully, families processed.`,
     );
     return res.status(201).json({
       success: true,
@@ -408,7 +408,7 @@ exports.getAllResponses = async (req, res) => {
                       input: { $toString: "$responses.response" },
                       regex: new RegExp(
                         escapeRegex("$responses.response"),
-                        "i"
+                        "i",
                       ),
                     },
                   },
@@ -452,7 +452,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response)
+      console.log(resp.question_id, "-->", resp.response),
     );
 
     // Add additional match stage if there are filters
@@ -489,7 +489,7 @@ exports.getAllResponses = async (req, res) => {
         Responses.findById(f._id)
           .populate("panna_pramukh_assigned")
           .populate("user_id")
-          .populate("survey_id")
+          .populate("survey_id"),
       );
 
       const re = await Promise.all(fin);
@@ -510,7 +510,7 @@ exports.getAllResponses = async (req, res) => {
       const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
       const fin = filteredResponse.map((f) =>
-        Responses.findById(f._id).populate("panna_pramukh_assigned")
+        Responses.findById(f._id).populate("panna_pramukh_assigned"),
       );
       const re = await Promise.all(fin);
       // console.log("res-->",re)
@@ -743,7 +743,7 @@ exports.getSurveyResponses = async (req, res) => {
       },
       {
         $limit: pageSize, // Limit the number of documents for pagination
-      }
+      },
     );
 
     const results = await Responses.aggregate(pipeline);
@@ -986,7 +986,7 @@ exports.updateResponse = async (req, res) => {
     const response = await Responses.findByIdAndUpdate(
       response_id,
       { $set: updateFields },
-      { new: true }
+      { new: true },
     );
 
     if (!response) {
@@ -1087,7 +1087,7 @@ exports.downloadVoter = async (req, res) => {
     const templatePath = path.join(__dirname, "..", "views", "voterCard.ejs");
     const htmlContent = await ejs.renderFile(
       templatePath,
-      voterData.toObject()
+      voterData.toObject(),
     );
 
     // Use Puppeteer to Generate PDF
@@ -1122,22 +1122,26 @@ exports.downloadVoter = async (req, res) => {
     console.log(`PDF saved to: ${filePath}`);
 
     // Send PDF Response
-    // res.setHeader("Content-Type", "application/pdf"); // Ensure it's PDF content type
-    // res.setHeader("Content-Disposition", `attachment; filename="card_${id}.pdf"`); // Set filename dynamically
-    // console.log("sending pdf buffer");
-    // res.send(pdfBuffer);
-    // res.send(htmlContent);
+    const processedBuffer = Buffer.from(pdfBuffer);
+    res.setHeader("Content-Type", "application/pdf"); // Ensure it's PDF content type
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="card_${id}.pdf"`,
+    ); // Set filename dynamically
+    console.log("sending pdf buffer");
+    res.send(processedBuffer);
+    //res.send(htmlContent);
 
-    const pdfBase64 = pdfBuffer.toString('base64').replace(/\n/g, '');
-    console.log("PDF Base64 string generated--->",pdfBase64);
-
-    // Send Base64 PDF Response
-    res.status(200).json({
-      success: true,
-      file: pdfBase64,
-      filename: `card_${id}.pdf`
-    });
-    console.log("buffer sent ");
+    // const pdfBase64 = Buffer.from(pdfBuffer).toString("base64");
+    // console.log("PDF Base64 string generated--->", pdfBase64);
+    //
+    // // Send Base64 PDF Response
+    // res.status(200).json({
+    //   success: true,
+    //   file: pdfBase64,
+    //   filename: `card_${id}.pdf`,
+    // });
+    // console.log("buffer sent ");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error generating PDF");
