@@ -1129,6 +1129,15 @@ exports.downloadVoter = async (req, res) => {
       `attachment; filename="card_${id}.pdf"`,
     ); // Set filename dynamically
     console.log("sending pdf buffer");
+
+    const additionalData = {
+      success: true,
+      message: "PDF generated successfully",
+      filename: `card_${id}.pdf`,
+    };
+
+    res.setHeader("X-Additional-Data", JSON.stringify(additionalData));
+
     res.send(processedBuffer);
     //res.send(htmlContent);
 
@@ -1145,5 +1154,27 @@ exports.downloadVoter = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Error generating PDF");
+  }
+};
+
+exports.saveVoteStatus = async (req, res) => {
+  try {
+    const { response_id, vote_status } = req.body;
+    const responseToUpdate = {
+      vote_status: !vote_status,
+    };
+    const updatedResponse = await Responses.findByIdAndUpdate(
+      response_id,
+      responseToUpdate,
+      {
+        new: true,
+      },
+    );
+    console.log("updatedResponse", updatedResponse.vote_status);
+    return res
+      .status(200)
+      .json({ success: "true", message: "Vote status saved successfully" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
   }
 };

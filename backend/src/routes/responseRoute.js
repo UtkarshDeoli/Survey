@@ -31,7 +31,7 @@ router.post(
 
 router.get("/getAllResponses", responseController.getAllResponses);
 router.get("/getResponse", responseController.getResponse);
-// 
+//
 router.get("/downloadVoter", responseController.downloadVoter);
 
 router.post("/saveResponses", responseController.saveResponses);
@@ -48,6 +48,7 @@ router.get(
 );
 router.post("/updateResponse", responseController.updateResponse);
 router.post("/markAsContacted", responseController.markAsContacted);
+router.post("/saveVoteStatus", responseController.saveVoteStatus);
 router.post("/saveRemark", responseController.saveRemark);
 
 module.exports = router;

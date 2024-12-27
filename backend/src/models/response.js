@@ -51,6 +51,10 @@ const responseSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    vote_status: {
+      type: Boolean,
+      default: false,
+    },
     remark: {
       type: String,
     },
