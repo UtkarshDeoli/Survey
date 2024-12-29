@@ -250,6 +250,7 @@ exports.getAllResponses = async (req, res) => {
       endDate,
       filters,
       statusFilter,
+      searchText,
       page = 1,
       limit = 4,
     } = req.query;
@@ -274,6 +275,15 @@ exports.getAllResponses = async (req, res) => {
     console.log("user id ---------->", userId);
     if (userId) {
       matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
+    }
+
+    if (searchText) {
+      matchStage.$or = [
+        { name: { $regex: searchText, $options: "i" } },
+        { ac_no: { $regex: searchText, $options: "i" } },
+        { booth_no: { $regex: searchText, $options: "i" } },
+        { house_no: { $regex: searchText, $options: "i" } },
+      ];
     }
 
     if (startDate && endDate) {
