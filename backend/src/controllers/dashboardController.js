@@ -3,6 +3,7 @@ const Response = require("../models/response");
 const User = require("../models/user");
 const Todo = require("../models/todo");
 const mongoose = require("mongoose");
+const Data = require("../models/data");
 
 exports.getDashboard = async (req, res) => {
   try {
@@ -203,6 +204,54 @@ exports.getResponsesByStatus = async (req, res) => {
         surveyPerPage: limit,
       },
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+exports.getKaryakartaAssignedResponsesStatus = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User Id is required" });
+    }
+
+    const responsesStatusCount = await Response.aggregate([
+      {
+        $match: {
+          panna_pramukh_assigned: new mongoose.Types.ObjectId(String(user_id)),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalResponsesAssigned: { $sum: 1 },
+          contactedCount: {
+            $sum: {
+              $cond: [{ $eq: ["$contacted", true] }, 1, 0],
+            },
+          },
+          voteStatusCount: {
+            $sum: {
+              $cond: [{ $eq: ["$vote_status", true] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalResponsesAssigned: 1,
+          contactedCount: 1,
+          voteStatusCount: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({ success: true, data: responsesStatusCount[0] });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });

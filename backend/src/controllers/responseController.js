@@ -106,7 +106,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } }
+        { $set: { family_head: response._id } },
       );
     }
 
@@ -114,7 +114,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      }
+      },
     );
     if (!survey) {
       return res
@@ -218,7 +218,7 @@ exports.saveResponses = async (req, res) => {
       const acNo = response.ac_no || null;
       const boothNo = response.booth_no || null;
       const houseNo = response.responses.find(
-        (r) => r.question === "C_HOUSE_NO"
+        (r) => r.question === "C_HOUSE_NO",
       )?.response;
 
       let familyId = null;
@@ -297,6 +297,7 @@ exports.getAllResponses = async (req, res) => {
       endDate,
       filters,
       statusFilter,
+      searchText,
       page = 1,
       limit = 4,
     } = req.query;
@@ -321,6 +322,15 @@ exports.getAllResponses = async (req, res) => {
     console.log("user id ---------->", userId);
     if (userId) {
       matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
+    }
+
+    if (searchText) {
+      matchStage.$or = [
+        { name: { $regex: searchText, $options: "i" } },
+        { ac_no: { $regex: searchText, $options: "i" } },
+        { booth_no: { $regex: searchText, $options: "i" } },
+        { house_no: { $regex: searchText, $options: "i" } },
+      ];
     }
 
     if (startDate && endDate) {
@@ -455,7 +465,7 @@ exports.getAllResponses = async (req, res) => {
                       input: { $toString: "$responses.response" },
                       regex: new RegExp(
                         escapeRegex("$responses.response"),
-                        "i"
+                        "i",
                       ),
                     },
                   },
@@ -499,7 +509,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response)
+      console.log(resp.question_id, "-->", resp.response),
     );
 
     // Add additional match stage if there are filters
@@ -536,7 +546,7 @@ exports.getAllResponses = async (req, res) => {
         Responses.findById(f._id)
           .populate("panna_pramukh_assigned")
           .populate("user_id")
-          .populate("survey_id")
+          .populate("survey_id"),
       );
 
       const re = await Promise.all(fin);
@@ -557,7 +567,7 @@ exports.getAllResponses = async (req, res) => {
       const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
       const fin = filteredResponse.map((f) =>
-        Responses.findById(f._id).populate("panna_pramukh_assigned")
+        Responses.findById(f._id).populate("panna_pramukh_assigned"),
       );
       const re = await Promise.all(fin);
       // console.log("res-->",re)
@@ -790,7 +800,7 @@ exports.getSurveyResponses = async (req, res) => {
       },
       {
         $limit: pageSize, // Limit the number of documents for pagination
-      }
+      },
     );
 
     const results = await Responses.aggregate(pipeline);
@@ -1033,7 +1043,7 @@ exports.updateResponse = async (req, res) => {
     const response = await Responses.findByIdAndUpdate(
       response_id,
       { $set: updateFields },
-      { new: true }
+      { new: true },
     );
 
     if (!response) {
@@ -1134,7 +1144,7 @@ exports.downloadVoter = async (req, res) => {
     const templatePath = path.join(__dirname, "..", "views", "voterCard.ejs");
     const htmlContent = await ejs.renderFile(
       templatePath,
-      voterData.toObject()
+      voterData.toObject(),
     );
 
     // Use Puppeteer to Generate PDF
@@ -1169,24 +1179,59 @@ exports.downloadVoter = async (req, res) => {
     console.log(`PDF saved to: ${filePath}`);
 
     // Send PDF Response
-    // res.setHeader("Content-Type", "application/pdf"); // Ensure it's PDF content type
-    // res.setHeader("Content-Disposition", `attachment; filename="card_${id}.pdf"`); // Set filename dynamically
-    // console.log("sending pdf buffer");
-    // res.send(pdfBuffer);
-    // res.send(htmlContent);
+    const processedBuffer = Buffer.from(pdfBuffer);
+    res.setHeader("Content-Type", "application/pdf"); // Ensure it's PDF content type
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="card_${id}.pdf"`,
+    ); // Set filename dynamically
+    console.log("sending pdf buffer");
 
-    const pdfBase64 = pdfBuffer.toString('base64').replace(/\n/g, '');
-    console.log("PDF Base64 string generated--->",pdfBase64);
-
-    // Send Base64 PDF Response
-    res.status(200).json({
+    const additionalData = {
       success: true,
-      file: pdfBase64,
-      filename: `card_${id}.pdf`
-    });
-    console.log("buffer sent ");
+      message: "PDF generated successfully",
+      filename: `card_${id}.pdf`,
+    };
+
+    res.setHeader("X-Additional-Data", JSON.stringify(additionalData));
+
+    res.send(processedBuffer);
+    //res.send(htmlContent);
+
+    // const pdfBase64 = Buffer.from(pdfBuffer).toString("base64");
+    // console.log("PDF Base64 string generated--->", pdfBase64);
+    //
+    // // Send Base64 PDF Response
+    // res.status(200).json({
+    //   success: true,
+    //   file: pdfBase64,
+    //   filename: `card_${id}.pdf`,
+    // });
+    // console.log("buffer sent ");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error generating PDF");
+  }
+};
+
+exports.saveVoteStatus = async (req, res) => {
+  try {
+    const { response_id, vote_status } = req.body;
+    const responseToUpdate = {
+      vote_status: !vote_status,
+    };
+    const updatedResponse = await Responses.findByIdAndUpdate(
+      response_id,
+      responseToUpdate,
+      {
+        new: true,
+      },
+    );
+    console.log("updatedResponse", updatedResponse.vote_status);
+    return res
+      .status(200)
+      .json({ success: "true", message: "Vote status saved successfully" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
   }
 };
