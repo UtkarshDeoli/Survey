@@ -92,6 +92,7 @@ function ImportSurveyModal({ importModalOpen, closeImportModal, setUpdated }: pr
           const params = {
             name,
             ac_list,
+            imported:true,
             response_count:jsonData.length,
             published: false,
             questions,
@@ -119,6 +120,9 @@ function ImportSurveyModal({ importModalOpen, closeImportModal, setUpdated }: pr
                 survey_id: response.survey._id,
                 ac_no : data.AC_NO,
                 booth_no : data.SECTION_NO,
+                house_no: data.C_HOUSE_NO,  
+                phone_no: data.MOBILE_NO,
+                name: data.FM_NAME_EN,
                 responses,
               });
             });

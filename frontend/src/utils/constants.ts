@@ -10,6 +10,7 @@ export const update_user = "api/user/updateUser";
 export const update_users = "api/user/updateUsers";
 export const get_all_chats_data = "api/chatroom/getAllChatsData";
 export const get_supervisor_collectors = "api/user/getSupervisorCollectors"
+export const assign_booth = "api/user/assignBooth"
 
 // karyakartas
 export const get_all_karyakartas = "api/user/getAllKaryakarta"

@@ -141,18 +141,66 @@ exports.saveResponse = async (req, res) => {
 //         .json({ success: false, message: "Invalid input data" });
 //     }
 
+//     // Save responses
 //     await Responses.insertMany(responsesArray);
 //     console.dir(responsesArray, { depth: null });
+
+//     // Extract and process family data
+//     const familiesToSave = responsesArray.map((response) => {
+//       const acNo = response.ac_no || null;
+//       const boothNo = response.booth_no || null;
+//       const houseNo = response.responses.find(
+//         (r) => r.question === "C_HOUSE_NO"
+//       )?.response;
+
+//       if (acNo && boothNo && houseNo) {
+//         return {
+//           survey_id: response.survey_id,
+//           ac_no: acNo,
+//           booth_no: boothNo,
+//           house_no: houseNo,
+//         };
+//       }
+//       return null;
+//     });
+
+//     // Remove invalid or duplicate family entries from processing
+//     const uniqueFamilies = Array.from(
+//       new Map(
+//         familiesToSave
+//           .filter(Boolean)
+//           .map((family) => [
+//             `${family.ac_no}-${family.booth_no}-${family.house_no}`,
+//             family,
+//           ])
+//       ).values()
+//     );
+
+//     // Save families, ensuring no duplicates
+//     for (const family of uniqueFamilies) {
+//       const existingFamily = await Family.findOne({
+//         survey_id: family.survey_id,
+//         ac_no: family.ac_no,
+//         booth_no: family.booth_no,
+//         house_no: family.house_no,
+//       });
+
+//       if (!existingFamily) {
+//         await Family.create(family);
+//       }
+//     }
+//     console.log(
+//       `${responsesArray.length} responses saved successfully, families processed.`
+//     );
 //     return res.status(201).json({
 //       success: true,
-//       message: `${responsesArray.length} responses saved successfully`,
+//       message: `${responsesArray.length} responses saved successfully, families processed.`,
 //     });
 //   } catch (error) {
-//     console.log(error);
+//     console.error(error);
 //     return res.status(400).json({ success: false, message: error.message });
 //   }
 // };
-
 exports.saveResponses = async (req, res) => {
   try {
     const responsesArray = req.body;
@@ -163,60 +211,59 @@ exports.saveResponses = async (req, res) => {
         .json({ success: false, message: "Invalid input data" });
     }
 
-    // Save responses
-    await Responses.insertMany(responsesArray);
-    console.dir(responsesArray, { depth: null });
+    // Cache to store already processed families
+    const familyCache = new Map();
 
-    // Extract and process family data
-    const familiesToSave = responsesArray.map((response) => {
+    for (const response of responsesArray) {
       const acNo = response.ac_no || null;
       const boothNo = response.booth_no || null;
       const houseNo = response.responses.find(
         (r) => r.question === "C_HOUSE_NO"
       )?.response;
 
+      let familyId = null;
+
       if (acNo && boothNo && houseNo) {
-        return {
-          survey_id: response.survey_id,
-          ac_no: acNo,
-          booth_no: boothNo,
-          house_no: houseNo,
-        };
+        const uniqueKey = `${acNo}-${boothNo}-${houseNo}`;
+
+        // Check if the family is already in the cache
+        if (familyCache.has(uniqueKey)) {
+          familyId = familyCache.get(uniqueKey);
+        } else {
+          const familyData = {
+            survey_id: response.survey_id,
+            ac_no: acNo,
+            booth_no: boothNo,
+            house_no: houseNo,
+          };
+
+          // Check if the family exists in the database
+          let family = await Family.findOne(familyData);
+
+          if (!family) {
+            // Create the family if it doesn't exist
+            family = await Family.create(familyData);
+          }
+
+          // Cache the family ID
+          familyId = family._id;
+          familyCache.set(uniqueKey, familyId);
+        }
       }
-      return null;
-    });
 
-    // Remove invalid or duplicate family entries from processing
-    const uniqueFamilies = Array.from(
-      new Map(
-        familiesToSave
-          .filter(Boolean)
-          .map((family) => [
-            `${family.ac_no}-${family.booth_no}-${family.house_no}`,
-            family,
-          ])
-      ).values()
-    );
-
-    // Save families, ensuring no duplicates
-    for (const family of uniqueFamilies) {
-      const existingFamily = await Family.findOne({
-        survey_id: family.survey_id,
-        ac_no: family.ac_no,
-        booth_no: family.booth_no,
-        house_no: family.house_no,
-      });
-
-      if (!existingFamily) {
-        await Family.create(family);
-      }
+      // Add family_id to the response
+      response.family_id = familyId;
     }
+
+    // Save all responses with the family_id field populated
+    await Responses.insertMany(responsesArray);
+
     console.log(
-      `${responsesArray.length} responses saved successfully, families processed.`
+      `${responsesArray.length} responses saved successfully with family IDs.`
     );
     return res.status(201).json({
       success: true,
-      message: `${responsesArray.length} responses saved successfully, families processed.`,
+      message: `${responsesArray.length} responses saved successfully with family IDs.`,
     });
   } catch (error) {
     console.error(error);

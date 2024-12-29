@@ -112,7 +112,7 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.assignBoothToUsers = async (req, res) => {
-  const { survey_id ,userId, ac_list } = req.body;
+  const { survey_id, userId, ac_list } = req.body;
 
   try {
     // Find the user by userId
@@ -121,14 +121,20 @@ exports.assignBoothToUsers = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Update the user's AC list
-    user.assigned_survey.push(survey_id);
+    // Update the user's survey list and AC list
+    if (!user.assigned_survey.includes(survey_id)) {
+      user.assigned_survey.push(survey_id);
+    }
     user.ac_list = ac_list;
     await user.save();
 
-    // Build filter criteria for the responses
+    // Build filter criteria for responses
     const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
-      booth_numbers.map((booth_no) => ({ ac_no, booth_no }))
+      booth_numbers.map((booth_no) => ({
+        survey_id,
+        ac_no,
+        booth_no,
+      }))
     );
 
     // Update responses in a single operation
@@ -138,7 +144,7 @@ exports.assignBoothToUsers = async (req, res) => {
     );
 
     return res.status(200).json({
-      success:true,
+      success: true,
       message: "Booths assigned to user and responses updated successfully",
     });
   } catch (error) {
@@ -146,6 +152,7 @@ exports.assignBoothToUsers = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 exports.updateUsers = async (req, res) => {
   try {

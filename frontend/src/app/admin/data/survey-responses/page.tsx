@@ -28,6 +28,7 @@ import survey_analytics_calender from "/public/images/calendar_new.png";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { surveyCollectorId } from "@/utils/constants";
 import useUser from "@/hooks/useUser";
+import AssignBoothModal from "@/components/survey-responses/AssignBoothModal";
 
 function Page() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -69,6 +70,13 @@ function Page() {
   // downloading
   const [downloading,setDownloading] = useState<boolean>(false)
   const [acList,setAcList] = useState<any>([]);
+  const [isImported,setIsImported] = useState<boolean>(false);
+
+
+  // assign booth modal
+  const [boothModal,setBoothModal] = useState<boolean>(false);
+  const [selectedBooth, setSelectedBooth] = useState<any>(null);;
+  const [selectedCollector,setSelectedCollector] = useState<any>(null);
 
   
 
@@ -131,6 +139,7 @@ function Page() {
     console.log("current survey-->",response);
     if(response.success){
       console.log("setting ac_list",response.data.ac_list)
+      setIsImported(response.data.imported);
       setAcList(response.data.ac_list);
       const questions = response.data.questions.map((el: any) => el);
       setSurveyQuestions(questions);
@@ -355,13 +364,18 @@ function Page() {
               </div>
             </div>
 
-            <div>
+            <div className="flex gap-2">
               {
                 acList && acList.length > 0 && (
                   <ButtonFilled onClick={() => setUserModal(true)}>
                     Assign Data
                   </ButtonFilled>
                 )
+              }
+              {
+                isImported && <ButtonFilled onClick={() => setBoothModal(true)}>
+                Assign Booth
+              </ButtonFilled>
               }
             </div>
           </div>
@@ -481,6 +495,7 @@ function Page() {
         userModal={userModal}
         userSearch={userSearch || ""}
       />
+      <AssignBoothModal survey_id ={surveyId || ""} acList={acList} boothModal={boothModal} setBoothModal={setBoothModal} users={users}/>
     </div>
   );
 }

@@ -16,6 +16,7 @@ import {
   updateMultipleKaryakarta,
   get_panna_pramukh_ac_list,
   get_supervisor_collectors,
+  assign_booth,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -63,7 +64,7 @@ export const getUser = async (params: any) => {
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
-      params
+      params,
     };
     const response = await axios.request(options);
     return response.data;
@@ -101,7 +102,6 @@ export const getAllUsers = async (params: {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
-
 
 export const addUsers = async (params: any) => {
   try {
@@ -150,7 +150,7 @@ export const getAllChatsData = async (params: {
   currentUserId: string;
   searchBarInput: string;
   selectedRole: string;
-  page?:number;
+  page?: number;
   limit?: number;
 }) => {
   try {
@@ -160,9 +160,9 @@ export const getAllChatsData = async (params: {
       params: {
         filter: params.searchBarInput,
         role: params.selectedRole,
-        currentUserId:params.currentUserId,
-        page:params.page,
-        limit:params.limit
+        currentUserId: params.currentUserId,
+        page: params.page,
+        limit: params.limit,
       },
     };
     const response = await axios.request(options);
@@ -176,6 +176,20 @@ export const getAllChatsData = async (params: {
   }
 };
 
+export const assignBooth = async (params: any) => {
+  try {
+    const options = {
+      method: "POST",
+      url: `${SERVER_URI}/${assign_booth}`,
+      data: params,
+    };
+    const response = await axios.request(options);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
 
 // karyakartas
 
@@ -212,7 +226,7 @@ export const createKaryakarta = async (params: any) => {
     const options = {
       method: "POST",
       url: `${SERVER_URI}/${create_karyakarta}`,
-      data:params,
+      data: params,
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
@@ -229,7 +243,7 @@ export const updateKaryakarta = async (params: any) => {
     const options = {
       method: "POST",
       url: `${SERVER_URI}/${update_karyakarta}`,
-      data:params,
+      data: params,
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
@@ -246,15 +260,15 @@ export const updateKaryakartas = async (params: any) => {
     const options = {
       method: "POST",
       url: `${SERVER_URI}/${updateMultipleKaryakarta}`,
-      data:params,
+      data: params,
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
     };
     const response = await axios.request(options);
     return response.data;
-  } catch (error:any) {
-    console.log("error in network",error)
+  } catch (error: any) {
+    console.log("error in network", error);
     return { success: false, message: error.response.data.message, error };
   }
 };
@@ -274,7 +288,7 @@ export const getKaryakarta = async (params: any) => {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
-export const getPannaPramukh= async (params: any) => {
+export const getPannaPramukh = async (params: any) => {
   try {
     const bearerToken = localStorage.getItem("token");
     const options = {
@@ -283,7 +297,7 @@ export const getPannaPramukh= async (params: any) => {
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
-      params
+      params,
     };
     const response = await axios.request(options);
     return response.data.data;
@@ -291,7 +305,7 @@ export const getPannaPramukh= async (params: any) => {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
-export const getPannaPramukhByAcList= async (params: any) => {
+export const getPannaPramukhByAcList = async (params: any) => {
   try {
     const bearerToken = localStorage.getItem("token");
     const options = {
@@ -300,16 +314,16 @@ export const getPannaPramukhByAcList= async (params: any) => {
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
-      data:params
+      data: params,
     };
     const response = await axios.request(options);
     return response.data.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }
-}
+};
 
-export const getSupervisorCollectors= async (params: any) => {
+export const getSupervisorCollectors = async (params: any) => {
   try {
     const bearerToken = localStorage.getItem("token");
     const options = {
@@ -318,15 +332,12 @@ export const getSupervisorCollectors= async (params: any) => {
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
-      params
+      params,
     };
     const response = await axios.request(options);
-    console.log("from network--->",response)
+    console.log("from network--->", response);
     return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
-
-
-
