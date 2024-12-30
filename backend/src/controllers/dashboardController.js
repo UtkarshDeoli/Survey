@@ -128,8 +128,14 @@ exports.getResponsesStatusCount = async (req, res) => {
       rejected: rejectedCount,
       pending: pendingCount,
     };
+    console.log("responseObject", responseObject);
 
-    res.status(200).json({ success: true, data: responseObject });
+    res.status(200).json({
+      success: true,
+      data: responseObject
+        ? responseObject
+        : { total: 0, approved: 0, rejected: 0, pending: 0 },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -251,7 +257,17 @@ exports.getKaryakartaAssignedResponsesStatus = async (req, res) => {
       },
     ]);
 
-    res.status(200).json({ success: true, data: responsesStatusCount[0] });
+    res.status(200).json({
+      success: true,
+      data:
+        responsesStatusCount.length > 0
+          ? responsesStatusCount[0]
+          : {
+              totalResponsesAssigned: 0,
+              contactedCount: 0,
+              voteStatusCount: 0,
+            },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
