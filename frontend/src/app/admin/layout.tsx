@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { CreateSurveyContextProvider } from "@/store/createSurveyContext";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import withAuth from "@/components/protect/withAuth";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -40,10 +41,9 @@ function Layout({ children }: LayoutProps) {
           </CreateSurveyContextProvider>
         </main>
       </div>
-      {/* "w-[calc(100vw-250px)]"  */}
       <Toaster />
     </div>
   );
 }
 
-export default Layout;
+export default withAuth(Layout)

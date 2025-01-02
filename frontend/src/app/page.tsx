@@ -38,7 +38,6 @@ export default function login() {
           toast.success(res.message);
           localStorage.setItem("jwt", res.token);
           const user = checkToken();
-          const isAdmin = user.role[0].category === "admin";
           const isAuthorized = user?.role.find((el: any) =>
             validRoles.includes(el._id.toString())
           );

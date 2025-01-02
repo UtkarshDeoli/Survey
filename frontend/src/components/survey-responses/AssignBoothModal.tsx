@@ -1,25 +1,63 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CustomModal from "../ui/Modal";
 import Select from "react-select";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import toast from "react-hot-toast";
 import { assignBooth } from "@/networks/user_networks";
+import { getAllUsers } from "@/networks/user_networks";
 
 interface Props {
+  isImported:boolean;
   boothModal: boolean;
   setBoothModal: (value: boolean) => void;
-  users: any[];
   acList: { ac_no: string; booth_numbers: string[] }[];
-  survey_id:string
+  survey_id: string;
 }
 
-function AssignBoothModal({ boothModal, setBoothModal, users, acList,survey_id }: Props) {
+function AssignBoothModal({ boothModal, setBoothModal, acList, survey_id,isImported }: Props) {
+  const allRoles = [
+    { value: "671f997d38863c2bfc859e76", label: "Survey Collector" },
+    { value: "67713c803e1c10c39195a9cc", label: "District President" },
+    { value: "67713c9a3e1c10c39195a9ce", label: "Shakti Kendra" },
+  ];
+  
+  const [roles, setRoles] = useState(allRoles);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [users, setUsers] = useState<any[]>([]);
   const [userId, setUserId] = useState<string>("");
   const [selectedAcBooths, setSelectedAcBooths] = useState<
     { ac_no: string; booth_numbers: string[] }[]
   >([]);
-  const [loading,setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const fetchUsersByRole = async (role: string) => {
+    try {
+      setLoading(true);
+      const response = await getAllUsers({ selectedRole: role });
+      if (response.success) {
+        setUsers(response.data || []);
+      } else {
+        toast.error("Failed to fetch users");
+      }
+    } catch (error) {
+      toast.error("An error occurred while fetching users");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    // Filter roles based on isImported prop
+    setRoles(!isImported ? allRoles.filter((role) => role.label !== "Survey Collector") : allRoles);
+  }, [isImported]);
+
+  useEffect(() => {
+    if (selectedRole) {
+      fetchUsersByRole(selectedRole);
+    } else {
+      setUsers([]);
+    }
+  }, [selectedRole]);
 
   const userOptions = users?.map((user) => ({
     value: user._id,
@@ -56,34 +94,54 @@ function AssignBoothModal({ boothModal, setBoothModal, users, acList,survey_id }
     setLoading(true);
     if (!userId || selectedAcBooths.length === 0) {
       toast.error("Please select all fields");
+      setLoading(false);
       return;
     }
     const updatedAcList = selectedAcBooths.map((item) => ({
       ...item,
       survey_id,
     }));
-    const payload = {
+    const payload:any = {
       survey_id,
       userId,
       ac_list: updatedAcList,
     };
-    console.log("payload is --->", payload);
-    const response = await assignBooth(payload)
-    if(response.success){
+    if(selectedRole === "671f997d38863c2bfc859e76"){
+      payload.editResponses = true
+    }
+    try {
+      const response = await assignBooth(payload);
+      if (response.success) {
         toast.success("AC and Booth assigned successfully!");
         setBoothModal(false);
-    }else{
+      } else {
         toast.error("Failed to assign AC and Booth");
+      }
+    } catch {
+      toast.error("An error occurred during assignment");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <CustomModal open={boothModal} closeModal={() => setBoothModal(false)}>
       <div className="min-h-[50vh] max-h-[90vh] flex items-center gap-5 p-8 flex-col bg-secondary-100 overflow-y-auto">
         <h1 className="text-xl font-bold text-primary-300">
-          Assign AC and Booth to Survey Collector
+          Assign AC and Booth to User
         </h1>
+
+        {/* Role Selector */}
+        <div className="flex flex-col space-y-2 w-[352px]">
+          <Select
+            value={roles.find((role) => role.value === selectedRole)}
+            onChange={(selectedOption) => setSelectedRole(selectedOption?.value || null)}
+            options={roles}
+            placeholder="Select Role"
+            classNamePrefix="react-select"
+            isSearchable
+          />
+        </div>
 
         {/* User Selector */}
         <div className="flex flex-col space-y-2 w-[352px]">
@@ -94,6 +152,7 @@ function AssignBoothModal({ boothModal, setBoothModal, users, acList,survey_id }
             placeholder="Select User"
             classNamePrefix="react-select"
             isSearchable
+            isDisabled={!selectedRole}
           />
         </div>
 
@@ -149,9 +208,9 @@ function AssignBoothModal({ boothModal, setBoothModal, users, acList,survey_id }
 
         {/* Submit Button */}
         <ButtonFilled
-        disabled={loading}
-        loading={loading}
-        className="mt-auto disabled:bg-primary-100"
+          disabled={loading}
+          loading={loading}
+          className="mt-auto disabled:bg-primary-100"
           onClick={handleSubmit}
         >
           Assign

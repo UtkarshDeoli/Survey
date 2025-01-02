@@ -372,11 +372,9 @@ function Page() {
                   </ButtonFilled>
                 )
               }
-              {
-                isImported && <ButtonFilled onClick={() => setBoothModal(true)}>
+               <ButtonFilled onClick={() => setBoothModal(true)}>
                 Assign Booth
               </ButtonFilled>
-              }
             </div>
           </div>
         </div>
@@ -495,7 +493,7 @@ function Page() {
         userModal={userModal}
         userSearch={userSearch || ""}
       />
-      <AssignBoothModal survey_id ={surveyId || ""} acList={acList} boothModal={boothModal} setBoothModal={setBoothModal} users={users}/>
+      <AssignBoothModal survey_id ={surveyId || ""} acList={acList} boothModal={boothModal} setBoothModal={setBoothModal} isImported = {isImported}/>
     </div>
   );
 }

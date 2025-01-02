@@ -14,7 +14,6 @@ const roleSchema = new Schema({
     },
     permissions:{
             type:[String],
-            // enum:["Create survey","Edit survey", "View survey","Contact voter","All"],
             required:true
     }
   },

@@ -1,5 +1,8 @@
 const Survey = require("../models/survey");
 const Responses = require("../models/response");
+const Data = require("../models/data");
+const User = require("../models/user");
+const Family = require("../models/family");
 
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -73,6 +76,24 @@ exports.deleteSurvey = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Survey not found" });
     }
+
+    // Delete associated responses manually
+    await Responses.deleteMany({ survey_id: id });
+    await Data.deleteMany({ survey_id: id });
+    await Family.deleteMany({survey_id: id});
+
+    // Update users
+    await User.updateMany(
+      { assigned_survey: id }, // Find users with the survey in assigned_survey
+      {
+        $pull: {
+          assigned_survey: id, // Remove the survey ID from assigned_survey
+          ac_list: { survey_id: id }, // Remove the objects in ac_list with the survey_id
+        },
+      }
+    );
+
+
 
     return res
       .status(200)

@@ -58,19 +58,12 @@ const customPermissions: any = {
     "View survey",
     "Edit survey",
   ],
-  "Supervisor":[
-    "View survey collectors",
-    "View survey collector data"
-  ],
-  "Quality Check" :[
-    "Accept/Reject data"
-  ],
-  "Data Analyst":[
-    "Access report"
-  ],
-  "Data Manager":[
-    "Download report"
-  ]
+  Supervisor: ["View survey collectors", "View survey collector data"],
+  "Quality Check": ["Accept/Reject data"],
+  "Data Analyst": ["Access report"],
+  "Data Manager": ["Download report"],
+  "District President": ["View data", "Edit data"],
+  "Shakti Kendra": ["View data", "Edit data"],
 };
 
 function Page() {

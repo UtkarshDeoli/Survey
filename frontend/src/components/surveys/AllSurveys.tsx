@@ -315,9 +315,9 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                 className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-mid-gray"
               >
                 <p
-                  onClick={() =>
-                    router.push(`/admin/surveys/edit?survey_id=${el._id}`)
-                  }
+                  onClick={() =>{
+                    if(!isSurveyManager) router.push(`/admin/surveys/edit?survey_id=${el._id}`)
+                  }}
                   className="col-span-2 cursor-pointer font-semibold"
                 >
                   {el.name}

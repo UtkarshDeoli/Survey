@@ -112,7 +112,7 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.assignBoothToUsers = async (req, res) => {
-  const { survey_id, userId, ac_list } = req.body;
+  const { survey_id, userId, ac_list, editResponses } = req.body;
 
   try {
     // Find the user by userId
@@ -128,20 +128,22 @@ exports.assignBoothToUsers = async (req, res) => {
     user.ac_list = ac_list;
     await user.save();
 
-    // Build filter criteria for responses
-    const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
-      booth_numbers.map((booth_no) => ({
-        survey_id,
-        ac_no,
-        booth_no,
-      }))
-    );
-
-    // Update responses in a single operation
-    await Response.updateMany(
-      { $or: filterCriteria },
-      { $set: { user_id: userId } }
-    );
+    if(editResponses){
+      // Build filter criteria for responses
+      const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
+        booth_numbers.map((booth_no) => ({
+          survey_id,
+          ac_no,
+          booth_no,
+        }))
+      );
+  
+      // Update responses in a single operation
+      await Response.updateMany(
+        { $or: filterCriteria },
+        { $set: { user_id: userId } }
+      );
+    }
 
     return res.status(200).json({
       success: true,
