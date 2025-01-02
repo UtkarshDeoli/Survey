@@ -128,8 +128,14 @@ exports.getResponsesStatusCount = async (req, res) => {
       rejected: rejectedCount,
       pending: pendingCount,
     };
+    console.log("responseObject", responseObject);
 
-    res.status(200).json({ success: true, data: responseObject });
+    res.status(200).json({
+      success: true,
+      data: responseObject
+        ? responseObject
+        : { total: 0, approved: 0, rejected: 0, pending: 0 },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -250,6 +256,85 @@ exports.getKaryakartaAssignedResponsesStatus = async (req, res) => {
         },
       },
     ]);
+
+    res.status(200).json({
+      success: true,
+      data:
+        responsesStatusCount.length > 0
+          ? responsesStatusCount[0]
+          : {
+              totalResponsesAssigned: 0,
+              contactedCount: 0,
+              voteStatusCount: 0,
+            },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+exports.getResponsesStatusByAcList = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User Id is required" });
+    }
+
+    const userData = await User.findById(user_id);
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const matchStage = {};
+    const { ac_list } = userData;
+    const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
+      booth_numbers.map((booth_no) => ({ ac_no, booth_no })),
+    );
+
+    if (filterCriteria.length > 0) {
+      matchStage.$or = filterCriteria;
+    }
+
+    const aggregationPipeline = [
+      {
+        $match: matchStage,
+      },
+      {
+        $group: {
+          _id: null,
+          totalResponsesAssigned: { $sum: 1 },
+          contactedCount: {
+            $sum: {
+              $cond: [{ $eq: ["$contacted", true] }, 1, 0],
+            },
+          },
+          voteStatusCount: {
+            $sum: {
+              $cond: [{ $eq: ["$vote_status", true] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalResponsesAssigned: 1,
+          contactedCount: 1,
+          voteStatusCount: 1,
+        },
+      },
+    ];
+    console.log(
+      "aggregationPipeline",
+      JSON.stringify(aggregationPipeline, null, 2),
+    );
+
+    const responsesStatusCount = await Response.aggregate(aggregationPipeline);
 
     res.status(200).json({ success: true, data: responsesStatusCount[0] });
   } catch (error) {

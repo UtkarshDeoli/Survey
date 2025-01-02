@@ -4,6 +4,7 @@ const {
   getResponsesStatusCount,
   getResponsesByStatus,
   getKaryakartaAssignedResponsesStatus,
+  getResponsesStatusByAcList,
 } = require("../controllers/dashboardController");
 const router = express.Router();
 
@@ -14,4 +15,5 @@ router.get(
   "/karyakarta-responses-status",
   getKaryakartaAssignedResponsesStatus,
 );
+router.get("/responses-status-by-aclist", getResponsesStatusByAcList);
 module.exports = router;

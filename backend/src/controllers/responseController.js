@@ -10,6 +10,7 @@ const ejs = require("ejs");
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer");
+const User = require("../models/user");
 
 function escapeRegex(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -321,7 +322,28 @@ exports.getAllResponses = async (req, res) => {
 
     console.log("user id ---------->", userId);
     if (userId) {
-      matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
+      const userData = await User.findById(userId).populate("role");
+      let isNotCollector = false;
+      userData.role.forEach((role) => {
+        if (
+          role.name === "District President" ||
+          role.name === "Shakti Kendra"
+        ) {
+          isNotCollector = true;
+        }
+      });
+      if (isNotCollector) {
+        const { ac_list } = userData;
+        const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
+          booth_numbers.map((booth_no) => ({ ac_no, booth_no })),
+        );
+
+        if (filterCriteria.length > 0) {
+          matchStage.$or = filterCriteria;
+        }
+      } else {
+        matchStage.user_id = new mongoose.Types.ObjectId(String(userId));
+      }
     }
 
     if (searchText) {
