@@ -50,3 +50,17 @@ export function checkToken() {
     }
   }
 }
+
+
+export const formatTime = (timestamp:any) => {
+  const dateObj = new Date(timestamp);
+
+  // Format time as HH:MM AM/PM (e.g., 07:19 AM)
+  const formattedTime = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }).format(dateObj);
+
+  return formattedTime
+};

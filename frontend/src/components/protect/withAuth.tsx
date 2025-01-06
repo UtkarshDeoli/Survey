@@ -51,6 +51,7 @@ const withAuth = (WrappedComponent: any) => {
         "Quality Check": ["/admin/quality-check-surveys","/admin/support"],
         "Data Analyst": ["/admin/data","/admin/support"],
         "Data Manager": ["/admin/data","/admin/support"],
+        "Support Executive" : ["/admin/support"]
       };
     
       const allowedForRole = allowedPaths[name] || [];
@@ -67,6 +68,7 @@ const withAuth = (WrappedComponent: any) => {
           "Quality Check": "/admin/quality-check-surveys",
           "Data Analyst": "/admin/data",
           "Data Manager": "/admin/data",
+          "Support Executive" : "/admin/support"
         };
     
         router.replace(defaultRedirect[name]);

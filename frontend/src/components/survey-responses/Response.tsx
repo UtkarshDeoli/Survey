@@ -32,7 +32,7 @@ function Response({ questionType, response, expand }: props) {
     return formatDate(response);
   }
   return (
-    <td className="px-4 py-2 border-b min-w-44 text-center">
+    <td className="px-4 py-2 min-w-44 text-center">
       {expand ? response : truncateText(response, 20)}
     </td>
   );

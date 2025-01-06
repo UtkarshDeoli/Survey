@@ -100,7 +100,11 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name === "Data"
       );
-    } else {
+    } else if(roleName.includes("Support Executive")){
+      SidebarScreens = SidebarScreens.filter(
+        (item: any) => item.name === "Support"
+      );
+    }else {
       SidebarScreens.push(
         {
           icon: "/images/karyakarta.png",

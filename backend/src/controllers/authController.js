@@ -80,6 +80,7 @@ exports.adminLogin = async (req, res) => {
       "675a92c24bbe3577d16bcb64",
       "675bece5305e5a3192324a7a",
       "675bed08305e5a3192324a7c",
+      "671f999538863c2bfc859e78"
     ];
 
     const isAuthorized = roles.find((role) =>
