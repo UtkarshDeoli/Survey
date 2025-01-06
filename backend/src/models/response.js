@@ -58,6 +58,9 @@ const responseSchema = new Schema(
     remark: {
       type: String,
     },
+    remark_list: {
+      type: [String],
+    },
     call_recording: {
       type: Schema.Types.ObjectId,
       ref: "CallRecordings99",

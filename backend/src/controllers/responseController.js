@@ -260,7 +260,7 @@ exports.saveResponses = async (req, res) => {
     await Responses.insertMany(responsesArray);
 
     console.log(
-      `${responsesArray.length} responses saved successfully with family IDs.`
+      `${responsesArray.length} responses saved successfully with family IDs.`,
     );
     return res.status(201).json({
       success: true,
@@ -1105,12 +1105,22 @@ exports.markAsContacted = async (req, res) => {
 exports.saveRemark = async (req, res) => {
   try {
     const { response_id, remark_text } = req.body;
-    const responseToUpdate = {
-      remark: remark_text,
-    };
-    await Responses.findByIdAndUpdate(response_id, responseToUpdate, {
-      new: true,
-    });
+
+    const response = await Responses.findById(response_id);
+    if (!response) {
+      return res
+        .status(404)
+        .json({ success: "false", message: "Response not found" });
+    }
+
+    if (!response.remark_list) {
+      response.remark_list = [];
+    }
+    response.remark_list.push(remark_text);
+
+    response.remark = remark_text;
+    await response.save();
+
     return res
       .status(201)
       .json({ success: "true", message: "Remark saved successfully" });
