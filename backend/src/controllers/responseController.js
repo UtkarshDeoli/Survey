@@ -1116,7 +1116,7 @@ exports.saveRemark = async (req, res) => {
     if (!response.remark_list) {
       response.remark_list = [];
     }
-    response.remark_list.push(remark_text);
+    response.remark_list.push({remark:remark_text});
 
     response.remark = remark_text;
     await response.save();

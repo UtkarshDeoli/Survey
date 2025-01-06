@@ -45,12 +45,12 @@ const withAuth = (WrappedComponent: any) => {
     
       // Define allowed paths for each role
       const allowedPaths: Record<string, string[]> = {
-        "Operation team": ["/admin/surveys", "/admin/data", "/admin/todos"],
-        Supervisor: ["/admin/collectors", "/admin/collector-surveys"],
-        "Survey Manager": ["/admin/surveys"],
-        "Quality Check": ["/admin/quality-check-surveys"],
-        "Data Analyst": ["/admin/data"],
-        "Data Manager": ["/admin/data"],
+        "Operation team": ["/admin/surveys", "/admin/data", "/admin/todos","/admin/support"],
+        Supervisor: ["/admin/collectors", "/admin/collector-surveys","/admin/support"],
+        "Survey Manager": ["/admin/surveys","/admin/support"],
+        "Quality Check": ["/admin/quality-check-surveys","/admin/support"],
+        "Data Analyst": ["/admin/data","/admin/support"],
+        "Data Manager": ["/admin/data","/admin/support"],
       };
     
       const allowedForRole = allowedPaths[name] || [];

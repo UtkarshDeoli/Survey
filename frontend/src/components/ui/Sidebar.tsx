@@ -41,6 +41,12 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       tooltip: "Data",
     },
     {
+      icon: "/images/report.png",
+      name: "Report",
+      path: "/admin/report",
+      tooltip: "Report",
+    },
+    {
       icon: "/images/todo.png",
       name: "To-Do list",
       path: "/admin/todos",
@@ -141,7 +147,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       </button>
       <div className="flex flex-col h-full w-full">
         <h1
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/admin")}
           className="flex flex-col font-semibold gap-3 cursor-pointer justify-center pt-4 items-center"
         >
           {sidebarOpen ? (

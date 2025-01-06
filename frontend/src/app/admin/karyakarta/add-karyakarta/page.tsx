@@ -1,22 +1,20 @@
 "use client";
 import React, { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import {  FaQuestionCircle } from "react-icons/fa";
+import { FaQuestionCircle } from "react-icons/fa";
 import {
   createKaryakarta,
   getKaryakarta,
   updateKaryakarta,
 } from "@/networks/user_networks";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-
-  getSurveyByAcAndBooth,
-} from "@/networks/survey_networks";
+import { getSurveyByAcAndBooth } from "@/networks/survey_networks";
 
 import { checkToken } from "@/utils/common_functions";
 import toast from "react-hot-toast";
 import { districts } from "@/utils/devData";
 import { getRoles } from "@/networks/role_networks";
+import Loader from "@/components/ui/Loader";
 
 const inputs = [
   {
@@ -70,7 +68,7 @@ function Page() {
   //response selection states
   const [selectedResponses, setSelectedResponses] = useState<string[]>([]);
   const [selectedSurvey, setSelectdSurvey] = useState<string | null>(null);
-
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const {
     register,
@@ -118,19 +116,21 @@ function Page() {
 
   const router = useRouter();
   const onSubmit = async (data: any) => {
+    setSubmitting(true);
     if (selectedSurvey) data.survey_id = selectedSurvey;
     if (selectedResponses) data.responses = selectedResponses;
     if (data.password) {
-      if(!data.confirm_password){
+      if (!data.confirm_password) {
         toast.error("Please confirm password");
+        setSubmitting(false);
         return;
-      }
-      else if(data.password.trim().length === 0){
+      } else if (data.password.trim().length === 0) {
         toast.error("Password should contain valid characters");
+        setSubmitting(false);
         return;
-      }
-      else if(data.password !== data.confirm_password) {
+      } else if (data.password !== data.confirm_password) {
         toast.error("Passwords donot match!");
+        setSubmitting(false);
         return;
       }
     }
@@ -148,22 +148,20 @@ function Page() {
     } else {
       res = await createKaryakarta(params);
     }
-    console.log("response after creating karyakarta --->",res);
+    console.log("response after creating karyakarta --->", res);
     if (res.success) {
       toast.success("Success!");
       router.replace("/admin/karyakarta");
-    }else{
-      if(res.error){
-        toast.error(res.error.response.data.message)
-      }else{
-        toast.error("Failed to create karyakarta!")
+    } else {
+      if (res.error) {
+        toast.error(res.error.response.data.message);
+      } else {
+        toast.error("Failed to create karyakarta!");
       }
     }
     console.log("data----->", data);
+    setSubmitting(false);
   };
-
-  
-
 
   useEffect(() => {
     if (userId) {
@@ -194,6 +192,7 @@ function Page() {
     }
   }
 
+  if (submitting) return <Loader />;
 
   return (
     <div className="w-full min-h-[calc(100vh-80px)] flex flex-col bg-my-gray-100 ">
@@ -230,9 +229,10 @@ function Page() {
                         {userId && field.name === "password" && (
                           <p className="text-sm">
                             <span className="font-bold">Note: </span>Entering a
-                            new password will result in <strong>overriding</strong> the older
-                            password. Leave the password and confirm password
-                            empty to avoid any change.
+                            new password will result in{" "}
+                            <strong>overriding</strong> the older password.
+                            Leave the password and confirm password empty to
+                            avoid any change.
                           </p>
                         )}
                         {errors[field.name] && (
@@ -241,33 +241,6 @@ function Page() {
                       </div>
                     </div>
                   ))}
-                </div>
-
-                <div className="flex items-center mt-3 space-x-2 w-full">
-                  <div className=" w-1/2 font-medium">District</div>
-                  <div className="w-1/2">
-                    <select
-                      {...register("district", {
-                        required: userId ? false : true,
-                      })}
-                      className="border border-gray-300 w-full text-center rounded-md p-2 outline-none focus:ring-2 focus:ring-primary-50"
-                    >
-                      <option
-                        value=""
-                        selected
-                        disabled={true}
-                        className="disabled:bg-gray-200"
-                      >
-                        Select Value
-                      </option>
-                      {districts.map((district) => (
-                        <option value={district}>{district}</option>
-                      ))}
-                    </select>
-                    {errors.status && (
-                      <p className="text-red-500">User status is required</p>
-                    )}
-                  </div>
                 </div>
 
                 {/* user status active/ inactive */}
@@ -291,9 +264,9 @@ function Page() {
               </div>
               <div className="w-[40%]">
                 {/* Roles */}
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3 w-full border-2 p-3 rounded-[20px]">
                   <div className="text-lg font-medium">Role</div>
-                  <div className="flex flex-col gap-5 space-y-2 w-1/2">
+                  <div className="flex flex-col gap-2 space-y-2 w-1/2">
                     {rolesData.map((role: any) => (
                       <div
                         key={role._id}
@@ -306,7 +279,7 @@ function Page() {
                           {...register("role", {
                             required: userId ? false : true,
                           })}
-                          className="text-blue-500 h-5 w-5"
+                          className="appearance-none w-4 h-4 border-2 border-primary-300 checked:bg-primary-100 checked:text-white rounded-full mt-1"
                         />
                         <label
                           htmlFor={role._id} // Ensure htmlFor matches the input's id

@@ -17,6 +17,7 @@ function Page() {
   const [rolesData, setRolesData] = useState<any>([]);
   const [rolesLoading, setRolesLoading] = useState<boolean>(false);
   const [supervisors,setSupervisors] = useState<any>(null);
+  const [submitting,setSubmitting] = useState<boolean>(false);
   const {
     register,
     watch,
@@ -72,6 +73,7 @@ function Page() {
 
   const router = useRouter();
   const onSubmit: SubmitHandler<IUser> = async (data: any) => {
+    setSubmitting(true);
     console.log(data);
     if (data.password){
       if(!data.confirm_password){
@@ -107,6 +109,7 @@ function Page() {
       if (res.error) toast.error(res.error.response.data.message);
       else toast.error("Failed");
     }
+    setSubmitting(false);
   };
 
   useEffect(() => {
@@ -135,7 +138,8 @@ function Page() {
       toast.error("something went wrong");
     }
   }
-  if (rolesLoading) return <Loader />;
+  if (rolesLoading || submitting) return <Loader />;
+  
   return (
     <div className="w-full bg-my-gray-100 h-[calc(100vh-80px)]">
       <nav className="bg-mid-gray w-full flex items-center h-20 px-4 shadow-md ">
@@ -307,7 +311,7 @@ function Page() {
                           >
                             <input
                               id={role.name} // Match the label's htmlFor attribute
-                              type="checkbox"
+                              type="radio"
                               value={role._id}
                               {...register("role", { required: true })}
                               className="appearance-none w-4 h-4 border-2 border-primary-300 checked:bg-primary-100 checked:text-white rounded-full mt-1"

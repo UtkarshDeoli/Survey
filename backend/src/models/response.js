@@ -58,9 +58,12 @@ const responseSchema = new Schema(
     remark: {
       type: String,
     },
-    remark_list: {
-      type: [String],
-    },
+    remark_list:[
+      {
+        remark: { type: String, required: true },
+        date: { type: Date, default: Date.now }
+      }
+    ],
     call_recording: {
       type: Schema.Types.ObjectId,
       ref: "CallRecordings99",
