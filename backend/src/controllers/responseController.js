@@ -1197,18 +1197,18 @@ exports.downloadVoter = async (req, res) => {
 
     console.log("closed browser === >");
 
-    // Save the PDF to server
-    const pdfDirectory = path.join(__dirname, "..", "pdfs"); // Ensure this directory exists
-    const filePath = path.join(pdfDirectory, `card_${id}.pdf`);
-
-    // Ensure the pdfs directory exists
-    if (!fs.existsSync(pdfDirectory)) {
-      fs.mkdirSync(pdfDirectory);
-    }
-
-    // Save PDF file to the server
-    fs.writeFileSync(filePath, pdfBuffer);
-    console.log(`PDF saved to: ${filePath}`);
+    // // Save the PDF to server
+    // const pdfDirectory = path.join(__dirname, "..", "pdfs"); // Ensure this directory exists
+    // const filePath = path.join(pdfDirectory, `card_${id}.pdf`);
+    //
+    // // Ensure the pdfs directory exists
+    // if (!fs.existsSync(pdfDirectory)) {
+    //   fs.mkdirSync(pdfDirectory);
+    // }
+    //
+    // // Save PDF file to the server
+    // fs.writeFileSync(filePath, pdfBuffer);
+    // console.log(`PDF saved to: ${filePath}`);
 
     // Send PDF Response
     const processedBuffer = Buffer.from(pdfBuffer);
