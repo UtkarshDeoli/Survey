@@ -19,9 +19,9 @@ const userSchema = new Schema(
     ac_no: String,
     booth_no: String,
     district: String,
-    ac_list:[
+    ac_list: [
       {
-        survey_id:{
+        survey_id: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Survey99",
         },
@@ -33,7 +33,7 @@ const userSchema = new Schema(
             type: String,
           },
         ],
-      }
+      },
     ],
     email: {
       type: String,
@@ -99,11 +99,19 @@ const userSchema = new Schema(
     },
     isOnline: { type: Boolean, default: false },
     notification_token: { type: String, default: null },
-    supervisor:{
+    supervisor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User99",
       required: false,
-    }
+    },
+    otp: {
+      code: {
+        type: String,
+      },
+      expiryTime: {
+        type: Date,
+      },
+    },
   },
   { timestamps: true },
 );

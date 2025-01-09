@@ -5,8 +5,11 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
-const { generateResetToken } = require("../utils/utils");
-const { sendPasswordResetEmail } = require("../services/emailService");
+const { generateResetToken, generateOTPWithExpiry } = require("../utils/utils");
+const {
+  sendPasswordResetEmail,
+  sendPasswordResetEmailWithOtp,
+} = require("../services/emailService");
 
 exports.login = async (req, res) => {
   try {
@@ -43,7 +46,7 @@ exports.login = async (req, res) => {
         name: user.name,
         role: roles,
       },
-      JWT_SECRET
+      JWT_SECRET,
     );
 
     // Response sending back the token too for frontend to store
@@ -84,7 +87,7 @@ exports.adminLogin = async (req, res) => {
     ];
 
     const isAuthorized = roles.find((role) =>
-      validRoles.includes(role._id.toString())
+      validRoles.includes(role._id.toString()),
     );
     console.log("user ---->", isAuthorized);
     console.log(roles);
@@ -121,7 +124,7 @@ exports.adminLogin = async (req, res) => {
         name: user.name,
         role: roles,
       },
-      JWT_SECRET
+      JWT_SECRET,
     );
 
     // Response sending back the token too for frontend to store
@@ -198,7 +201,7 @@ exports.signup = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, mode } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -211,17 +214,81 @@ exports.forgotPassword = async (req, res) => {
     // Generate a JWT token with user ID and email
     const token = generateResetToken(user._id, user.email);
 
-    // Create a password reset link containing the token
-    const resetLink = `${process.env.CLIENT_URL}/login/reset-password?token=${token}`;
+    if (mode === "app") {
+      resetLink = `bdrpl://reset-password?token=${token}`;
+      const otp = generateOTPWithExpiry();
 
-    // Send the reset link via email
-    await sendPasswordResetEmail(user.email, resetLink);
+      user.otp = {
+        code: otp.otp,
+        expiryTime: otp.expiryTime,
+      };
+
+      await user.save();
+
+      await sendPasswordResetEmailWithOtp(user.email, otp.otp);
+    } else {
+      // Create a password reset link containing the token
+      const resetLink = `${process.env.CLIENT_URL}/login/reset-password?token=${token}`;
+
+      await sendPasswordResetEmail(user.email, resetLink);
+    }
 
     return res.status(200).json({
       success: true,
       message: "Password reset link sent to your email",
     });
   } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+exports.resetPasswordByOtp = async (req, res) => {
+  try {
+    const { email, otp, new_password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (
+      !user.otp ||
+      user.otp.code !== otp ||
+      user.otp.expiryTime < Date.now()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired OTP",
+      });
+    }
+
+    // Update user's otp to null
+    user.otp = null;
+
+    // Update the password
+    const hashedPass = await bcrypt.hash(new_password, 10);
+    //console.log(hashedPass);
+    user.password = hashedPass;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password successfully reset",
+    });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Token has expired",
+      });
+    }
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
