@@ -2,17 +2,14 @@
 
 import { truncateText, formatDate } from "@/utils/common_functions";
 import React, { useState } from "react";
-import { FaEye } from "react-icons/fa";
-import { FaCircleXmark, FaLocationDot } from "react-icons/fa6";
-import ButtonFilled from "../ui/buttons/ButtonFilled";
+import { FaCircleXmark} from "react-icons/fa6";
 import toast from "react-hot-toast";
-import { updateKaryakartas } from "@/networks/user_networks";
 import { useSearchParams } from "next/navigation";
 import Response from "../survey-responses/Response";
 import { updateResponse } from "@/networks/response_networks";
 import { GoCheckCircleFill } from "react-icons/go";
 
-interface ResponseTableProps {
+interface ResponseTableProps {  
   responses: any;
   users: {
     _id: string;
@@ -38,19 +35,43 @@ function ResponseGrid({
   more,
   getUserResponses
 }: ResponseTableProps) {
+  const [localResponses, setLocalResponses] = useState(responses);
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
-  async function updateStatus(response_id:string,status:string,e:any){
+
+  async function updateStatus(response_id: string, status: string, e: any) {
     e.stopPropagation();
-    const params = {response_id,status}
+
+    // Update the local state instantly
+    setLocalResponses((prevResponses:any) =>
+      prevResponses.map((res:any) =>
+        res._id === response_id ? { ...res, status } : res
+      )
+    );
+
+    // Call the backend to update the status
+    const params = { response_id, status };
     const response = await updateResponse(params);
-    if(response.success){
-      toast.success("Successfully updated!")
-      getUserResponses();
-    }else{
-      toast.error("Failed to update!")
+
+    if (response.success) {
+      toast.success("Successfully updated!");
+    } else {
+      // Revert the local state if the backend update fails
+      setLocalResponses(responses);
+      toast.error("Failed to update!");
     }
   }
+  // async function updateStatus(response_id:string,status:string,e:any){
+  //   e.stopPropagation();
+  //   const params = {response_id,status}
+  //   const response = await updateResponse(params);
+  //   if(response.success){
+  //     toast.success("Successfully updated!")
+  //     getUserResponses();
+  //   }else{
+  //     toast.error("Failed to update!")
+  //   }
+  // }
 
   return (
     <div
@@ -59,8 +80,8 @@ function ResponseGrid({
     >
       <table className="w-full table-auto">
         <thead className="">
-          <tr className="bg-dark-gray text-white sticky top-0 left-0 z-10">
-            <td className="min-w-32 px-4 py-2 border-b text-center"></td>
+          <tr className="bg-dark-gray text-white sticky top-0 left-0">
+            <td className="min-w-32 px-4 py-2 border-b text-center whitespace-nowrap sticky top-0 left-0 bg-dark-gray"> Quality check status</td>
             <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
               Panna pramukh
             </td>
@@ -109,8 +130,8 @@ function ResponseGrid({
           </tr>
         </thead>
         <tbody className="bg-white">
-          {responses &&
-            responses.map((response: any, rowIndex: number) => (
+          {localResponses &&
+            localResponses.map((response: any, rowIndex: number) => (
               <tr
                 onClick={() => {
                   setSelectedResponse(response);
@@ -119,20 +140,52 @@ function ResponseGrid({
                 className="cursor-pointer"
                 key={rowIndex}
               >
-                <td className="min-w-32 px-4 py-4 border-b h-full sticky left-0 bg-white w-full text-center">
-                  {
-                    response.status === "Pending" ? (
-                      <div className="flex gap-3">
-                          <button onClick={(e)=>updateStatus(response._id,"Approved",e)} className="bg-green-500 p-2 rounded-md text-white"><GoCheckCircleFill /></button>
-                          <button onClick={(e)=>updateStatus(response._id,"Rejected",e)} className="bg-red-400 p-2 rounded-md text-white"><FaCircleXmark /></button>
-                      </div>
-                    ) : response.status === "Approved" ? (
-                      <p className="bg-green-500 p-2 rounded-md flex gap-2 items-center w-fit text-white"><GoCheckCircleFill /> Approved</p>
-                    ) :(
-                      <p className="bg-red-400 p-2 rounded-md flex gap-2 items-center w-fit text-white"><FaCircleXmark /> Rejected</p>
-                    )
-                  }
-                </td>
+                 <td className="min-w-32 px-4 py-4 border-b h-full sticky left-0 bg-white w-full text-center">
+                {response.status === "Pending" ? (
+                  <div className="flex gap-3">
+                    <button
+                      onClick={(e) => updateStatus(response._id, "Approved", e)}
+                      className="bg-green-500 p-2 rounded-md text-white"
+                    >
+                      <GoCheckCircleFill />
+                    </button>
+                    <button
+                      onClick={(e) => updateStatus(response._id, "Rejected", e)}
+                      className="bg-red-400 p-2 rounded-md text-white"
+                    >
+                      <FaCircleXmark />
+                    </button>
+                  </div>
+                ) : response.status === "Approved" ? (
+                  <div className="flex gap-3">
+                    <p className="bg-green-500 p-2 rounded-md flex gap-2 items-center w-fit text-white">
+                      <GoCheckCircleFill /> Approved
+                    </p>
+                    <button
+                      onClick={(e) =>
+                        updateStatus(response._id, "Pending", e)
+                      }
+                      className="bg-amber-500 p-2 rounded-md text-white"
+                    >
+                      Revert
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-3">
+                    <p className="bg-red-400 p-2 rounded-md flex gap-2 items-center w-fit text-white">
+                      <FaCircleXmark /> Rejected
+                    </p>
+                    <button
+                      onClick={(e) =>
+                        updateStatus(response._id, "Pending", e)
+                      }
+                      className="bg-amber-500 p-2 rounded-md text-white"
+                    >
+                      Revert
+                    </button>
+                  </div>
+                )}
+              </td>
                 <td className="min-w-32 px-4 py-4 border-b text-center">
                   {response.panna_pramukh_assigned
                     ? response.panna_pramukh_assigned.name
