@@ -74,6 +74,8 @@ export const supervisorId = "675985aaa6b36c1fa78d5517"
 export const surveyCollectorId = "671f997d38863c2bfc859e76"
 export const surveyManagerId = "671f999c38863c2bfc859e7a"
 export const qualityCheckId = "675a92c24bbe3577d16bcb64"
+export const districtPresidentId = "67713c803e1c10c39195a9cc"
+export const shaktiKendraId = "67713c9a3e1c10c39195a9ce"
 export const validRoles = [
     "675985aaa6b36c1fa78d5517",
     "672bbdbfbdbe172165452e7d",

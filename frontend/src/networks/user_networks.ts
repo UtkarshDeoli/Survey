@@ -80,6 +80,7 @@ export const getAllUsers = async (params: {
   page?: number;
   limit?: number;
 }) => {
+  console.log("params from network --- >",params)
   try {
     const bearerToken = localStorage.getItem("token");
     const options = {

@@ -9,14 +9,15 @@ import { useRouter } from "next/navigation";
 import { createSurvey } from "@/networks/survey_networks";
 import toast from "react-hot-toast";
 import Loader from "../ui/Loader";
+import { PropagateLoader } from "react-spinners";
 
 interface Props {
   modalIsOpen: boolean;
   closeModal: () => void;
-  setUpdated:any
+  setUpdated: any;
 }
 
-function CreateSurveyModal({ modalIsOpen, closeModal,setUpdated}: Props) {
+function CreateSurveyModal({ modalIsOpen, closeModal, setUpdated }: Props) {
   const { ac_list, addAcEntry, name, removeAcEntry, setName } =
     useCreateSurveyContext();
   const [currentAcNo, setCurrentAcNo] = useState<string>("");
@@ -42,7 +43,7 @@ function CreateSurveyModal({ modalIsOpen, closeModal,setUpdated}: Props) {
         toast.success("Survey created successfully!");
         console.log("survey--------", response);
         closeModal();
-        setUpdated((prev:any)=>!prev)
+        setUpdated((prev: any) => !prev);
         router.push(`/admin/surveys/edit?survey_id=${response.survey._id}`);
       }
     } catch (error) {
@@ -54,9 +55,18 @@ function CreateSurveyModal({ modalIsOpen, closeModal,setUpdated}: Props) {
   };
 
   return (
-    <CustomModal open={modalIsOpen} closeModal={closeModal}>
-      {loading && <Loader />}
+    <CustomModal
+      preventOutsideClose={loading}
+      open={modalIsOpen}
+      closeModal={closeModal}
+    >
       <div className="relative w-[50vw] min-h-[60vh] max-h-[90vh] overflow-y-auto vertical-scrollbar-orange flex flex-col items-center">
+        {loading && (
+          <div className="absolute inset-0 z-30 bg-black/65 flex flex-col justify-center items-center gap-10 h-full w-full">
+            <PropagateLoader speedMultiplier={1.25} color="#FF8437" />
+            <h3 className="text-white font-semibold">Getting survey ready...</h3>
+          </div>
+        )}
         <div className="sticky top-0 left-0 z-10 text-primary-300 px-8 py-4 text-[24px] bg-white font-bold border-b w-full">
           Create surveys
         </div>

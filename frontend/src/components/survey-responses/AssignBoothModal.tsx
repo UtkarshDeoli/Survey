@@ -4,8 +4,9 @@ import CustomModal from "../ui/Modal";
 import Select from "react-select";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import toast from "react-hot-toast";
-import { assignBooth } from "@/networks/user_networks";
+import { assignBooth, getAllKaryakarta } from "@/networks/user_networks";
 import { getAllUsers } from "@/networks/user_networks";
+import { districtPresidentId, shaktiKendraId, surveyCollectorId } from "@/utils/constants";
 
 interface Props {
   isImported:boolean;
@@ -17,9 +18,9 @@ interface Props {
 
 function AssignBoothModal({ boothModal, setBoothModal, acList, survey_id,isImported }: Props) {
   const allRoles = [
-    { value: "671f997d38863c2bfc859e76", label: "Survey Collector" },
-    { value: "67713c803e1c10c39195a9cc", label: "District President" },
-    { value: "67713c9a3e1c10c39195a9ce", label: "Shakti Kendra" },
+    { value: surveyCollectorId, label: "Survey Collector" },
+    { value: districtPresidentId, label: "District President" },
+    { value: shaktiKendraId, label: "Shakti Kendra" },
   ];
   
   const [roles, setRoles] = useState(allRoles);
@@ -34,7 +35,14 @@ function AssignBoothModal({ boothModal, setBoothModal, acList, survey_id,isImpor
   const fetchUsersByRole = async (role: string) => {
     try {
       setLoading(true);
-      const response = await getAllUsers({ selectedRole: role });
+      let response
+      if(selectedRole === districtPresidentId || selectedRole === shaktiKendraId) {
+        response = await getAllKaryakarta({role:selectedRole})
+      }
+      else{
+        response = await getAllUsers({ selectedRole: role });
+      }
+      console.log("users ---->",response);
       if (response.success) {
         setUsers(response.data || []);
       } else {
@@ -53,6 +61,7 @@ function AssignBoothModal({ boothModal, setBoothModal, acList, survey_id,isImpor
 
   useEffect(() => {
     if (selectedRole) {
+      console.log(" ------->",selectedRole);
       fetchUsersByRole(selectedRole);
     } else {
       setUsers([]);

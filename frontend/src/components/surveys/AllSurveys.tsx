@@ -22,11 +22,9 @@ import {
   getUser,
   updateMultipleUsers,
 } from "@/networks/user_networks";
-import {
-  qualityCheckId,
-  surveyCollectorId,
-} from "@/utils/constants";
+import { qualityCheckId, surveyCollectorId } from "@/utils/constants";
 import useUser from "@/hooks/useUser";
+import PropagateLoader from "react-spinners/PropagateLoader";
 
 interface AllSurveysProps {
   queryParams: Params;
@@ -64,8 +62,10 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   const [user, setUser] = useState<any>(null);
   const [userSearch, setUserSearch] = useState<string>("");
   const [qcSearch, setQcSearch] = useState<string>("");
-  const [qc,setQc] = useState<any>(null);
-  const [qcModal,setQcModal] = useState<boolean>(false);
+  const [qc, setQc] = useState<any>(null);
+  const [qcModal, setQcModal] = useState<boolean>(false);
+  const [deleting,setDeleting] = useState<boolean>(false);
+  const [publishing,setPublishing] = useState<boolean>(false);
 
   const userData = useUser();
   const isSurveyManager = userData?.role
@@ -97,15 +97,18 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       id: surveyToDelete,
       created_by: "rohitchand490@gmail.com",
     };
+    setDeleting(true);
     const response = await deleteSurvey(params);
     if (response.success) {
       handleGetAllSurveys();
       setDeleteModal(false);
       setActiveDropdown(null);
+      setDeleting(false);
       toast.success("Survey deleted successfully");
     } else {
       toast.error("Failed to delete survey");
     }
+    setDeleting(false);
   }
 
   const handleUserSelection = (userId: string) => {
@@ -127,6 +130,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
 
   // Toggle publish/unpublish survey
   async function handlePublishSurvey() {
+    setPublishing(true);
     const formData = {
       published: !isSurveyPublished,
       created_by: "rohitchand490@gmail.com",
@@ -139,12 +143,14 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       setPublishModal(false);
       setSurveyToPublish(null);
       setisSurveyPublished(null);
+      setPublishing(false)
       toast.success(
         `Survey ${isSurveyPublished ? "Unpublished" : "Published"} successfully`
       );
     } else {
       toast.error("Failed to Publish survey");
     }
+    setPublishing(false)
   }
 
   async function handleGetAllSurveys() {
@@ -165,7 +171,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       selectedRole: surveyCollectorId,
       searchBarInput: userSearch,
     };
-    console.log("params are --->",params);
+    console.log("params are --->", params);
     const response = await getAllUsers(params);
 
     setUsers(response.data);
@@ -297,7 +303,11 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
 
   return (
     <div className="w-full flex-1 flex flex-col">
-      <div className={`w-[96%] mt-1 mx-auto text-sm pb-5  ${isSurveyManager ? "max-h-[65vh]":"max-h-[60vh]"} overflow-y-auto vertical-scrollbar`}>
+      <div
+        className={`w-[96%] mt-1 mx-auto text-sm pb-5  ${
+          isSurveyManager ? "max-h-[65vh]" : "max-h-[60vh]"
+        } overflow-y-auto vertical-scrollbar`}
+      >
         {/* surveys */}
         <div className="sticky top-0 z-10 grid grid-cols-8 text-white font-semibold bg-dark-gray px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
           <p className="col-span-2">All surveys</p>
@@ -315,8 +325,11 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                 className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-mid-gray"
               >
                 <p
-                  onClick={() =>{
-                    if(!isSurveyManager) router.push(`/admin/surveys/edit?survey_id=${el._id}`)
+                  onClick={() => {
+                    if (!isSurveyManager)
+                      router.push(`/admin/surveys/edit?survey_id=${el._id}`);
+                    if (!isSurveyManager)
+                      router.push(`/admin/surveys/edit?survey_id=${el._id}`);
                   }}
                   className="col-span-2 cursor-pointer font-semibold"
                 >
@@ -328,11 +341,11 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                   <ButtonFilled
                     onClick={() => {
                       const selected = qc
-                      .filter((user:any) =>
-                        user.assigned_survey.includes(el._id)
-                      )
-                      .map((u:any) => u._id);
-                    setSelectedUsers(selected);
+                        .filter((user: any) =>
+                          user.assigned_survey.includes(el._id)
+                        )
+                        .map((u: any) => u._id);
+                      setSelectedUsers(selected);
                       setSurveyToAssign(el._id);
                       setQcModal(true);
                     }}
@@ -423,6 +436,14 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
           }}
         >
           <div className="flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
+          {publishing && (
+              <div className="absolute inset-0 z-30 bg-black/65 flex flex-col justify-center items-center gap-10 h-full w-full">
+                <PropagateLoader speedMultiplier={1.25} color="#FF8437" />
+                <h3 className="text-white font-semibold">
+                {isSurveyPublished ? "Unpublishing" : "Publishing"} survey...
+                </h3>
+              </div>
+            )}
             <h1 className="text-xl">
               Do you want to {isSurveyPublished ? "Unpublish" : "Publish"} this
               survey?
@@ -447,13 +468,22 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
 
         <CustomModal
           open={deleteModal}
+          preventOutsideClose={deleting}
           closeModal={() => {
             setDeleteModal(false);
             setActiveDropdown(null);
             setSurveyToDelete(null);
           }}
         >
-          <div className="flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
+          <div className="relative flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
+            {deleting && (
+              <div className="absolute inset-0 z-30 bg-black/65 flex flex-col justify-center items-center gap-10 h-full w-full">
+                <PropagateLoader speedMultiplier={1.25} color="#FF8437" />
+                <h3 className="text-white font-semibold">
+                  Deleting survey...
+                </h3>
+              </div>
+            )}
             <h1 className="text-xl">
               Are you sure you want to delete this survey?
             </h1>
@@ -494,27 +524,31 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
             />
             <div className="grid grid-cols-2 gap-4  w-full overflow-y-auto max-h-[60vh]">
               {qc && qc.length > 0 ? (
-                qc.map(({ _id, email, name, assigned_survey }:any, index:number) => {
-                
-                  return (
-                    <label
-                      key={_id}
-                      className="cursor-pointer flex items-center h-fit  min-w-[50%] justify-between"
-                    >
-                      <div>
-                        {index + 1}. {name || email}
-                      </div>
-                      <input
-                        className="h-5 w-5 disabled:cursor-not-allowed"
-                        type="checkbox"
-                        defaultChecked={assigned_survey.includes(
-                          surveyToAssign
-                        )}
-                        onChange={() => handleUserSelection(_id)}
-                      />
-                    </label>
-                  );
-                })
+                qc.map(
+                  (
+                    { _id, email, name, assigned_survey }: any,
+                    index: number
+                  ) => {
+                    return (
+                      <label
+                        key={_id}
+                        className="cursor-pointer flex items-center h-fit  min-w-[50%] justify-between"
+                      >
+                        <div>
+                          {index + 1}. {name || email}
+                        </div>
+                        <input
+                          className="h-5 w-5 disabled:cursor-not-allowed"
+                          type="checkbox"
+                          defaultChecked={assigned_survey.includes(
+                            surveyToAssign
+                          )}
+                          onChange={() => handleUserSelection(_id)}
+                        />
+                      </label>
+                    );
+                  }
+                )
               ) : (
                 <div>No Quality checks available</div>
               )}
