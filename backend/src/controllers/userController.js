@@ -128,20 +128,20 @@ exports.assignBoothToUsers = async (req, res) => {
     user.ac_list = ac_list;
     await user.save();
 
-    if(editResponses){
+    if (editResponses) {
       // Build filter criteria for responses
       const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
         booth_numbers.map((booth_no) => ({
           survey_id,
           ac_no,
           booth_no,
-        }))
+        })),
       );
-  
+
       // Update responses in a single operation
       await Response.updateMany(
         { $or: filterCriteria },
-        { $set: { user_id: userId } }
+        { $set: { user_id: userId } },
       );
     }
 
@@ -154,7 +154,6 @@ exports.assignBoothToUsers = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 exports.updateUsers = async (req, res) => {
   try {
@@ -227,7 +226,7 @@ exports.updateUsers = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    console.log(req.query)
+    console.log(req.query);
     const _id = req.query.userId;
     const returnAssignedSurveys = req.query.assignedSurveys;
 
@@ -389,7 +388,6 @@ exports.getProfilePicture = async (req, res) => {
   }
 };
 
-
 exports.getSupervisorCollectors = async (req, res) => {
   try {
     const { supervisor_id, name, page = 1, limit = 10 } = req.query;
@@ -401,7 +399,7 @@ exports.getSupervisorCollectors = async (req, res) => {
     const limitNumber = parseInt(limit, 10);
 
     const collectors = await User.find(filters)
-      .populate('role')
+      .populate("role")
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber);
 
@@ -516,21 +514,21 @@ exports.updateMultipleKaryakarta = async (req, res) => {
     if (data) {
       console.log("data existed");
       const finalLength = data.responses.length + responses.length;
-      if (finalLength > 4) {
+      if (finalLength > 60) {
         return res.status(500).json({
           success: false,
-          message: "Cannot assign more than 4 responses.",
+          message: "Cannot assign more than 60 responses.",
         });
       } else {
         data.responses = [...data.responses, ...responses];
         await data.save();
       }
     } else {
-      if (responses.length > 4) {
+      if (responses.length > 60) {
         console.log("returned exceeded response");
         return res.status(500).json({
           success: false,
-          message: "Cannot assign more than 4 responses.",
+          message: "Cannot assign more than 60 responses.",
         });
       }
       console.log("new data created");
