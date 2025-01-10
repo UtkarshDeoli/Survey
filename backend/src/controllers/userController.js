@@ -235,10 +235,21 @@ exports.getUser = async (req, res) => {
     const skip = (page - 1) * limit;
 
     if (returnAssignedSurveys) {
-      const assignedSurveys = await User.findOne({ _id: _id })
+      const allUserSurveys = await User.findOne({ _id: _id })
+        .populate("assigned_survey")
+        .select("assigned_survey _id");
+
+      const totalSurveys = allUserSurveys.assigned_survey.length;
+      const totalPages = Math.ceil(totalSurveys / limit);
+
+      const assignedSurveys = await User.findOne({ _id })
         .populate({
           path: "assigned_survey",
-          options: { sort: { createdAt: -1 }, skip, limit },
+          options: {
+            sort: { createdAt: -1 },
+            skip,
+            limit,
+          },
         })
         .select("assigned_survey _id");
 
@@ -251,9 +262,6 @@ exports.getUser = async (req, res) => {
           return { ...survey.toObject(), collected_count: collectedCount };
         }),
       );
-
-      const totalSurveys = assignedSurveysWithCount.length;
-      const totalPages = Math.ceil(totalSurveys / limit);
 
       return res.status(200).json({
         success: true,
