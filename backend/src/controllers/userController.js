@@ -155,6 +155,28 @@ exports.assignBoothToUsers = async (req, res) => {
   }
 };
 
+exports.getAssignedAcBooths = async (req, res) => {
+  const { userId, survey_id } = req.query;
+  console.log("assifgned rtoute hitting")
+  console.log("quwery is --- >",req.query);
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    console.log("ac_list is",user.ac_list)
+    const assignedAcBooths = user.ac_list.filter(
+      (ac) => ac.survey_id.toString() === survey_id
+    );
+    console.log("assignedAcBooths --- >",assignedAcBooths)
+    return res.status(200).json({ success: true, assignedAcBooths });
+  } catch (error) {
+    console.error("Error fetching assigned ACs and booths:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 
 exports.updateUsers = async (req, res) => {
   try {
@@ -437,8 +459,6 @@ exports.createKaryakarta = async (req, res) => {
       ac_no,
       booth_no,
       district,
-      survey_id,
-      responses,
       password,
       role,
     } = req.body;
@@ -463,34 +483,26 @@ exports.createKaryakarta = async (req, res) => {
       });
     }
     const hashedPass = await bcrypt.hash(password, 12);
-    const newKaryakarta = await User.create({
+
+    const excludeFieldsRoles = ["District President", "Shakti Kendra"];
+    const roleName = karyakartaRoles.find((el) => el._id.toString() === role)?.name;
+    const karyakartaData = {
       email,
       username,
       created_by,
       name,
-      ac_no,
-      booth_no,
       district,
       password: hashedPass,
       role: [role],
-    });
+    };
 
-    // const userId = newKaryakarta._id;
-    // let responseIds;
-    // if (responses) {
-    //   responseIds = responses.map(
-    //     (responseId) => new mongoose.Types.ObjectId(String(responseId)),
-    //   );
-    // }
+    if (!excludeFieldsRoles.includes(roleName)) {
+      karyakartaData.ac_no = ac_no;
+      karyakartaData.booth_no = booth_no;
+    }
 
-    // let savedData;
-    // if (responseIds) {
-    //   savedData = await Data.create({
-    //     survey_id: new mongoose.Types.ObjectId(String(survey_id)),
-    //     user_id: userId,
-    //     responses: responses,
-    //   });
-    // }
+    // Create the new Karyakarta
+    const newKaryakarta = await User.create(karyakartaData);
 
     return res.status(200).json({
       success: true,

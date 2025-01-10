@@ -191,6 +191,20 @@ export const assignBooth = async (params: any) => {
     return { success: false, message: "Something Went Wrong", error };
   }
 };
+// export const getAssignedBooth = async (params: any) => {
+//   try {
+//     const options = {
+//       method: "GET",
+//       url: `${SERVER_URI}/${get_assigned_booth}`,
+//       params
+//     };
+//     const response = await axios.request(options);
+//     console.log("get - assignerd- ac- booth----->",response);
+//     return response.data;
+//   } catch (error) {
+//     return { success: false, message: "Something Went Wrong", error };
+//   }
+// };
 
 // karyakartas
 

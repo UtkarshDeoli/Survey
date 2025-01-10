@@ -11,6 +11,7 @@ router.post("/updateUsers", userController.updateUsers);
 router.post("/uploadProfilePicture", userController.uploadProfilePicture);
 router.get("/getSupervisorCollectors", userController.getSupervisorCollectors);
 router.post("/assignBooth", userController.assignBoothToUsers);
+router.get("/getAssignedBooth", userController.getAssignedAcBooths);
 
 
 // karyakarta

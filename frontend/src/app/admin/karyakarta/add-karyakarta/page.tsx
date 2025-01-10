@@ -1,20 +1,18 @@
 "use client";
 import React, { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaQuestionCircle } from "react-icons/fa";
 import {
   createKaryakarta,
   getKaryakarta,
   updateKaryakarta,
 } from "@/networks/user_networks";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getSurveyByAcAndBooth } from "@/networks/survey_networks";
 
 import { checkToken } from "@/utils/common_functions";
 import toast from "react-hot-toast";
-import { districts } from "@/utils/devData";
 import { getRoles } from "@/networks/role_networks";
 import Loader from "@/components/ui/Loader";
+import { districtPresidentId, shaktiKendraId } from "@/utils/constants";
 
 const inputs = [
   {
@@ -79,8 +77,6 @@ function Page() {
   } = useForm({ defaultValues: userData });
   const searchParams = useSearchParams();
 
-  const ac_no = watch("ac_no");
-  const booth_no = watch("booth_no");
   const role = watch("role");
   const [rolesData, setRolesData] = useState<any>([]);
 
@@ -210,37 +206,48 @@ function Page() {
               <div className="w-[60%] ">
                 {/* user details */}
                 <div className="w-full">
-                  {inputs.map((field, index) => (
-                    <div className="flex w-full space-y-2" key={index}>
-                      <div className="w-1/2 py-2">
-                        <label className="block  font-medium">
-                          {field.label}
-                        </label>
+                  {inputs
+                    .filter(
+                      (field) =>
+                        !(
+                          role === districtPresidentId ||
+                          role === shaktiKendraId
+                        ) ||
+                        (field.name !== "ac_no" && field.name !== "booth_no")
+                    )
+                    .map((field, index) => (
+                      <div className="flex w-full space-y-2" key={index}>
+                        <div className="w-1/2 py-2">
+                          <label className="block  font-medium">
+                            {field.label}
+                          </label>
+                        </div>
+                        <div className="w-1/2">
+                          <input
+                            type={field.type}
+                            placeholder={field.placeholder}
+                            {...register(field.name, {
+                              required: userId ? false : true,
+                            })}
+                            className="border border-gray-300 rounded-md p-2 w-full outline-none focus:ring-2 focus:ring-primary-50"
+                          />
+                          {userId && field.name === "password" && (
+                            <p className="text-sm">
+                              <span className="font-bold">Note: </span>Entering
+                              a new password will result in{" "}
+                              <strong>overriding</strong> the older password.
+                              Leave the password and confirm password empty to
+                              avoid any change.
+                            </p>
+                          )}
+                          {errors[field.name] && (
+                            <p className="text-red-500">
+                              This field is required
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className="w-1/2">
-                        <input
-                          type={field.type}
-                          placeholder={field.placeholder}
-                          {...register(field.name, {
-                            required: userId ? false : true,
-                          })}
-                          className="border border-gray-300 rounded-md p-2 w-full outline-none focus:ring-2 focus:ring-primary-50"
-                        />
-                        {userId && field.name === "password" && (
-                          <p className="text-sm">
-                            <span className="font-bold">Note: </span>Entering a
-                            new password will result in{" "}
-                            <strong>overriding</strong> the older password.
-                            Leave the password and confirm password empty to
-                            avoid any change.
-                          </p>
-                        )}
-                        {errors[field.name] && (
-                          <p className="text-red-500">This field is required</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
 
                 {/* user status active/ inactive */}
@@ -274,7 +281,7 @@ function Page() {
                       >
                         <input
                           type="radio"
-                          id={role._id} // Set the id to match the label's htmlFor
+                          id={role._id}
                           value={role._id}
                           {...register("role", {
                             required: userId ? false : true,
@@ -287,7 +294,6 @@ function Page() {
                         >
                           {role.name}
                         </label>
-                        {/* <FaQuestionCircle className="text-[#477BFF]" /> */}
                       </div>
                     ))}
                     {errors.role && (
