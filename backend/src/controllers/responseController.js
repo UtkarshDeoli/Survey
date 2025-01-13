@@ -107,7 +107,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } }
+        { $set: { family_head: response._id } },
       );
     }
 
@@ -115,7 +115,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      }
+      },
     );
     if (!survey) {
       return res
@@ -219,7 +219,7 @@ exports.saveResponses = async (req, res) => {
       const acNo = response.ac_no || null;
       const boothNo = response.booth_no || null;
       const houseNo = response.responses.find(
-        (r) => r.question === "C_HOUSE_NO"
+        (r) => r.question === "C_HOUSE_NO",
       )?.response;
 
       let familyId = null;
@@ -260,7 +260,7 @@ exports.saveResponses = async (req, res) => {
     await Responses.insertMany(responsesArray);
 
     console.log(
-      `${responsesArray.length} responses saved successfully with family IDs.`
+      `${responsesArray.length} responses saved successfully with family IDs.`,
     );
     return res.status(201).json({
       success: true,
@@ -327,7 +327,8 @@ exports.getAllResponses = async (req, res) => {
       userData.role.forEach((role) => {
         if (
           role.name === "District President" ||
-          role.name === "Shakti Kendra"
+          role.name === "Shakti Kendra" ||
+          role.name === "Booth Adhyaksh"
         ) {
           isNotCollector = true;
         }
@@ -335,7 +336,7 @@ exports.getAllResponses = async (req, res) => {
       if (isNotCollector) {
         const { ac_list } = userData;
         const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
-          booth_numbers.map((booth_no) => ({ ac_no, booth_no }))
+          booth_numbers.map((booth_no) => ({ ac_no, booth_no })),
         );
 
         if (filterCriteria.length > 0) {
@@ -487,7 +488,7 @@ exports.getAllResponses = async (req, res) => {
                       input: { $toString: "$responses.response" },
                       regex: new RegExp(
                         escapeRegex("$responses.response"),
-                        "i"
+                        "i",
                       ),
                     },
                   },
@@ -531,7 +532,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response)
+      console.log(resp.question_id, "-->", resp.response),
     );
 
     // Add additional match stage if there are filters
@@ -568,7 +569,7 @@ exports.getAllResponses = async (req, res) => {
         Responses.findById(f._id)
           .populate("panna_pramukh_assigned")
           .populate("user_id")
-          .populate("survey_id")
+          .populate("survey_id"),
       );
 
       const re = await Promise.all(fin);
@@ -589,7 +590,7 @@ exports.getAllResponses = async (req, res) => {
       const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
       const fin = filteredResponse.map((f) =>
-        Responses.findById(f._id).populate("panna_pramukh_assigned")
+        Responses.findById(f._id).populate("panna_pramukh_assigned"),
       );
       const re = await Promise.all(fin);
       // console.log("res-->",re)
@@ -757,7 +758,7 @@ exports.getSurveyResponses = async (req, res) => {
       },
       {
         $limit: pageSize, // Limit the number of documents for pagination
-      }
+      },
     );
 
     const results = await Responses.aggregate(pipeline);
@@ -922,7 +923,6 @@ exports.getSurveyResponseStats = async (req, res) => {
       },
     ];
 
-
     if (responseFilters.length > 0) {
       aggregationPipeline.push({
         $match: {
@@ -1072,7 +1072,7 @@ exports.updateResponse = async (req, res) => {
     const response = await Responses.findByIdAndUpdate(
       response_id,
       { $set: updateFields },
-      { new: true }
+      { new: true },
     );
 
     if (!response) {
@@ -1207,7 +1207,7 @@ exports.downloadVoter = async (req, res) => {
     const templatePath = path.join(__dirname, "..", "views", "voterCard.ejs");
     const htmlContent = await ejs.renderFile(
       templatePath,
-      voterData.toObject()
+      voterData.toObject(),
     );
 
     // Use Puppeteer to Generate PDF
@@ -1246,7 +1246,7 @@ exports.downloadVoter = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf"); // Ensure it's PDF content type
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="card_${id}.pdf"`
+      `attachment; filename="card_${id}.pdf"`,
     ); // Set filename dynamically
     console.log("sending pdf buffer");
 
@@ -1288,7 +1288,7 @@ exports.saveVoteStatus = async (req, res) => {
       responseToUpdate,
       {
         new: true,
-      }
+      },
     );
     console.log("updatedResponse", updatedResponse.vote_status);
     return res
