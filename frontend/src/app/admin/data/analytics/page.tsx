@@ -407,8 +407,8 @@ function Page() {
             </div>
           </form>
           <div className="flex gap-3 items-center p-4">
-            <ButtonBordered
-              className="disabled:bg-blue-100 disabled:cursor-not-allowed disabled:text-secondary-100"
+            <ButtonFilled
+              className="disabled:bg-primary-100 disabled:cursor-not-allowed disabled:text-secondary-100"
               disabled={
                 question.trim().length === 0 ||
                 operator.trim().length === 0 ||
@@ -417,7 +417,7 @@ function Page() {
               onClick={saveFilter}
             >
               Save Filter
-            </ButtonBordered>
+            </ButtonFilled>
             <ButtonBordered
               className="border-red-500 hover:bg-red-500 hover:text-white text-red-500"
               onClick={() => setModal(false)}

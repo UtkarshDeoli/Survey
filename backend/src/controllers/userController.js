@@ -111,8 +111,55 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+// exports.assignBoothToUsers = async (req, res) => {
+//   const { survey_id, userId, ac_list, editResponses } = req.body;
+
+//   try {
+//     // Find the user by userId
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     // Update the user's survey list and AC list
+//     if (!user.assigned_survey.includes(survey_id)) {
+//       user.assigned_survey.push(survey_id);
+      
+//     }
+//     console.log("ac_list is --->",ac_list)
+//     user.ac_list = ac_list;
+//     await user.save();
+
+//     if (editResponses) {
+//       // Build filter criteria for responses
+//       const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
+//         booth_numbers.map((booth_no) => ({
+//           survey_id,
+//           ac_no,
+//           booth_no,
+//         })),
+//       );
+
+//       // Update responses in a single operation
+//       await Response.updateMany(
+//         { $or: filterCriteria },
+//         { $set: { user_id: userId } },
+//       );
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Booths assigned to user and responses updated successfully",
+//     });
+//   } catch (error) {
+//     console.error("Error in assigning booths to users:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
 exports.assignBoothToUsers = async (req, res) => {
   const { survey_id, userId, ac_list, editResponses } = req.body;
+  console.log("assigning booth running")
 
   try {
     // Find the user by userId
@@ -121,11 +168,40 @@ exports.assignBoothToUsers = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Update the user's survey list and AC list
+    // Check if the survey is already in the user's assigned surveys
     if (!user.assigned_survey.includes(survey_id)) {
       user.assigned_survey.push(survey_id);
     }
-    user.ac_list = ac_list;
+
+    // Merge or update the ac_list for the specific survey
+    const updatedAcList = [...user.ac_list]; // Clone the existing AC list
+    console.log("existing ac list is --->",updatedAcList);
+    console.log("new ac list is --->",ac_list);
+    ac_list.forEach((newAc) => {
+      const existingAcIndex = updatedAcList.findIndex(
+        (existingAc) =>
+          existingAc.ac_no === newAc.ac_no &&
+          existingAc.survey_id.toString() === survey_id,
+      );
+
+      if (existingAcIndex !== -1) {
+        // If AC already exists for the survey, update its booth numbers
+        console.log("existing ac no found");
+        const existingAc = updatedAcList[existingAcIndex];
+        console.log("existing booth numbers --->",existingAc.booth_numbers)
+        console.log("new booth numbers --->",newAc.booth_numbers)
+        existingAc.booth_numbers = [
+          ...new Set([...existingAc.booth_numbers, ...newAc.booth_numbers]),
+        ];
+        console.log("updated ac list booth numbers--->",existingAc.booth_numbers)
+      } else {
+        // If AC does not exist for the survey, add it
+        console.log("existing ac no not found");
+        updatedAcList.push({ ...newAc, survey_id });
+      }
+    });
+
+    user.ac_list = updatedAcList;
     await user.save();
 
     if (editResponses) {
@@ -154,6 +230,7 @@ exports.assignBoothToUsers = async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 exports.getAssignedAcBooths = async (req, res) => {
   const { userId, survey_id } = req.query;

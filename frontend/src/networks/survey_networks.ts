@@ -100,6 +100,7 @@ export const getSurveyResponseStats = async (params: any) => {
       // url: `${SERVER_URI}/${get_all_surveys}?filter=${filter}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&published=${published}&created_by=${created_by}`,
     };
     const response = await axios.request(options);
+    console.log("survey response stats from networks ------>",response);
     console.log(response);
     return response.data;
   } catch (error) {
@@ -114,6 +115,7 @@ export const getSurvey = async (params: any) => {
       url: `${SERVER_URI}/${get_survey}?_id=${params._id}`,
     };
     const response = await axios.request(options);
+    console.log("stats response is ====>",response)
     return response.data;
   } catch (error) {
     return { success: false, message: "Something Went Wrong", error };

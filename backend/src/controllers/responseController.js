@@ -107,7 +107,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } },
+        { $set: { family_head: response._id } }
       );
     }
 
@@ -115,7 +115,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      },
+      }
     );
     if (!survey) {
       return res
@@ -219,7 +219,7 @@ exports.saveResponses = async (req, res) => {
       const acNo = response.ac_no || null;
       const boothNo = response.booth_no || null;
       const houseNo = response.responses.find(
-        (r) => r.question === "C_HOUSE_NO",
+        (r) => r.question === "C_HOUSE_NO"
       )?.response;
 
       let familyId = null;
@@ -260,7 +260,7 @@ exports.saveResponses = async (req, res) => {
     await Responses.insertMany(responsesArray);
 
     console.log(
-      `${responsesArray.length} responses saved successfully with family IDs.`,
+      `${responsesArray.length} responses saved successfully with family IDs.`
     );
     return res.status(201).json({
       success: true,
@@ -335,7 +335,7 @@ exports.getAllResponses = async (req, res) => {
       if (isNotCollector) {
         const { ac_list } = userData;
         const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
-          booth_numbers.map((booth_no) => ({ ac_no, booth_no })),
+          booth_numbers.map((booth_no) => ({ ac_no, booth_no }))
         );
 
         if (filterCriteria.length > 0) {
@@ -487,7 +487,7 @@ exports.getAllResponses = async (req, res) => {
                       input: { $toString: "$responses.response" },
                       regex: new RegExp(
                         escapeRegex("$responses.response"),
-                        "i",
+                        "i"
                       ),
                     },
                   },
@@ -531,7 +531,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response),
+      console.log(resp.question_id, "-->", resp.response)
     );
 
     // Add additional match stage if there are filters
@@ -568,7 +568,7 @@ exports.getAllResponses = async (req, res) => {
         Responses.findById(f._id)
           .populate("panna_pramukh_assigned")
           .populate("user_id")
-          .populate("survey_id"),
+          .populate("survey_id")
       );
 
       const re = await Promise.all(fin);
@@ -589,7 +589,7 @@ exports.getAllResponses = async (req, res) => {
       const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
       const fin = filteredResponse.map((f) =>
-        Responses.findById(f._id).populate("panna_pramukh_assigned"),
+        Responses.findById(f._id).populate("panna_pramukh_assigned")
       );
       const re = await Promise.all(fin);
       // console.log("res-->",re)
@@ -697,71 +697,6 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
   }
 };
 
-// exports.getSurveyResponses = async (req, res) => {
-//   try {
-//     const { search, sortOrder = "desc" } = req.query;
-//     console.log("route is hitting --- >")
-
-//     const pipeline = [
-//       {
-//         $group: {
-//           _id: "$survey_id",
-//           responseCount: { $sum: 1 },
-//           latestResponseCreatedAt: { $max: "$createdAt" },
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "survey99",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "surveyDetails",
-//         },
-//       },
-//       {
-//         $unwind: "$surveyDetails",
-//       },
-//       {
-//         $project: {
-//           _id: 0,
-//           survey_id: "$_id",
-//           surveyName: "$surveyDetails.name",
-//           ac_list:"$surveyDetails.ac_list",
-//           responseCount: 1,
-//           latestResponseCreatedAt: 1,
-//           surveyCreatedAt: "$surveyDetails.createdAt",
-//         },
-//       },
-//     ];
-
-//     if (search) {
-//       pipeline.push({
-//         $match: {
-//           surveyName: { $regex: search, $options: "i" },
-//         },
-//       });
-//     }
-
-//     pipeline.push({
-//       $sort: {
-//         latestResponseCreatedAt: sortOrder === "asc" ? 1 : -1,
-//       },
-//     });
-
-//     const results = await Responses.aggregate(pipeline);
-//     console.log("results are ----->",results);
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "Responses grouped by survey retrieved successfully",
-//       data: results,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(400).json({ success: false, message: error.message });
-//   }
-// };
-
 exports.getSurveyResponses = async (req, res) => {
   try {
     const { search, sortOrder = "desc", page = 1, limit = 10 } = req.query; // Default values for page and limit
@@ -822,7 +757,7 @@ exports.getSurveyResponses = async (req, res) => {
       },
       {
         $limit: pageSize, // Limit the number of documents for pagination
-      },
+      }
     );
 
     const results = await Responses.aggregate(pipeline);
@@ -907,79 +842,150 @@ exports.getSurveyResponseStats = async (req, res) => {
       });
     }
 
-    const aggregationPipeline = [
-      { $match: matchStage },
-      { $unwind: "$responses" },
+    let aggregationPipeline = [
+      {
+        $match: matchStage,
+      },
+      {
+        $unwind: "$responses",
+      },
       {
         $project: {
           _id: 1,
+          user_id: 1,
           survey_id: 1,
+          family_id: 1,
+          ac_no: 1,
+          booth_no: 1,
+          house_no: 1,
+          name: 1,
+          location_data: 1,
           createdAt: 1,
+          audio_recording_path: 1,
           "responses.question_id": 1,
-          "responses.question": 1,
-          "responses.response": 1,
           "responses.question_type": 1,
-        },
-      },
-      {
-        $group: {
-          _id: "$responses.question_id",
-          question: { $first: "$responses.question" },
-          question_type: { $first: "$responses.question_type" },
-          responses: { $push: "$responses.response" },
-          total_responses: { $sum: 1 },
-        },
-      },
-      { $unwind: "$responses" },
-      {
-        $group: {
-          _id: { question_id: "$_id", response_value: "$responses" },
-          question: { $first: "$question" },
-          question_type: { $first: "$question_type" },
-          response_count: { $sum: 1 },
-          total_responses: { $first: "$total_responses" },
-        },
-      },
-      {
-        $group: {
-          _id: "$_id.question_id",
-          question: { $first: "$question" },
-          question_type: { $first: "$question_type" },
-          total_responses: { $first: "$total_responses" },
-          responses: {
-            $push: {
-              response_value: "$_id.response_value",
-              count: "$response_count",
+          "responses.question": 1,
+          "responses.response": {
+            $cond: {
+              if: {
+                $in: [
+                  "$responses.question_type",
+                  ["Number Input", "Phone Number"],
+                ],
+              },
+              then: {
+                $cond: {
+                  if: {
+                    $regexMatch: {
+                      input: { $toString: "$responses.response" },
+                      regex: "^[0-9]+$",
+                    },
+                  },
+                  then: { $toDouble: "$responses.response" },
+                  else: "$responses.response",
+                },
+              },
+              else: {
+                $cond: {
+                  if: { $in: ["$responses.question_type", ["Date"]] },
+                  then: {
+                    $dateFromString: {
+                      dateString: "$responses.response",
+                      onError: "$responses.response",
+                    },
+                  },
+                  else: "$responses.response",
+                },
+              },
             },
           },
         },
       },
       {
-        $sort: { _id: 1 }, // Sort questions by question_id in ascending order
+        $group: {
+          _id: "$_id",
+          user_id: { $first: "$user_id" },
+          family_id: { $first: "$family_id" },
+          ac_no: { $first: "$ac_no" },
+          booth_no: { $first: "$booth_no" },
+          house_no: { $first: "$house_no" },
+          name: { $first: "$name" },
+          location_data: { $first: "$location_data" },
+          survey_id: { $first: "$survey_id" },
+          createdAt: { $first: "$createdAt" },
+          responses: { $push: "$responses" },
+          audio_recording_path: { $first: "$audio_recording_path" },
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+    ];
+
+
+    if (responseFilters.length > 0) {
+      aggregationPipeline.push({
+        $match: {
+          $and: responseFilters.map((response) => ({
+            responses: {
+              $elemMatch: {
+                question_id: response.question_id,
+                response: response.response,
+              },
+            },
+          })),
+        },
+      });
+    }
+
+    aggregationPipeline = [
+      ...aggregationPipeline,
+      {
+        $unwind: "$responses",
+      },
+      {
+        $match: {
+          "responses.question_type": { $in: ["Radio Button", "Checkbox"] },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            question_id: "$responses.question_id",
+            question: "$responses.question",
+            question_type: "$responses.question_type",
+            response_value: "$responses.response",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            question_id: "$_id.question_id",
+            question: "$_id.question",
+            question_type: "$_id.question_type",
+          },
+          total_responses: { $sum: "$count" },
+          responses: {
+            $push: {
+              response_value: "$_id.response_value",
+              count: "$count",
+            },
+          },
+        },
       },
       {
         $project: {
           _id: 0,
-          question_id: "$_id",
-          question_type: 1,
-          question: 1,
+          question_id: "$_id.question_id",
+          question: "$_id.question",
+          question_type: "$_id.question_type",
           total_responses: 1,
           responses: 1,
         },
       },
     ];
-
-    // Apply response filters if any exist
-    if (responseFilters.length > 0) {
-      aggregationPipeline.push({
-        $match: {
-          $and: responseFilters.map((filter) => ({
-            question_id: filter.question_id,
-            responses: { $elemMatch: { response_value: filter.response } },
-          })),
-        },
-      });
-    }
 
     console.log(JSON.stringify(aggregationPipeline, null, 2));
 
@@ -1039,7 +1045,7 @@ exports.updateResponse = async (req, res) => {
     if (booth_no) updateFields.booth_no = booth_no;
     if (house_no) updateFields.house_no = house_no;
     // if (last_name) updateFields.last_name = last_name;
-    if (status){
+    if (status) {
       updateFields.status = status;
     }
 
@@ -1066,7 +1072,7 @@ exports.updateResponse = async (req, res) => {
     const response = await Responses.findByIdAndUpdate(
       response_id,
       { $set: updateFields },
-      { new: true },
+      { new: true }
     );
 
     if (!response) {
@@ -1117,7 +1123,7 @@ exports.saveRemark = async (req, res) => {
     if (!response.remark_list) {
       response.remark_list = [];
     }
-    response.remark_list.push({remark:remark_text});
+    response.remark_list.push({ remark: remark_text });
 
     response.remark = remark_text;
     await response.save();
@@ -1143,7 +1149,7 @@ exports.saveQualityRemark = async (req, res) => {
     if (!response.quality_check_remarks) {
       response.quality_check_remarks = [];
     }
-    response.quality_check_remarks.push({note});
+    response.quality_check_remarks.push({ note });
     await response.save();
 
     return res
@@ -1201,7 +1207,7 @@ exports.downloadVoter = async (req, res) => {
     const templatePath = path.join(__dirname, "..", "views", "voterCard.ejs");
     const htmlContent = await ejs.renderFile(
       templatePath,
-      voterData.toObject(),
+      voterData.toObject()
     );
 
     // Use Puppeteer to Generate PDF
@@ -1240,7 +1246,7 @@ exports.downloadVoter = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf"); // Ensure it's PDF content type
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="card_${id}.pdf"`,
+      `attachment; filename="card_${id}.pdf"`
     ); // Set filename dynamically
     console.log("sending pdf buffer");
 
@@ -1282,7 +1288,7 @@ exports.saveVoteStatus = async (req, res) => {
       responseToUpdate,
       {
         new: true,
-      },
+      }
     );
     console.log("updatedResponse", updatedResponse.vote_status);
     return res
