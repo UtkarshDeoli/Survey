@@ -12,7 +12,7 @@ import { checkToken } from "@/utils/common_functions";
 import toast from "react-hot-toast";
 import { getRoles } from "@/networks/role_networks";
 import Loader from "@/components/ui/Loader";
-import { districtPresidentId, shaktiKendraId } from "@/utils/constants";
+import { boothAdhyakshId, districtPresidentId, shaktiKendraId } from "@/utils/constants";
 
 const inputs = [
   {
@@ -211,7 +211,8 @@ function Page() {
                       (field) =>
                         !(
                           role === districtPresidentId ||
-                          role === shaktiKendraId
+                          role === shaktiKendraId ||
+                          role ===  boothAdhyakshId
                         ) ||
                         (field.name !== "ac_no" && field.name !== "booth_no")
                     )

@@ -491,7 +491,7 @@ exports.createKaryakarta = async (req, res) => {
     }
     const hashedPass = await bcrypt.hash(password, 12);
 
-    const excludeFieldsRoles = ["District President", "Shakti Kendra"];
+    const excludeFieldsRoles = ["District President", "Shakti Kendra", "Booth Adhyaksh"];
     const roleName = karyakartaRoles.find((el) => el._id.toString() === role)?.name;
     const karyakartaData = {
       email,

@@ -14,21 +14,19 @@ import {
 import { useRouter } from "next/navigation"; // For routing
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/Loader";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import { useJsApiLoader } from "@react-google-maps/api";
 import Select from "react-select";
 import { getSurvey } from "@/networks/survey_networks";
 import Filters from "@/components/survey-responses/Filters";
 import DataFilterModal from "@/components/survey-responses/DataFilterModal";
-import ResponseModal from "@/components/survey-responses/ResponseModal";
 import AssignPannaPramukhModal from "@/components/survey-responses/AssignPannaPramukhModal";
-import MapModal from "@/components/survey-responses/MapModal";
-import ResponseTable from "@/components/survey-responses/ResponseTable";
 import Image from "next/image";
 import survey_analytics_calender from "/public/images/calendar_new.png";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { surveyCollectorId } from "@/utils/constants";
 import useUser from "@/hooks/useUser";
 import ResponseGrid from "@/components/qualityCheck/ResponseGrid";
+import QualityResponseModal from "@/components/survey-responses/QualityResponseModal";
 
 function Page() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -375,6 +373,7 @@ function Page() {
           setAssignedMode={setAssignMode}
           getUserResponses={getUserResponses}
           setSelectedPanna={setSelectedPanna}
+          update={()=>setReset(!reset)}
         />
       ) : (
         !loading && (
@@ -446,7 +445,7 @@ function Page() {
       />
 
       {/* modal for response */}
-      <ResponseModal
+      <QualityResponseModal
         responseModalIsOpen={responseModalIsOpen}
         selectedResponse={selectedResponse}
         setResponseModalIsOpen={setResponseModalIsOpen}

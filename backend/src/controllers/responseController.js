@@ -1022,7 +1022,6 @@ exports.updateResponse = async (req, res) => {
       ac_no,
       booth_no,
       house_no,
-      // last_name,
       status,
       family_id,
       save_mode,
@@ -1040,7 +1039,9 @@ exports.updateResponse = async (req, res) => {
     if (booth_no) updateFields.booth_no = booth_no;
     if (house_no) updateFields.house_no = house_no;
     // if (last_name) updateFields.last_name = last_name;
-    if (status) updateFields.status = status;
+    if (status){
+      updateFields.status = status;
+    }
 
     if (media_responses) {
       Object.entries(media_responses).map(([key, value]) => {
@@ -1119,6 +1120,30 @@ exports.saveRemark = async (req, res) => {
     response.remark_list.push({remark:remark_text});
 
     response.remark = remark_text;
+    await response.save();
+
+    return res
+      .status(201)
+      .json({ success: "true", message: "Remark saved successfully" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
+exports.saveQualityRemark = async (req, res) => {
+  try {
+    const { response_id, note } = req.body;
+
+    const response = await Responses.findById(response_id);
+    if (!response) {
+      return res
+        .status(404)
+        .json({ success: "false", message: "Response not found" });
+    }
+
+    if (!response.quality_check_remarks) {
+      response.quality_check_remarks = [];
+    }
+    response.quality_check_remarks.push({note});
     await response.save();
 
     return res

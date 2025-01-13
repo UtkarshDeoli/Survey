@@ -73,6 +73,10 @@ const responseSchema = new Schema(
       enum: ["Approved", "Rejected", "Pending"],
       default: "Pending",
     },
+    quality_check_remarks:[{
+      note: { type: String, required: true },
+      date: { type: Date, default: Date.now }
+    }]
   },
   { strict: false, timestamps: true },
 );
