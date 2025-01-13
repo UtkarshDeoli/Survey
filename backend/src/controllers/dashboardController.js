@@ -292,6 +292,16 @@ exports.getResponsesStatusByAcList = async (req, res) => {
 
     const matchStage = {};
     const { ac_list } = userData;
+    if (ac_list.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          totalResponsesAssigned: 0,
+          contactedCount: 0,
+          voteStatusCount: 0,
+        },
+      });
+    }
     const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
       booth_numbers.map((booth_no) => ({ ac_no, booth_no })),
     );
