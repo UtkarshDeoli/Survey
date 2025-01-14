@@ -1049,6 +1049,8 @@ exports.updateResponse = async (req, res) => {
       updateFields.status = status;
     }
 
+    console.log("updateFields", updateFields);
+
     if (media_responses) {
       Object.entries(media_responses).map(([key, value]) => {
         const mediaBuffer = Buffer.from(value.data, "base64");
@@ -1066,6 +1068,34 @@ exports.updateResponse = async (req, res) => {
           }
         }
       });
+    }
+
+    if (save_mode === "new_family") {
+      const alreadyExists = await Family.findOne({
+        survey_id,
+        ac_no,
+        booth_no,
+        house_no,
+        // last_name,
+      });
+
+      console.log("already exists", alreadyExists);
+
+      if (alreadyExists) {
+        updateFields.family_id = alreadyExists._id;
+      } else {
+        const newFamily = await Family.create({
+          survey_id,
+          ac_no,
+          booth_no,
+          house_no,
+          // last_name,
+        });
+        createdNewFamily = true;
+        updateFields.family_id = newFamily._id;
+      }
+    } else if (family_id) {
+      updateFields.family_id = family_id;
     }
 
     // Perform the update
