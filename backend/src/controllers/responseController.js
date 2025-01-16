@@ -1328,3 +1328,21 @@ exports.saveVoteStatus = async (req, res) => {
     return res.status(400).json({ success: "false", message: error.message });
   }
 };
+
+exports.saveContactedStatus = async (req, res) => {
+  try {
+    const { response_id, contacted_status } = req.body;
+      const responseToUpdate = {
+        contacted: !contacted_status,
+      };
+      await Responses.findByIdAndUpdate(response_id, responseToUpdate, {
+        new: true,
+      });
+
+    return res
+      .status(201)
+      .json({ success: "true", message: "Contact status saved successfully" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
