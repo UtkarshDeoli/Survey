@@ -86,12 +86,40 @@ exports.saveResponse = async (req, res) => {
 
       if (alreadyExists) {
         responseToSave.family_id = alreadyExists._id;
+
+        const commonResponseMap = new Map(
+          alreadyExists.common_responses.map((response) => [
+            response.question_id,
+            response,
+          ]),
+        );
+
+        responseToSave.responses = parsedResponses.map((response) => {
+          if (response.common && commonResponseMap.has(response.question_id)) {
+            return commonResponseMap.get(response.question_id);
+          }
+          return response;
+        });
+
+        //console.log("responseToSave", responseToSave.responses);
       } else {
+        let commonResponses = [];
+
+        //console.log("responseToSave", parsedResponses);
+        parsedResponses.map((response) => {
+          if (response.common) {
+            commonResponses.push(response);
+          }
+        });
+
+        //console.log("commonResponses", commonResponses);
+
         const newFamily = await Family.create({
           survey_id,
           ac_no,
           booth_no,
           house_no,
+          common_responses: commonResponses,
           // last_name,
         });
         createdNewFamily = true;
@@ -100,6 +128,7 @@ exports.saveResponse = async (req, res) => {
     } else if (family_id) {
       responseToSave.family_id = family_id;
     }
+
     responseToSave.audio_recording_path = req.file.path;
     const response = new Responses(responseToSave);
     await response.save();
@@ -623,12 +652,16 @@ exports.getResponse = async (req, res) => {
   try {
     const responseId = req.query.responseId;
     const response = await Responses.findById(responseId);
+    const family = await Family.findById(response.family_id);
+
     if (!response) {
       return res
         .status(404)
         .json({ success: "false", message: "Response not found" });
     } else {
-      return res.status(201).json({ success: "true", data: response });
+      return res
+        .status(201)
+        .json({ success: "true", data: response, familyData: family });
     }
   } catch (error) {
     return res.status(400).json({ success: "false", message: error.message });
@@ -1083,15 +1116,42 @@ exports.updateResponse = async (req, res) => {
 
       if (alreadyExists) {
         updateFields.family_id = alreadyExists._id;
+
+         const commonResponseMap = new Map(
+          alreadyExists.common_responses.map((response) => [
+            response.question_id,
+            response,
+          ]),
+        );
+
+        updateFields.responses = parsedResponses.map((response) => {
+          if (response.common && commonResponseMap.has(response.question_id)) {
+            return commonResponseMap.get(response.question_id);
+          }
+          return response;
+        });
+
       } else {
+         let commonResponses = [];
+
+        //console.log("responseToSave", parsedResponses);
+        responses.map((response) => {
+          if (response.common) {
+            commonResponses.push(response);
+          }
+        });
+
+
         const newFamily = await Family.create({
           survey_id,
           ac_no,
           booth_no,
           house_no,
           // last_name,
+          common_responses: commonResponses,
         });
         createdNewFamily = true;
+
         updateFields.family_id = newFamily._id;
       }
     } else if (family_id) {
@@ -1332,12 +1392,12 @@ exports.saveVoteStatus = async (req, res) => {
 exports.saveContactedStatus = async (req, res) => {
   try {
     const { response_id, contacted_status } = req.body;
-      const responseToUpdate = {
-        contacted: !contacted_status,
-      };
-      await Responses.findByIdAndUpdate(response_id, responseToUpdate, {
-        new: true,
-      });
+    const responseToUpdate = {
+      contacted: !contacted_status,
+    };
+    await Responses.findByIdAndUpdate(response_id, responseToUpdate, {
+      new: true,
+    });
 
     return res
       .status(201)
