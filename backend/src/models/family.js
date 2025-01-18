@@ -28,8 +28,16 @@ const familySchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User99",
     },
+    common_responses: [
+      {
+        response: String,
+        question: String,
+        question_id: Number,
+        question_type: String,
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Family = mongoose.model("Family99", familySchema);

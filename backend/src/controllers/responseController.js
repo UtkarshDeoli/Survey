@@ -86,12 +86,40 @@ exports.saveResponse = async (req, res) => {
 
       if (alreadyExists) {
         responseToSave.family_id = alreadyExists._id;
+
+        const commonResponseMap = new Map(
+          alreadyExists.common_responses.map((response) => [
+            response.question_id,
+            response,
+          ]),
+        );
+
+        responseToSave.responses = parsedResponses.map((response) => {
+          if (response.common && commonResponseMap.has(response.question_id)) {
+            return commonResponseMap.get(response.question_id);
+          }
+          return response;
+        });
+
+        //console.log("responseToSave", responseToSave.responses);
       } else {
+        let commonResponses = [];
+
+        //console.log("responseToSave", parsedResponses);
+        parsedResponses.map((response) => {
+          if (response.common) {
+            commonResponses.push(response);
+          }
+        });
+
+        //console.log("commonResponses", commonResponses);
+
         const newFamily = await Family.create({
           survey_id,
           ac_no,
           booth_no,
           house_no,
+          common_responses: commonResponses,
           // last_name,
         });
         createdNewFamily = true;
@@ -100,6 +128,7 @@ exports.saveResponse = async (req, res) => {
     } else if (family_id) {
       responseToSave.family_id = family_id;
     }
+
     responseToSave.audio_recording_path = req.file.path;
     const response = new Responses(responseToSave);
     await response.save();
@@ -107,7 +136,7 @@ exports.saveResponse = async (req, res) => {
     if (createdNewFamily) {
       await Family.updateOne(
         { _id: responseToSave.family_id },
-        { $set: { family_head: response._id } }
+        { $set: { family_head: response._id } },
       );
     }
 
@@ -115,7 +144,7 @@ exports.saveResponse = async (req, res) => {
       { _id: survey_id },
       {
         $inc: { response_count: 1 },
-      }
+      },
     );
     if (!survey) {
       return res
@@ -218,7 +247,7 @@ exports.saveResponses = async (req, res) => {
       const acNo = response.ac_no || null;
       const boothNo = response.booth_no || null;
       const houseNo = response.responses.find(
-        (r) => r.question === "C_HOUSE_NO"
+        (r) => r.question === "C_HOUSE_NO",
       )?.response;
 
       let familyId = null;
@@ -259,7 +288,7 @@ exports.saveResponses = async (req, res) => {
     await Responses.insertMany(responsesArray);
 
     console.log(
-      `${responsesArray.length} responses saved successfully with family IDs.`
+      `${responsesArray.length} responses saved successfully with family IDs.`,
     );
     return res.status(201).json({
       success: true,
@@ -326,7 +355,8 @@ exports.getAllResponses = async (req, res) => {
       userData.role.forEach((role) => {
         if (
           role.name === "District President" ||
-          role.name === "Shakti Kendra"
+          role.name === "Shakti Kendra" ||
+          role.name === "Booth Adhyaksh"
         ) {
           isNotCollector = true;
         }
@@ -334,7 +364,7 @@ exports.getAllResponses = async (req, res) => {
       if (isNotCollector) {
         const { ac_list } = userData;
         const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
-          booth_numbers.map((booth_no) => ({ ac_no, booth_no }))
+          booth_numbers.map((booth_no) => ({ ac_no, booth_no })),
         );
 
         if (filterCriteria.length > 0) {
@@ -486,7 +516,7 @@ exports.getAllResponses = async (req, res) => {
                       input: { $toString: "$responses.response" },
                       regex: new RegExp(
                         escapeRegex("$responses.response"),
-                        "i"
+                        "i",
                       ),
                     },
                   },
@@ -530,7 +560,7 @@ exports.getAllResponses = async (req, res) => {
     ];
 
     responseFilters.forEach((resp) =>
-      console.log(resp.question_id, "-->", resp.response)
+      console.log(resp.question_id, "-->", resp.response),
     );
 
     // Add additional match stage if there are filters
@@ -567,7 +597,7 @@ exports.getAllResponses = async (req, res) => {
         Responses.findById(f._id)
           .populate("panna_pramukh_assigned")
           .populate("user_id")
-          .populate("survey_id")
+          .populate("survey_id"),
       );
 
       const re = await Promise.all(fin);
@@ -588,7 +618,7 @@ exports.getAllResponses = async (req, res) => {
       const filteredResponse = await Responses.aggregate(aggregationPipeline);
 
       const fin = filteredResponse.map((f) =>
-        Responses.findById(f._id).populate("panna_pramukh_assigned")
+        Responses.findById(f._id).populate("panna_pramukh_assigned"),
       );
       const re = await Promise.all(fin);
       // console.log("res-->",re)
@@ -621,12 +651,16 @@ exports.getResponse = async (req, res) => {
   try {
     const responseId = req.query.responseId;
     const response = await Responses.findById(responseId);
+    const family = await Family.findById(response.family_id);
+
     if (!response) {
       return res
         .status(404)
         .json({ success: "false", message: "Response not found" });
     } else {
-      return res.status(201).json({ success: "true", data: response });
+      return res
+        .status(201)
+        .json({ success: "true", data: response, familyData: family });
     }
   } catch (error) {
     return res.status(400).json({ success: "false", message: error.message });
@@ -756,7 +790,7 @@ exports.getSurveyResponses = async (req, res) => {
       },
       {
         $limit: pageSize, // Limit the number of documents for pagination
-      }
+      },
     );
 
     const results = await Responses.aggregate(pipeline);
@@ -921,7 +955,6 @@ exports.getSurveyResponseStats = async (req, res) => {
       },
     ];
 
-
     if (responseFilters.length > 0) {
       aggregationPipeline.push({
         $match: {
@@ -1048,6 +1081,8 @@ exports.updateResponse = async (req, res) => {
       updateFields.status = status;
     }
 
+    console.log("updateFields", updateFields);
+
     if (media_responses) {
       Object.entries(media_responses).map(([key, value]) => {
         const mediaBuffer = Buffer.from(value.data, "base64");
@@ -1067,11 +1102,66 @@ exports.updateResponse = async (req, res) => {
       });
     }
 
+    if (save_mode === "new_family") {
+      const alreadyExists = await Family.findOne({
+        survey_id,
+        ac_no,
+        booth_no,
+        house_no,
+        // last_name,
+      });
+
+      console.log("already exists", alreadyExists);
+
+      if (alreadyExists) {
+        updateFields.family_id = alreadyExists._id;
+
+         const commonResponseMap = new Map(
+          alreadyExists.common_responses.map((response) => [
+            response.question_id,
+            response,
+          ]),
+        );
+
+        updateFields.responses = parsedResponses.map((response) => {
+          if (response.common && commonResponseMap.has(response.question_id)) {
+            return commonResponseMap.get(response.question_id);
+          }
+          return response;
+        });
+
+      } else {
+         let commonResponses = [];
+
+        //console.log("responseToSave", parsedResponses);
+        responses.map((response) => {
+          if (response.common) {
+            commonResponses.push(response);
+          }
+        });
+
+
+        const newFamily = await Family.create({
+          survey_id,
+          ac_no,
+          booth_no,
+          house_no,
+          // last_name,
+          common_responses: commonResponses,
+        });
+        createdNewFamily = true;
+
+        updateFields.family_id = newFamily._id;
+      }
+    } else if (family_id) {
+      updateFields.family_id = family_id;
+    }
+
     // Perform the update
     const response = await Responses.findByIdAndUpdate(
       response_id,
       { $set: updateFields },
-      { new: true }
+      { new: true },
     );
 
     if (!response) {
@@ -1206,7 +1296,7 @@ exports.downloadVoter = async (req, res) => {
     const templatePath = path.join(__dirname, "..", "views", "voterCard.ejs");
     const htmlContent = await ejs.renderFile(
       templatePath,
-      voterData.toObject()
+      voterData.toObject(),
     );
 
     // Use Puppeteer to Generate PDF
@@ -1245,7 +1335,7 @@ exports.downloadVoter = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf"); // Ensure it's PDF content type
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="card_${id}.pdf"`
+      `attachment; filename="card_${id}.pdf"`,
     ); // Set filename dynamically
     console.log("sending pdf buffer");
 
@@ -1287,12 +1377,30 @@ exports.saveVoteStatus = async (req, res) => {
       responseToUpdate,
       {
         new: true,
-      }
+      },
     );
     console.log("updatedResponse", updatedResponse.vote_status);
     return res
       .status(200)
       .json({ success: "true", message: "Vote status saved successfully" });
+  } catch (error) {
+    return res.status(400).json({ success: "false", message: error.message });
+  }
+};
+
+exports.saveContactedStatus = async (req, res) => {
+  try {
+    const { response_id, contacted_status } = req.body;
+    const responseToUpdate = {
+      contacted: !contacted_status,
+    };
+    await Responses.findByIdAndUpdate(response_id, responseToUpdate, {
+      new: true,
+    });
+
+    return res
+      .status(201)
+      .json({ success: "true", message: "Contact status saved successfully" });
   } catch (error) {
     return res.status(400).json({ success: "false", message: error.message });
   }

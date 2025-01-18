@@ -49,6 +49,7 @@ router.get(
 router.post("/updateResponse", responseController.updateResponse);
 router.post("/markAsContacted", responseController.markAsContacted);
 router.post("/saveVoteStatus", responseController.saveVoteStatus);
+router.post("/saveContactedStatus", responseController.saveContactedStatus);
 router.post("/saveRemark", responseController.saveRemark);
 router.post("/saveQualityRemark", responseController.saveQualityRemark);
 
