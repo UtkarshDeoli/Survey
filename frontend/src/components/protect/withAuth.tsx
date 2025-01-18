@@ -47,7 +47,7 @@ const withAuth = (WrappedComponent: any) => {
       const allowedPaths: Record<string, string[]> = {
         "Operation team": ["/admin/surveys", "/admin/data", "/admin/todos","/admin/support"],
         Supervisor: ["/admin/collectors", "/admin/collector-surveys","/admin/support"],
-        "Survey Manager": ["/admin/surveys","/admin/support"],
+        "Survey Manager": ["/admin/surveys","/admin/support","/admin/survey-manager/survey-response"],
         "Quality Check": ["/admin/quality-check-surveys","/admin/support"],
         "Data Analyst": ["/admin/data","/admin/support"],
         "Data Manager": ["/admin/data","/admin/support"],

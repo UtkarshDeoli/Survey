@@ -39,7 +39,7 @@ function PhoneNumberForm({
         control={control}
       />
       {!hide && (
-        <div className="bg-blue-100 p-5 w-full">
+        <div className="bg-primary-50 p-5 w-full">
           <div className="flex flex-col justify-center items-center p-5 gap-3 bg-white w-full">
             <div className="grid grid-cols-12 w-3/4">
               <label className="col-span-4 text-secondary-300">

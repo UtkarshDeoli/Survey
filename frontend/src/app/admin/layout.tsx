@@ -30,7 +30,7 @@ function Layout({ children }: LayoutProps) {
       <div className={`flex flex-col flex-1`}>
         <Navbar />
         <main
-          className={`flex-1 h-full overflow-auto ${
+          className={`flex-1 h-full overflow-auto vertical-scrollbar ${
             sidebarOpen ? "w-[calc(100vw-300px)]" : "w-[calc(100vw-75px)]"
           }`}
         >

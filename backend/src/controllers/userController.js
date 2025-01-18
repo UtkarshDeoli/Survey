@@ -5,6 +5,8 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const Role = require("../models/role");
 const Response = require("../models/response");
+const fs = require("fs");
+const XLSX = require("xlsx");
 const {
   sendNotificationToMultipleTokens,
   storeNotification,
@@ -94,7 +96,7 @@ exports.updateUser = async (req, res) => {
     const updatedUser = await User.findOneAndUpdate(
       { _id: user_id },
       { $set: userData },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
 
     return res.status(200).json({
@@ -111,55 +113,9 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// exports.assignBoothToUsers = async (req, res) => {
-//   const { survey_id, userId, ac_list, editResponses } = req.body;
-
-//   try {
-//     // Find the user by userId
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     // Update the user's survey list and AC list
-//     if (!user.assigned_survey.includes(survey_id)) {
-//       user.assigned_survey.push(survey_id);
-      
-//     }
-//     console.log("ac_list is --->",ac_list)
-//     user.ac_list = ac_list;
-//     await user.save();
-
-//     if (editResponses) {
-//       // Build filter criteria for responses
-//       const filterCriteria = ac_list.flatMap(({ ac_no, booth_numbers }) =>
-//         booth_numbers.map((booth_no) => ({
-//           survey_id,
-//           ac_no,
-//           booth_no,
-//         })),
-//       );
-
-//       // Update responses in a single operation
-//       await Response.updateMany(
-//         { $or: filterCriteria },
-//         { $set: { user_id: userId } },
-//       );
-//     }
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "Booths assigned to user and responses updated successfully",
-//     });
-//   } catch (error) {
-//     console.error("Error in assigning booths to users:", error);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
-
 exports.assignBoothToUsers = async (req, res) => {
   const { survey_id, userId, ac_list, editResponses } = req.body;
-  console.log("assigning booth running")
+  console.log("assigning booth running");
 
   try {
     // Find the user by userId
@@ -175,25 +131,28 @@ exports.assignBoothToUsers = async (req, res) => {
 
     // Merge or update the ac_list for the specific survey
     const updatedAcList = [...user.ac_list]; // Clone the existing AC list
-    console.log("existing ac list is --->",updatedAcList);
-    console.log("new ac list is --->",ac_list);
+    console.log("existing ac list is --->", updatedAcList);
+    console.log("new ac list is --->", ac_list);
     ac_list.forEach((newAc) => {
       const existingAcIndex = updatedAcList.findIndex(
         (existingAc) =>
           existingAc.ac_no === newAc.ac_no &&
-          existingAc.survey_id.toString() === survey_id,
+          existingAc.survey_id.toString() === survey_id
       );
 
       if (existingAcIndex !== -1) {
         // If AC already exists for the survey, update its booth numbers
         console.log("existing ac no found");
         const existingAc = updatedAcList[existingAcIndex];
-        console.log("existing booth numbers --->",existingAc.booth_numbers)
-        console.log("new booth numbers --->",newAc.booth_numbers)
+        console.log("existing booth numbers --->", existingAc.booth_numbers);
+        console.log("new booth numbers --->", newAc.booth_numbers);
         existingAc.booth_numbers = [
           ...new Set([...existingAc.booth_numbers, ...newAc.booth_numbers]),
         ];
-        console.log("updated ac list booth numbers--->",existingAc.booth_numbers)
+        console.log(
+          "updated ac list booth numbers--->",
+          existingAc.booth_numbers
+        );
       } else {
         // If AC does not exist for the survey, add it
         console.log("existing ac no not found");
@@ -211,13 +170,13 @@ exports.assignBoothToUsers = async (req, res) => {
           survey_id,
           ac_no,
           booth_no,
-        })),
+        }))
       );
 
       // Update responses in a single operation
       await Response.updateMany(
         { $or: filterCriteria },
-        { $set: { user_id: userId } },
+        { $set: { user_id: userId } }
       );
     }
 
@@ -231,29 +190,27 @@ exports.assignBoothToUsers = async (req, res) => {
   }
 };
 
-
 exports.getAssignedAcBooths = async (req, res) => {
   const { userId, survey_id } = req.query;
-  console.log("assifgned rtoute hitting")
-  console.log("quwery is --- >",req.query);
+  console.log("assifgned rtoute hitting");
+  console.log("quwery is --- >", req.query);
 
   try {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    console.log("ac_list is",user.ac_list)
+    console.log("ac_list is", user.ac_list);
     const assignedAcBooths = user.ac_list.filter(
       (ac) => ac.survey_id.toString() === survey_id
     );
-    console.log("assignedAcBooths --- >",assignedAcBooths)
+    console.log("assignedAcBooths --- >", assignedAcBooths);
     return res.status(200).json({ success: true, assignedAcBooths });
   } catch (error) {
     console.error("Error fetching assigned ACs and booths:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 exports.updateUsers = async (req, res) => {
   try {
@@ -268,7 +225,7 @@ exports.updateUsers = async (req, res) => {
 
     const updatePromises = users.map(async (user) => {
       const fetchedUserData = await User.findById(user.user_id).select(
-        "notification_token",
+        "notification_token"
       );
 
       if (!user.user_id) {
@@ -360,7 +317,7 @@ exports.getUser = async (req, res) => {
             user_id: _id,
           });
           return { ...survey.toObject(), collected_count: collectedCount };
-        }),
+        })
       );
 
       return res.status(200).json({
@@ -414,7 +371,7 @@ exports.getAllUsers = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validUserRoleIds.filter(
-        (ro) => ro.toString() === role.toString(),
+        (ro) => ro.toString() === role.toString()
       );
     }
     if (role && roleExists.length > 0) {
@@ -468,7 +425,7 @@ exports.uploadProfilePicture = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { profile_picture: profilePicture._id } },
-      { new: true },
+      { new: true }
     );
 
     return res.status(200).json({
@@ -533,6 +490,109 @@ exports.getSupervisorCollectors = async (req, res) => {
 };
 // karyakarta API'S////////////////////////////////////////////////////
 
+exports.importKaryakartas = async (req, res) => {
+  try {
+    // Check if a file is uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    console.log(req.file);
+    // Parse the uploaded Excel file
+    const workbook = XLSX.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    // Validate if the file contains required fields
+    const requiredFields = ["username", "name", "email", "password", "role"];
+    const missingFields = requiredFields.filter(
+      (field) => !data[0] || !Object.keys(data[0]).includes(field)
+    );
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields in Excel: ${missingFields.join(
+          ", "
+        )}`,
+      });
+    }
+
+    // Fetch valid roles for karyakartas
+    const karyakartaRoles = await Role.find({ category: "karyakarta" });
+    const roleNames = karyakartaRoles.map((role) => role.name); // Extract role names
+
+    const createdKaryakartas = [];
+    const errors = [];
+
+    for (const row of data) {
+      const { username, name, email, password, role, userStatus } = row;
+
+      // Check if email already exists
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        errors.push({ email, message: "Email already exists" });
+        continue;
+      }
+
+      // Check if role name is valid
+      const roleExists = roleNames.includes(role);
+      if (!roleExists) {
+        errors.push({ email, message: `Invalid role name: ${role}` });
+        continue;
+      }
+
+      // Find the role ID by role name
+      const foundRole = karyakartaRoles.find((r) => r.name === role);
+      const roleId = foundRole ? foundRole._id.toString() : null;
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      // Create karyakarta data
+      const karyakartaData = {
+        username,
+        name,
+        email,
+        password: hashedPassword,
+        role: [roleId], // Store the role ID
+        userStatus: userStatus || "active", // Default userStatus to 'active' if not provided
+      };
+
+      try {
+        const newKaryakarta = await User.create(karyakartaData);
+        createdKaryakartas.push(newKaryakarta);
+      } catch (err) {
+        errors.push({ email, message: "Error creating user", error: err });
+      }
+    }
+
+    // Delete the uploaded file after processing
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error("Error deleting file:", err);
+      } else {
+        console.log("File deleted successfully.");
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Import completed",
+      created: createdKaryakartas.length,
+      errors,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Error importing karyakartas",
+    });
+  }
+};
+
 exports.createKaryakarta = async (req, res) => {
   try {
     const {
@@ -557,7 +617,7 @@ exports.createKaryakarta = async (req, res) => {
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("ROLE ISS:", role);
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString(),
+      (el) => el.toString() === role.toString()
     );
 
     if (roleExists.length === 0) {
@@ -568,8 +628,14 @@ exports.createKaryakarta = async (req, res) => {
     }
     const hashedPass = await bcrypt.hash(password, 12);
 
-    const excludeFieldsRoles = ["District President", "Shakti Kendra", "Booth Adhyaksh"];
-    const roleName = karyakartaRoles.find((el) => el._id.toString() === role)?.name;
+    const excludeFieldsRoles = [
+      "District President",
+      "Shakti Kendra",
+      "Booth Adhyaksh",
+    ];
+    const roleName = karyakartaRoles.find(
+      (el) => el._id.toString() === role
+    )?.name;
     const karyakartaData = {
       email,
       username,
@@ -636,7 +702,7 @@ exports.updateMultipleKaryakarta = async (req, res) => {
     responses.forEach(async (response) => {
       await Response.findOneAndUpdate(
         { _id: response },
-        { panna_pramukh_assigned: id },
+        { panna_pramukh_assigned: id }
       );
     });
     return res
@@ -671,7 +737,7 @@ exports.updateKaryakarta = async (req, res) => {
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("valid roles are -->", validRoles);
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString(),
+      (el) => el.toString() === role.toString()
     );
     console.log("role exists->>>>", roleExists);
     if (roleExists.length === 0) {
@@ -746,7 +812,7 @@ exports.getAllKaryakarta = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validRoleIds.filter(
-        (ro) => ro.toString() === role.toString(),
+        (ro) => ro.toString() === role.toString()
       );
     }
 
@@ -791,46 +857,49 @@ exports.getKaryakarta = async (req, res) => {
 };
 
 exports.getUsersByAcList = async (req, res) => {
-  // this controller only fetches panna pramukhs by default
   try {
     const { ac_list } = req.body;
-    console.log("query is --->", req.body);
 
-    if (!ac_list) {
-      return res
-        .status(400)
-        .json({ success: false, message: "ac_list is required" });
-    }
+    // Find the role ID for "Panna Pramukh"
     const pannaPramukhRole = await Role.findOne({
       name: "Panna Pramukh",
     });
 
-    // Construct a `$or` condition with `$and` for each `ac_no` and its corresponding `booth_numbers`
-    const conditions = ac_list.map(({ ac_no, booth_numbers }) => ({
-      $and: [
-        { ac_no: ac_no }, // Match the `ac_no`
-        { booth_no: { $in: booth_numbers } }, // Ensure `booth_no` is in the corresponding list
-      ],
-    }));
+    if (!pannaPramukhRole) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Panna Pramukh role not found" });
+    }
 
-    console.log("conditions are ===>", JSON.stringify(conditions, null, 2));
-    console.log("role === >", pannaPramukhRole._id);
+    let query = { role: pannaPramukhRole._id };
 
-    // Query to match users based on the constructed conditions
-    const users = await User.find({
-      role: { $in: [pannaPramukhRole._id] },
-      $or: conditions,
-    });
+    // If `ac_list` is provided, construct the `$or` conditions
+    if (ac_list && ac_list.length > 0) {
+      const conditions = ac_list.map(({ ac_no, booth_numbers }) => ({
+        $and: [
+          { ac_no: ac_no }, // Match the `ac_no`
+          { booth_no: { $in: booth_numbers } }, // Ensure `booth_no` is in the corresponding list
+        ],
+      }));
 
-    console.log(users);
+      query.$or = conditions;
+    }
+
+    console.log("Query:", JSON.stringify(query, null, 2));
+
+    // Fetch users based on the query
+    const users = await User.find(query);
 
     return res.status(200).json({
       success: true,
       data: users,
     });
   } catch (error) {
-    console.error("error is ----> ", error);
-    return res.status(500).json({ success: false, message: "Server error" });
+    console.error("Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 

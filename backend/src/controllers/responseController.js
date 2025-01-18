@@ -132,7 +132,6 @@ exports.saveResponse = async (req, res) => {
   }
 };
 
-// exports.saveResponses = async (req, res) => {
 //   try {
 //     const responsesArray = req.body;
 

@@ -1,5 +1,5 @@
-// export const SERVER_URI = "http://localhost:6969";
-export const SERVER_URI = "https://survey-3uf0.onrender.com";
+export const SERVER_URI = "http://localhost:6969";
+// export const SERVER_URI = "https://survey-3uf0.onrender.com";
 
 // users
 export const get_user = "api/user/getUser";
@@ -21,6 +21,7 @@ export const get_panna_pramukh = "api/user/getPannaPramukh"
 export const get_panna_pramukh_ac_list = "api/user/getUsersByAcList"
 export const get_booth_adhyaksh = "api/user/getBoothAdhyaksh"
 export const updateMultipleKaryakarta = "api/user/updateMultipleKaryakarta"
+export const import_karyakartas = "api/user/importKaryakartas"
 
 
 // surveys

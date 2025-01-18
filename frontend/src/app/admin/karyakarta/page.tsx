@@ -1,19 +1,19 @@
 "use client";
-import ButtonBordered from "@/components/ui/buttons/ButtonBordered";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
-import {
-  getAllKaryakarta,
-  getAllUsers,
-  getKaryakarta,
-  updateKaryakarta,
-} from "@/networks/user_networks";
+import { getAllKaryakarta, updateKaryakarta } from "@/networks/user_networks";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { IUser } from "@/types/user_interfaces";
 import Switch from "react-switch";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import {
+  IoIosAddCircle,
+  IoIosArrowBack,
+  IoIosArrowForward,
+} from "react-icons/io";
 import Loader from "@/components/ui/Loader";
+import { CgImport } from "react-icons/cg";
+import KaryakartaHeader from "@/components/karyakarta/KaryakartaHeader";
 
 function page() {
   const [users, setUsers] = useState<IUser[]>([]);
@@ -76,21 +76,7 @@ function page() {
 
   return (
     <div className="w-full bg-[#ECF0FA] text-sm min-h-[calc(100vh-80px)]">
-      <nav className="h-16 w-full py-3 px-8 flex justify-between">
-        <div className="text-my-gray-200">
-          <h1 className="text-2xl">All Karyakarta</h1>
-        </div>
-        <div className="flex justify-end space-x-3 text-xs">
-          {/* <ButtonFilled className="bg-my-blue-600">Help</ButtonFilled> */}
-          <ButtonFilled
-            onClick={() => {
-              router.push("./karyakarta/add-karyakarta");
-            }}
-          >
-            Add Karyakarta
-          </ButtonFilled>
-        </div>
-      </nav>
+      <KaryakartaHeader setReset={setReset}/>
 
       <div className="p-3 text-sm text-my-gray-200 bg-white mx-5 rounded-xl my-2">
         <div className="flex justify-between">
@@ -140,9 +126,7 @@ function page() {
         {loading && (
           <Loader className="h-[50vh] flex justify-center items-center w-full" />
         )}
-        {!loading &&
-          users &&
-          users.length !== 0 ?
+        {!loading && users && users.length !== 0 ? (
           users.map((user, index) => (
             <div
               key={index}
@@ -196,9 +180,14 @@ function page() {
                 </p>
               </div>
             </div>
-          )):<div className="flex justify-center items-center h-[20vh] w-full">No karyakartas found</div>}
+          ))
+        ) : (
+          <div className="flex justify-center items-center h-[20vh] w-full">
+            No karyakartas found
+          </div>
+        )}
       </div>
-      
+
       {!loading && (
         <div className="flex gap-3 items-center mt-4 pl-4 pb-4 sticky bottom-0 left-0 bg-[#ECF0FA]">
           {/* Limit Select */}

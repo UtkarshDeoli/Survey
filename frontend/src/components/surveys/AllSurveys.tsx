@@ -25,6 +25,7 @@ import {
 import { qualityCheckId, surveyCollectorId } from "@/utils/constants";
 import useUser from "@/hooks/useUser";
 import PropagateLoader from "react-spinners/PropagateLoader";
+import AssignQcBoothModal from "../survey-manager/AssignQcBoothModal";
 
 interface AllSurveysProps {
   queryParams: Params;
@@ -61,11 +62,10 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   const [surveyToAssign, setSurveyToAssign] = useState<string>("");
   const [user, setUser] = useState<any>(null);
   const [userSearch, setUserSearch] = useState<string>("");
-  const [qcSearch, setQcSearch] = useState<string>("");
-  const [qc, setQc] = useState<any>(null);
   const [qcModal, setQcModal] = useState<boolean>(false);
   const [deleting,setDeleting] = useState<boolean>(false);
   const [publishing,setPublishing] = useState<boolean>(false);
+  const [selectedSurvey,setSelectedSurvey] = useState<string | null>(null)
 
   const userData = useUser();
   const isSurveyManager = userData?.role
@@ -86,10 +86,6 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   useEffect(() => {
     getUsers();
   }, [userSearch]);
-
-  useEffect(() => {
-    getQC();
-  }, [qcSearch]);
 
   // Delete a survey
   async function handleDeleteSurvey() {
@@ -163,8 +159,6 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
     setLoading(false);
   }
 
-  console.log("quality checks are --->", users);
-
   async function getUsers() {
     setLoading(true);
     const params = {
@@ -175,18 +169,6 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
     const response = await getAllUsers(params);
 
     setUsers(response.data);
-    setLoading(false);
-  }
-  async function getQC() {
-    setLoading(true);
-    const params = {
-      selectedRole: qualityCheckId,
-      searchBarInput: qcSearch,
-    };
-    // console.log("params are --->",params);
-    const response = await getAllUsers(params);
-    console.log("qc are ------ >", response.data);
-    setQc(response.data);
     setLoading(false);
   }
 
@@ -263,44 +245,6 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
     setSelectedUsers([]);
   }
 
-  async function handleAssignSurveyToQc() {
-    let paramsUsers: any = selectedUsers.map((user) => {
-      return {
-        user_id: user,
-        assigned_survey: surveyToAssign,
-      };
-    });
-    const paramsUsersDeSelected = deSelectedUsers.map((user) => {
-      return {
-        user_id: user,
-        remove_survey: surveyToAssign,
-      };
-    });
-    if (paramsUsersDeSelected) {
-      paramsUsers = [...paramsUsers, ...paramsUsersDeSelected];
-    }
-
-    if (!paramsUsers || paramsUsers.length === 0) {
-      toast.error("Please select at least one new user");
-      return;
-    }
-    const params = {
-      users: paramsUsers,
-    };
-    console.log("params-------->", paramsUsers);
-    setLoading(true);
-    const response = await updateMultipleUsers(params);
-    if (response.success) {
-      toast.success("Assigned surveys updated successfully!");
-      getAllSurveys(queryParams);
-      getQC();
-    } else {
-      toast.error("Something went wrong");
-    }
-    setQcModal(false);
-    setSelectedUsers([]);
-  }
-
   return (
     <div className="w-full flex-1 flex flex-col">
       <div
@@ -339,15 +283,9 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                 <p className="col-span-2">{formatDate(el.createdAt)}</p>
                 {isSurveyManager ? (
                   <ButtonFilled
-                    onClick={() => {
-                      const selected = qc
-                        .filter((user: any) =>
-                          user.assigned_survey.includes(el._id)
-                        )
-                        .map((u: any) => u._id);
-                      setSelectedUsers(selected);
-                      setSurveyToAssign(el._id);
-                      setQcModal(true);
+                    onClick={()=>{
+                      setQcModal(true)
+                      setSelectedSurvey(el._id)
                     }}
                     className="w-full col-span-2"
                   >
@@ -504,63 +442,10 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
             </div>
           </div>
         </CustomModal>
-        {/* Assign Survey to qc Modal */}
-        <CustomModal
-          open={qcModal}
-          closeModal={() => {
-            setQcModal(false);
-            setSelectedUsers([]);
-          }}
-        >
-          <div className="flex flex-col h-[70vh] w-[40vw] items-center gap-5 p-4">
-            <h1 className="text-xl w-full text-center">
-              Select Quality checks to assign the survey
-            </h1>
-            <input
-              value={qcSearch}
-              onChange={(e) => setQcSearch(e.target.value)}
-              placeholder="Search user"
-              className="px-4 py-2 rounded-md border outline-none w-full"
-            />
-            <div className="grid grid-cols-2 gap-4  w-full overflow-y-auto max-h-[60vh]">
-              {qc && qc.length > 0 ? (
-                qc.map(
-                  (
-                    { _id, email, name, assigned_survey }: any,
-                    index: number
-                  ) => {
-                    return (
-                      <label
-                        key={_id}
-                        className="cursor-pointer flex items-center h-fit  min-w-[50%] justify-between"
-                      >
-                        <div>
-                          {index + 1}. {name || email}
-                        </div>
-                        <input
-                          className="h-5 w-5 disabled:cursor-not-allowed"
-                          type="checkbox"
-                          defaultChecked={assigned_survey.includes(
-                            surveyToAssign
-                          )}
-                          onChange={() => handleUserSelection(_id)}
-                        />
-                      </label>
-                    );
-                  }
-                )
-              ) : (
-                <div>No Quality checks available</div>
-              )}
-            </div>
-            <ButtonFilled
-              onClick={handleAssignSurveyToQc}
-              className="whitespace-nowrap mt-auto"
-            >
-              Update Assigned Surveys
-            </ButtonFilled>
-          </div>
-        </CustomModal>
+
+        {/* assign booth to qc */}
+        <AssignQcBoothModal boothModal={qcModal}
+          setBoothModal={setQcModal} survey_id={selectedSurvey}/>
         {/* Assign Survey to users Modal */}
         <CustomModal
           open={assignModal}

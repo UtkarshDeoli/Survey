@@ -72,16 +72,10 @@ function Page() {
   const [acList,setAcList] = useState<any>([]);
   const [isImported,setIsImported] = useState<boolean>(false);
 
-
   // assign booth modal
   const [boothModal,setBoothModal] = useState<boolean>(false);
-  const [selectedBooth, setSelectedBooth] = useState<any>(null);;
-  const [selectedCollector,setSelectedCollector] = useState<any>(null);
-
-  
 
   const searchParams = useSearchParams();
-  const userData = useUser()
   const surveyId = searchParams.get("survey_id");
   const router = useRouter();
   const { isLoaded } = useJsApiLoader({
@@ -157,9 +151,8 @@ function Page() {
   }
   async function handleGetPannaPramukh() {
     setLoading(true);
-    console.log("ac list is coming  --->",acList)
     const response = await getPannaPramukhByAcList({
-      ac_list:acList,
+      // ac_list:acList,
       filter: userSearch,
     });
     console.log("panna below-------->", response);

@@ -10,10 +10,9 @@ import Loader from "../ui/Loader";
 import { saveResponses } from "@/networks/response_networks";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 
-
 interface Question {
   question_id: number;
-  type: string|number;
+  type: string | number;
   parameters: Record<string, any>; // Replace `any` with a specific type if known
   children: number[];
   dependency: Array<{ question: string }>; // Adjust type as per your actual structure
@@ -23,7 +22,6 @@ interface Question {
 interface FormData {
   questions: Question[];
 }
-
 
 function SurveyForm() {
   // search params
@@ -39,11 +37,10 @@ function SurveyForm() {
   const [endDragIndex, setEndDragIndex] = useState<number | null>(null);
   const [questId, setQuestId] = useState<number>(10);
   const [loading, setLoading] = useState(false);
-  const [isValidDrag, setIsValidDrag] = useState <boolean>(true);
+  const [isValidDrag, setIsValidDrag] = useState<boolean>(true);
   const [draggingOverIndex, setDraggingOverIndex] = useState<number | null>(
-    null,
+    null
   );
-  
 
   // React hook form
   const {
@@ -52,11 +49,9 @@ function SurveyForm() {
     setValue,
     getValues,
     control,
-    formState: { isSubmitting,isDirty },
-  } = useForm<any>({defaultValues:{questions:[]}});
+    formState: { isSubmitting, isDirty },
+  } = useForm<any>({ defaultValues: { questions: [] } });
 
-  console.log("is form dirty ??? ======",isDirty)
- 
   const { fields, append, move, remove } = useFieldArray({
     control,
     name: "questions",
@@ -92,13 +87,14 @@ function SurveyForm() {
           children: question.children,
           dependency: question.dependency,
           randomize: question.randomize,
+          common: question.common || false,
         });
         Object.keys(question.parameters).forEach((parameter: string) =>
           setValue(
             `questions.${index}.parameters[${parameter}]`,
             question.parameters[parameter],
-            {shouldDirty:false}
-          ),
+            { shouldDirty: false }
+          )
         );
       });
       if (max !== 10) setQuestId(max + 1);
@@ -109,9 +105,9 @@ function SurveyForm() {
 
   // Handle form submission
   async function handleSubmitForm(data: any) {
-    console.log("submitted data is ---->",data);
+    console.log("submitted data is ---->", data);
     const questions = data.questions || [];
-    const formData = {questions };
+    const formData = { questions };
     const params = { _id, formData };
     const response = await updateSurvey(params);
     if (response.success) {
@@ -127,12 +123,12 @@ function SurveyForm() {
       if (index !== ind) {
         const dependencies = getValues(`questions.${index}.dependency`) || [];
         const updatedDependencies = dependencies.filter(
-          (dep: any) => dep.question !== deletedQuestionId.toString(),
+          (dep: any) => dep.question !== deletedQuestionId.toString()
         );
         setValue(`questions.${index}.dependency`, updatedDependencies);
         const children = getValues(`questions.${index}.children`) || [];
         const updatedChildren = children.filter(
-          (childId: number) => childId !== deletedQuestionId,
+          (childId: number) => childId !== deletedQuestionId
         );
         setValue(`questions.${index}.children`, updatedChildren);
       }
@@ -152,7 +148,7 @@ function SurveyForm() {
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     const formMapping = FormMappings();
     const data = e.dataTransfer.getData(
-      "text/plain",
+      "text/plain"
     ) as keyof typeof formMapping;
     if (data !== "form_reorder") {
       const newForm = { component: formMapping[data], hide: false };
@@ -161,9 +157,10 @@ function SurveyForm() {
         question_id: questId,
         type: data,
         randomize: true,
+        common: false,
         children: [],
         dependency: [],
-        parameters:{}
+        parameters: {},
       });
       setQuestId((prev) => prev + 1);
     }
@@ -172,41 +169,40 @@ function SurveyForm() {
   const isValidDrop = (draggingIndex: number, targetIndex: number) => {
     const surveyQuestions = getValues("questions");
     const draggedQuestion = surveyQuestions[draggingIndex];
-  
+
     // Check if any dependencies would be violated
     for (let dep of draggedQuestion.dependency) {
       const depIndex = surveyQuestions.findIndex(
-        (q:any) => q.question_id.toString() === dep.question,
+        (q: any) => q.question_id.toString() === dep.question
       );
       if (depIndex !== -1 && targetIndex <= depIndex) {
         return false; // Cannot move before dependent question
       }
     }
-  
+
     // Check if any child relationships would be violated
     for (let childId of draggedQuestion.children) {
       const childIndex = surveyQuestions.findIndex(
-        (q:any) => q.question_id === childId,
+        (q: any) => q.question_id === childId
       );
       if (childIndex !== -1 && targetIndex >= childIndex) {
         return false; // Cannot move after a child question
       }
     }
-  
+
     return true; // Valid drop
   };
-  
 
   function handleDropForm(e: React.DragEvent<HTMLDivElement>) {
     if (draggedIndex === null || endDragIndex === null) return;
-  
+
     // Get the dragged question and its target index
     const surveyQuestions = getValues("questions");
-  
+
     // Validate the drop before moving
     if (isValidDrop(draggedIndex, endDragIndex)) {
       move(draggedIndex, endDragIndex);
-  
+
       const reorderedForms = [...forms];
       const [draggedItem] = reorderedForms.splice(draggedIndex, 1);
       reorderedForms.splice(endDragIndex, 0, draggedItem);
@@ -214,10 +210,11 @@ function SurveyForm() {
       setDraggedIndex(null);
       setEndDragIndex(null);
     } else {
-      toast.error("Action not allowed. Please consider editing conditional display.");
+      toast.error(
+        "Action not allowed. Please consider editing conditional display."
+      );
     }
   }
-  
 
   // Handle drag enter event (update the end drag index)
   function handleDragEnter(index: number) {
@@ -233,8 +230,8 @@ function SurveyForm() {
   function handleHide(index: number) {
     setForms((prevForms) =>
       prevForms.map((form, i) =>
-        i === index ? { ...form, hide: !form.hide } : form,
-      ),
+        i === index ? { ...form, hide: !form.hide } : form
+      )
     );
   }
 
@@ -249,7 +246,8 @@ function SurveyForm() {
       randomize: true,
       children: [],
       dependency: [],
-      parameters:{}
+      parameters: {},
+      common: false,
     });
     setQuestId((prev) => prev + 1);
   }
@@ -259,7 +257,7 @@ function SurveyForm() {
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="relative flex-1 bg-white flex flex-col gap-2 p-2 overflow-y-auto"
+        className="relative flex-1 bg-white flex flex-col gap-2 p-2 overflow-y-auto vertical-scrollbar"
       >
         <form className="flex flex-col flex-1 pb-20">
           <div
