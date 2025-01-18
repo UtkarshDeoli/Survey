@@ -88,7 +88,7 @@ function Calendar({selectedDate,setSelectedDate}:calendarProps){
           return (
             <div
               key={day}
-              className={`border p-8 ${isBeforeToday ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-blue-100'} ${isSelected ? 'bg-primary-300 text-white' : ''}`}
+              className={`border p-8 ${isBeforeToday ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-primary-50'} ${isSelected ? 'bg-primary-300 text-white' : ''}`}
               onClick={() => !isBeforeToday && handleDateClick(dayNumber)}
             >
               {dayNumber}

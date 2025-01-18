@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-montserrat">
+      <body className="font-montserrat vertical-scrollbar">
         {children}
       </body>
     </html>

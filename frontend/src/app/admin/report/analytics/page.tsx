@@ -408,7 +408,7 @@ function Page() {
           </form>
           <div className="flex gap-3 items-center p-4">
             <ButtonBordered
-              className="disabled:bg-blue-100 disabled:cursor-not-allowed disabled:text-secondary-100"
+              className="disabled:bg-primary-50 disabled:cursor-not-allowed disabled:text-secondary-100"
               disabled={
                 question.trim().length === 0 ||
                 operator.trim().length === 0 ||

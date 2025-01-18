@@ -89,6 +89,7 @@ function ImportSurveyModal({
               question_id: index + 10,
               type: "Single line Text Input",
               randomize: false,
+              common:false,
               dependency: [],
               children: [],
               parameters: {

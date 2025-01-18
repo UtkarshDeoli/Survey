@@ -44,19 +44,7 @@ const inputs = [
     name: "confirm_password",
     type: "password",
     placeholder: "Confirm password",
-  },
-  {
-    label: "AC_NO",
-    name: "ac_no",
-    type: "text",
-    placeholder: "AC number",
-  },
-  {
-    label: "BOOTH_NO",
-    name: "booth_no",
-    type: "text",
-    placeholder: "Booth number",
-  },
+  }
 ];
 function Page() {
   const [userData, setUserData] = useState<any>();
@@ -206,17 +194,7 @@ function Page() {
               <div className="w-[60%] ">
                 {/* user details */}
                 <div className="w-full">
-                  {inputs
-                    .filter(
-                      (field) =>
-                        !(
-                          role === districtPresidentId ||
-                          role === shaktiKendraId ||
-                          role ===  boothAdhyakshId
-                        ) ||
-                        (field.name !== "ac_no" && field.name !== "booth_no")
-                    )
-                    .map((field, index) => (
+                  {inputs.map((field, index) => (
                       <div className="flex w-full space-y-2" key={index}>
                         <div className="w-1/2 py-2">
                           <label className="block  font-medium">

@@ -166,7 +166,7 @@ function Page() {
                 </div> 
               </div>
               {show.includes(qIndex) && (
-                <div onClick={e => e.stopPropagation()} className='w-full h-full bg-blue-100 p-3'>
+                <div onClick={e => e.stopPropagation()} className='w-full h-full bg-primary-50 p-3'>
                   <div className='bg-white p-2'>
                     <ButtonBordered className='font-semibold' onClick={() => handleAddCondition(qIndex)}>Add Condition</ButtonBordered>
 

@@ -35,6 +35,7 @@ interface ResponseChartProps {
 }
 
 function ResponseChart({ responses, chartType }: ResponseChartProps) {
+  console.log("response from chart ---->",responses)
   console.log(chartType);
   const labels = responses.map((item) => item.response_value);
   const dataValues = responses.map((item) => item.count);

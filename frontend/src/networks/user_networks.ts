@@ -17,6 +17,7 @@ import {
   get_panna_pramukh_ac_list,
   get_supervisor_collectors,
   assign_booth,
+  import_karyakartas,
 } from "@/utils/constants";
 import axios from "axios";
 
@@ -80,7 +81,7 @@ export const getAllUsers = async (params: {
   page?: number;
   limit?: number;
 }) => {
-  console.log("params from network --- >",params)
+  console.log("params from network --- >", params);
   try {
     const bearerToken = localStorage.getItem("token");
     const options = {
@@ -348,6 +349,25 @@ export const getSupervisorCollectors = async (params: any) => {
         Authorization: `Bearer ${bearerToken}`,
       },
       params,
+    };
+    const response = await axios.request(options);
+    console.log("from network--->", response);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: "Something Went Wrong", error };
+  }
+};
+export const importKaryakartas = async (params: any) => {
+  try {
+    const bearerToken = localStorage.getItem("token");
+    const options = {
+      method: "POST",
+      url: `${SERVER_URI}/${import_karyakartas}`,
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+        "Content-Type": "multipart/form-data",
+      },
+      data:params,
     };
     const response = await axios.request(options);
     console.log("from network--->", response);

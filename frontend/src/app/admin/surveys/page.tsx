@@ -50,7 +50,7 @@ function Page() {
       published: published,
       sortBy: sortSelect.includes("name") ? "name" : "createdAt",
       sortOrder: sortSelect.includes("Asc") ? "asc" : "desc",
-      page: 1, // Reset to first page when applying new filters
+      page: 1,
     }));
   };
 

@@ -95,8 +95,8 @@ function ResponseGrid({
     >
       <table className="w-full table-auto">
         <thead className="">
-          <tr className="bg-dark-gray text-white sticky top-0 left-0">
-            <td className="min-w-32 px-4 py-2 border-b text-center whitespace-nowrap sticky top-0 left-0 bg-dark-gray">
+          <tr className="bg-dark-gray text-white sticky top-0 left-0 z-50 ">
+            <td className="min-w-32 px-4 py-2 border-b text-center whitespace-nowrap sticky left-0 bg-dark-gray">
               {" "}
               Quality check status
             </td>

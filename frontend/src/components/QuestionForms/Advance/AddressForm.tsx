@@ -105,7 +105,7 @@ function AddressForm({
         defaultQuestionTitle="Address Form"
       /> */}
       {!hide && (
-        <div className="bg-blue-100 p-5 w-full">
+        <div className="bg-primary-50 p-5 w-full">
           <div
             onDrop={handleDrop}
             onDragOver={(e) => {

@@ -1,6 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 router.get("/getUser", userController.getUser);
 router.get("/getAllUsers", userController.getAllUsers);
@@ -13,19 +25,19 @@ router.get("/getSupervisorCollectors", userController.getSupervisorCollectors);
 router.post("/assignBooth", userController.assignBoothToUsers);
 router.get("/getAssignedBooth", userController.getAssignedAcBooths);
 
-
 // karyakarta
+router.post("/importKaryakartas",upload.single("file"),userController.importKaryakartas)
 router.post("/createKaryakarta", userController.createKaryakarta);
 router.post("/updateKaryakarta", userController.updateKaryakarta);
 router.get("/getAllKaryakarta", userController.getAllKaryakarta);
 router.get("/getKaryakarta", userController.getKaryakarta);
 router.get("/getPannaPramukh", userController.getPannaPramukh);
 router.get("/getBoothAdhyaksh", userController.getBoothAdhyaksh);
-router.post('/updateMultipleKaryakarta',userController.updateMultipleKaryakarta)
-router.post('/getUsersByAcList',userController.getUsersByAcList)
-
-
-
+router.post(
+  "/updateMultipleKaryakarta",
+  userController.updateMultipleKaryakarta
+);
+router.post("/getUsersByAcList", userController.getUsersByAcList);
 
 // notification settings
 router.post("/saveToken", userController.saveToken);
