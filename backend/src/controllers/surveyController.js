@@ -23,7 +23,7 @@ exports.saveSurvey = async (req, res) => {
       background_location_capture,
       thank_time_duration,
       questions,
-      response_count
+      response_count,
     } = req.body;
 
     console.log("body is----->", req.body);
@@ -47,7 +47,7 @@ exports.saveSurvey = async (req, res) => {
       ac_list,
       background_location_capture,
       thank_time_duration,
-      imported:imported || false,
+      imported: imported || false,
       response_count: response_count || 0,
     });
     if (questions && Array.isArray(questions) && questions.length > 0) {
@@ -80,7 +80,7 @@ exports.deleteSurvey = async (req, res) => {
     // Delete associated responses manually
     await Responses.deleteMany({ survey_id: id });
     await Data.deleteMany({ survey_id: id });
-    await Family.deleteMany({survey_id: id});
+    await Family.deleteMany({ survey_id: id });
 
     // Update users
     await User.updateMany(
@@ -92,8 +92,6 @@ exports.deleteSurvey = async (req, res) => {
         },
       }
     );
-
-
 
     return res
       .status(200)
@@ -160,7 +158,7 @@ exports.getAllSurvey = async (req, res) => {
       published,
       user_id,
     } = req.query;
-    console.log("query is ---->",req.query);
+    console.log("query is ---->", req.query);
 
     const order = sortOrder === "asc" ? 1 : -1;
     const skip = (page - 1) * limit;
@@ -188,7 +186,7 @@ exports.getAllSurvey = async (req, res) => {
 
     const findOptions =
       searchConditions.length > 0 ? { $and: searchConditions } : {};
-      console.log("find options are --->",findOptions)
+    console.log("find options are --->", findOptions);
     const total = await Survey.countDocuments(findOptions);
     const surveys = await Survey.find(findOptions)
       .skip(skip)
@@ -196,8 +194,7 @@ exports.getAllSurvey = async (req, res) => {
       .sort(sortOptions)
       .collation({ locale: "en", strength: 2 });
 
-
-    console.log("surveys =--->",surveys);
+    console.log("surveys =--->", surveys);
     if (surveys.length === 0) {
       return res
         .status(404)
@@ -313,7 +310,6 @@ exports.getSurveysByAcAndBooth = async (req, res) => {
   }
 };
 
-
 exports.updateSurvey = async (req, res) => {
   try {
     const id = req.query._id;
@@ -326,8 +322,9 @@ exports.updateSurvey = async (req, res) => {
       thank_time_duration,
       published,
       response_count,
+      sampling,
     } = req.body;
-
+    console.log("body is --->",req.body)
     let updateFields = {};
 
     if (name !== undefined && name !== null) updateFields.name = name;
@@ -348,6 +345,9 @@ exports.updateSurvey = async (req, res) => {
       updateFields.published = published;
     if (response_count !== undefined && response_count !== null)
       updateFields.response_count = response_count;
+    if (sampling !== undefined && sampling !== null) {
+      updateFields.sampling = sampling;
+    }
 
     if (req.files && req.files.welcome_image) {
       console.log("Welcome image found");
@@ -371,12 +371,10 @@ exports.updateSurvey = async (req, res) => {
     } else {
       console.log("No changes to thankyou image");
     }
-
-    const result = await Survey.findOneAndUpdate(
-      { _id: id},
-      updateFields,
-      { new: true }
-    );
+    console.log("id is --->",id)
+    const result = await Survey.findOneAndUpdate({ _id: id }, updateFields, {
+      new: true,
+    });
 
     if (!result) {
       return res

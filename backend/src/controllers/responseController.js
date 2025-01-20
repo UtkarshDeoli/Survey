@@ -330,7 +330,7 @@ exports.getAllResponses = async (req, res) => {
       page = 1,
       limit = 4,
     } = req.query;
-    console.log("query is------>", req.query);
+    // console.log("query is------>", req.query);
     const selectedSurvey = await Survey.findById(surveyId);
     const question_type_map = {};
     selectedSurvey.questions.forEach((surv) => {
@@ -338,12 +338,12 @@ exports.getAllResponses = async (req, res) => {
       const val = surv.type;
       question_type_map[key] = val;
     });
-    console.log("quesyion map ----->", question_type_map);
+    // console.log("quesyion map ----->", question_type_map);
     const matchStage = {};
 
     matchStage.survey_id = new mongoose.Types.ObjectId(String(surveyId));
 
-    console.log("statusFilter ---------->", statusFilter);
+    // console.log("statusFilter ---------->", statusFilter);
     if (statusFilter) {
       matchStage.status = statusFilter;
     }
@@ -351,13 +351,16 @@ exports.getAllResponses = async (req, res) => {
     console.log("user id ---------->", userId);
     if (userId) {
       const userData = await User.findById(userId).populate("role");
+      console.log("userData is --->",userData)
       let isNotCollector = false;
       userData.role.forEach((role) => {
         if (
           role.name === "District President" ||
           role.name === "Shakti Kendra" ||
-          role.name === "Booth Adhyaksh"
+          role.name === "Booth Adhyaksh" ||
+          role.name === "Quality Check"
         ) {
+          console.log("not a collector");
           isNotCollector = true;
         }
       });
@@ -409,7 +412,7 @@ exports.getAllResponses = async (req, res) => {
       };
     }
     const responseFilters = [];
-    console.log("filters are-->", filters);
+    // console.log("filters are-->", filters);
     if (filters) {
       filters.forEach(({ question, operator, response: answer }) => {
         const filter = {
@@ -478,8 +481,8 @@ exports.getAllResponses = async (req, res) => {
         responseFilters.push(filter);
       });
     }
-    console.log("respons filters: " + JSON.stringify(responseFilters, null, 2));
-    if (responseFilters) console.log("respons filters: " + responseFilters[0]);
+    // console.log("respons filters: " + JSON.stringify(responseFilters, null, 2));
+    // if (responseFilters) console.log("respons filters: " + responseFilters[0]);
 
     const aggregationPipeline = [
       { $match: matchStage },

@@ -4,12 +4,12 @@ import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
 import { Suspense, useEffect, useState } from "react";
-import { downloadResponses, getSurveyResponses } from "@/networks/response_networks";
-import { useSearchParams } from "next/navigation";
 import {
-  getAllUsers,
-  getPannaPramukhByAcList,
-} from "@/networks/user_networks";
+  downloadResponses,
+  getSurveyResponses,
+} from "@/networks/response_networks";
+import { useSearchParams } from "next/navigation";
+import { getAllUsers, getPannaPramukhByAcList } from "@/networks/user_networks";
 
 import { useRouter } from "next/navigation"; // For routing
 import toast from "react-hot-toast";
@@ -23,7 +23,7 @@ import AssignPannaPramukhModal from "@/components/survey-responses/AssignPannaPr
 import Image from "next/image";
 import survey_analytics_calender from "/public/images/calendar_new.png";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import { surveyCollectorId } from "@/utils/constants";
+import { qualityCheckId, surveyCollectorId } from "@/utils/constants";
 import useUser from "@/hooks/useUser";
 import ResponseGrid from "@/components/qualityCheck/ResponseGrid";
 import QualityResponseModal from "@/components/survey-responses/QualityResponseModal";
@@ -62,17 +62,17 @@ function Page() {
 
   //  pagination
   const [totalResponsePages, setTotalResponsePages] = useState<number>(1);
-  const [pageLimit,setPageLimit] = useState<number>(10)
-  const [page,setPage] = useState<number>(1)
+  const [pageLimit, setPageLimit] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
 
   // downloading
-  const [downloading,setDownloading] = useState<boolean>(false)
-  const [acList,setAcList] = useState<any>([]);
-
+  const [downloading, setDownloading] = useState<boolean>(false);
+  const [acList, setAcList] = useState<any>([]);
   
 
   const searchParams = useSearchParams();
-  const userData = useUser()
+  const userData = useUser();
+  console.log(userData)
   const surveyId = searchParams.get("survey_id");
   const router = useRouter();
   const { isLoaded } = useJsApiLoader({
@@ -81,16 +81,17 @@ function Page() {
   });
   useEffect(() => {
     getQuestions();
-    getUserResponses();
+    if(userData){
+      getUserResponses();
+    }
     getUsers();
-  }, [reset,page,pageLimit]);
-
+  }, [reset, page, pageLimit,userData]);
 
   useEffect(() => {
-    if(acList.length > 0){
+    if (acList.length > 0) {
       handleGetPannaPramukh();
     }
-  }, [userSearch,acList]);
+  }, [userSearch, acList]);
 
   async function getUserResponses() {
     let nStartDate, nEndDate;
@@ -104,10 +105,10 @@ function Page() {
       surveyId,
       startDate: nStartDate,
       endDate: nEndDate,
-      userId,
+      userId:userData.id,
       filters: appliedFilters,
-      limit:pageLimit,
-      page
+      limit: pageLimit,
+      page,
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
@@ -127,29 +128,29 @@ function Page() {
 
   async function getQuestions() {
     const response = await getSurvey({ _id: surveyId });
-    console.log("current survey-->",response);
-    if(response.success){
-      console.log("setting ac_list",response.data.ac_list)
+    console.log("current survey-->", response);
+    if (response.success) {
+      console.log("setting ac_list", response.data.ac_list);
       setAcList(response.data.ac_list);
       const questions = response.data.questions.map((el: any) => el);
       setSurveyQuestions(questions);
-    }else{
-      toast.error("Error fetching the survey!")
+    } else {
+      toast.error("Error fetching the survey!");
     }
   }
 
   async function getUsers() {
     setLoading(true);
-    const response = await getAllUsers({selectedRole:surveyCollectorId});
+    const response = await getAllUsers({ selectedRole: surveyCollectorId });
     console.log("users-------->", response.data);
     setUsers(response.data);
     setLoading(false);
   }
   async function handleGetPannaPramukh() {
     setLoading(true);
-    console.log("ac list is coming  --->",acList)
+    console.log("ac list is coming  --->", acList);
     const response = await getPannaPramukhByAcList({
-      ac_list:acList,
+      ac_list: acList,
       filter: userSearch,
     });
     console.log("panna below-------->", response);
@@ -193,30 +194,29 @@ function Page() {
         endDate: nEndDate,
         userId,
         filters: appliedFilters,
-        download:true
+        download: true,
       };
-      let filename= "response.xlsx"
-      const response:any = await downloadResponses(params);
-    
+      let filename = "response.xlsx";
+      const response: any = await downloadResponses(params);
+
       const contentDisposition = response.headers["content-disposition"];
-      console.log("header ======>",contentDisposition);
-      const file= contentDisposition.split('filename=')[1].replace(/"/g, ''); 
-      if(file) filename=file
-      
+      console.log("header ======>", contentDisposition);
+      const file = contentDisposition.split("filename=")[1].replace(/"/g, "");
+      if (file) filename = file;
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", filename); 
+      link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       toast.error("Failed to export to Excel");
-    }finally{
+    } finally {
       setDownloading(false);
     }
   };
-  
 
   const options = users?.map((user) => ({
     value: user._id,
@@ -229,11 +229,11 @@ function Page() {
   };
 
   const handleNextPage = () => {
-   setPage(page+1)
+    setPage(page + 1);
   };
 
   const handlePreviousPage = () => {
-   setPage(page-1)
+    setPage(page - 1);
   };
 
   return (
@@ -253,7 +253,7 @@ function Page() {
           />
           <div className="flex space-x-2 text-black text-base font-semibold">
             <ButtonFilled
-              loading={downloading} 
+              loading={downloading}
               onClick={exportToExcel}
               className="rounded-[20px] h-fit px-4 py-2 w-44 justify-center"
             >
@@ -304,8 +304,7 @@ function Page() {
             </div>
 
             <div className="flex gap-5 items-center">
-              {/* Selected User */}
-              <div className="flex flex-col space-y-2 w-[352px]">
+              {/* <div className="flex flex-col space-y-2 w-[352px]">
                 <Select
                   value={options.find((option) => option.value === userId)}
                   onChange={(selectedOption) =>
@@ -316,7 +315,7 @@ function Page() {
                   classNamePrefix="react-select"
                   isSearchable={true} // Enables search
                 />
-              </div>
+              </div> */}
 
               {/* Action Buttons */}
               <div className="flex space-x-4">
@@ -373,7 +372,7 @@ function Page() {
           setAssignedMode={setAssignMode}
           getUserResponses={getUserResponses}
           setSelectedPanna={setSelectedPanna}
-          update={()=>setReset(!reset)}
+          update={() => setReset(!reset)}
         />
       ) : (
         !loading && (
@@ -382,51 +381,49 @@ function Page() {
           </div>
         )
       )}
-       {/* Pagination Controls */}
-       {
-        !loading && (
-          <div className="flex gap-3 items-center my-4 ml-3">
-            {/* Limit Select */}
-            <div>
-              <label htmlFor="limit-select" className="mr-2">
-                Show:
-              </label>
-              <select
-                id="limit-select"
-                value={pageLimit}
-                onChange={handleLimitChange}
-                className="p-2 border rounded-md"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-
-            {/* Navigation Arrows */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handlePreviousPage}
-                disabled={page === 1}
-                className="p-2 border rounded-md disabled:opacity-50"
-              >
-                <IoIosArrowBack />
-              </button>
-              <span>
-                Page {page} of {totalResponsePages}
-              </span>
-              <button
-                onClick={handleNextPage}
-                disabled={page === totalResponsePages}
-                className="p-2 border rounded-md disabled:opacity-50"
-              >
-                <IoIosArrowForward />
-              </button>
-            </div>
+      {/* Pagination Controls */}
+      {!loading && (
+        <div className="flex gap-3 items-center my-4 ml-3">
+          {/* Limit Select */}
+          <div>
+            <label htmlFor="limit-select" className="mr-2">
+              Show:
+            </label>
+            <select
+              id="limit-select"
+              value={pageLimit}
+              onChange={handleLimitChange}
+              className="p-2 border rounded-md"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
           </div>
-        )
-       }
+
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowBack />
+            </button>
+            <span>
+              Page {page} of {totalResponsePages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalResponsePages}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Custom Modal for Data Filter */}
       <DataFilterModal

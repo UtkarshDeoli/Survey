@@ -34,6 +34,10 @@ const surveySchema = new Schema(
       type: Boolean,
       default: false,
     },
+    sampling:{
+      type:Boolean,
+      default:false
+    },
     questions: {
       type: Schema.Types.Mixed,
       default: [],

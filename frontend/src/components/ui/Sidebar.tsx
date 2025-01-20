@@ -47,6 +47,12 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       tooltip: "Report",
     },
     {
+      icon: "/icons/sample.png",
+      name: "Survey-sampling",
+      path: "/admin/survey-sampling",
+      tooltip: "Survey-sampling",
+    },
+    {
       icon: "/images/todo.png",
       name: "To-Do list",
       path: "/admin/todos",

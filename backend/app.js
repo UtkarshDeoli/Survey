@@ -16,6 +16,7 @@ const todoRoutes = require("./src/routes/todoRoutes");
 const contactRoutes = require("./src/routes/contactRoutes");
 const dashboardRoutes = require("./src/routes/dashboardRoutes");
 const notificationsRoutes = require("./src/routes/notificationsRoutes");
+const samplingRoutes = require("./src/routes/sampleResponseRoutes");
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use("/api/todo", todoRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use("/api/sampling", samplingRoutes);
 
 app.use(express.static(path.join(__dirname, "../frontend/out/")));
 app.get("*", (req, res) =>
