@@ -110,18 +110,64 @@ exports.getFamilyResponse = async (req, res) => {
 exports.updateFamily = async (req, res) => {
   try {
     // const { family_id, house_no, last_name } = req.body;
-    const { family_id, house_no } = req.body;
+    const { survey_id, family_id, house_no, commonResponses } = req.body;
 
-    const updatedFamily = {};
-    if (house_no) updatedFamily.house_no = house_no;
     // if (last_name) updatedFamily.last_name = last_name;
 
-    const family = await Family.findByIdAndUpdate(family_id, updatedFamily, {
-      new: true,
-    });
+    // Check if house number already exists for different family
+    const existingFamily = await Family.find({ survey_id, house_no });
+    const family = await Family.findById(family_id);
 
-    if (Object.keys(updatedFamily).length > 0) {
-      await Response.updateMany({ family_id }, { $set: updatedFamily });
+    if (existingFamily.length > 0 && house_no !== family.house_no) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Family for current survey with the given house number already exists",
+      });
+    }
+
+    // Update family data
+    if (house_no) family.house_no = house_no;
+    if (commonResponses) family.common_responses = commonResponses;
+    family.save();
+
+    // If commonResponses were updated, process all related responses
+    if (commonResponses) {
+      const responses = await Response.find({ family_id });
+
+      for (const singleResponseDoc of responses) {
+        let updated = false;
+
+        if (house_no) {
+          updated = true;
+          singleResponseDoc.house_no = house_no;
+        }
+
+        if (Array.isArray(singleResponseDoc.responses)) {
+          singleResponseDoc.responses = singleResponseDoc.responses.map(
+            (responseItem) => {
+              const matchingCommonResponse = commonResponses.find(
+                (commonRes) =>
+                  commonRes.question_id === responseItem.question_id,
+              );
+
+              if (matchingCommonResponse) {
+                updated = true;
+                return {
+                  ...responseItem,
+                  response: matchingCommonResponse.response,
+                };
+              }
+              return responseItem;
+            },
+          );
+
+          // Save only if updates were made
+          if (updated) {
+            await singleResponseDoc.save();
+          }
+        }
+      }
     }
 
     res.status(200).json({ success: true, data: family });
@@ -161,5 +207,16 @@ exports.updateFamilyMemberDetails = async (req, res) => {
       success: false,
       message: "Internal server error while updating family member details",
     });
+  }
+};
+
+exports.getSingleFamily = async (req, res) => {
+  try {
+    const { family_id } = req.query;
+    const family = await Family.findById(family_id);
+    res.status(200).json({ success: true, data: family });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

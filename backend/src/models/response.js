@@ -30,7 +30,7 @@ const responseSchema = new Schema(
     phone_no: {
       type: String,
     },
-    response: {
+    responses: {
       type: Schema.Types.Mixed,
     },
     other_details: {
@@ -54,11 +54,11 @@ const responseSchema = new Schema(
     remark: {
       type: String,
     },
-    remark_list:[
+    remark_list: [
       {
         remark: { type: String, required: true },
-        date: { type: Date, default: Date.now }
-      }
+        date: { type: Date, default: Date.now },
+      },
     ],
     call_recording: {
       type: Schema.Types.ObjectId,
@@ -69,10 +69,12 @@ const responseSchema = new Schema(
       enum: ["Approved", "Rejected", "Pending"],
       default: "Pending",
     },
-    quality_check_remarks:[{
-      note: { type: String, required: true },
-      date: { type: Date, default: Date.now }
-    }]
+    quality_check_remarks: [
+      {
+        note: { type: String, required: true },
+        date: { type: Date, default: Date.now },
+      },
+    ],
   },
   { strict: false, timestamps: true },
 );
