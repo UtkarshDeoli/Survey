@@ -148,7 +148,8 @@ exports.assignResponsesToCollector = async (req, res) => {
 };
 
 exports.getSampleResponses = async (req, res) => {
-  const { surveyId, groupId, userId } = req.query;
+  const { surveyId, groupId, userId, page = 1, limit = 10 } = req.query;
+  console.log("query is -->", req.query);
 
   // Validate the surveyId
   if (!surveyId) {
@@ -171,7 +172,7 @@ exports.getSampleResponses = async (req, res) => {
         .sort({ group_id: -1 }) // Sort to get the latest group
         .select("group_id sampling_method sampling_size user_id") // Fetch additional details
         .populate("user_id"); // Populate user_id to get the collector's name
-      console.log("latest group --->",latestGroup)
+
       if (latestGroup) {
         filterQuery.group_id = latestGroup.group_id;
         selectedGroupId = latestGroup.group_id;
@@ -205,10 +206,20 @@ exports.getSampleResponses = async (req, res) => {
       filterQuery.user_id = userId;
     }
 
-    // Fetch filtered sample responses
+    // Convert page and limit to integers and calculate skip
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Fetch total count of responses for the filters
+    const totalResponses = await SampleResponse.countDocuments(filterQuery);
+
+    // Fetch filtered sample responses with pagination
     const sampleResponses = await SampleResponse.find(filterQuery)
       .populate("response_id") // Populate the response details
       .populate("user_id") // Populate user_id to get the collector's name for each response
+      .skip(skip) // Skip records for pagination
+      .limit(limitNum) // Limit the number of records
       .lean(); // Convert the data to plain JavaScript objects for easier manipulation
 
     return res.status(200).json({
@@ -217,6 +228,11 @@ exports.getSampleResponses = async (req, res) => {
       data: sampleResponses,
       group_id: selectedGroupId,
       group_details: selectedGroupDetails, // Include sampling method and sample size
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalResponses / limitNum),
+        totalResponses,
+      },
     });
   } catch (error) {
     console.error("Error filtering sample responses:", error);
@@ -232,13 +248,37 @@ exports.getSampleResponses = async (req, res) => {
 exports.getSampleSurveys = async (req, res) => {
   try {
     console.log("route hitting");
-    const { name } = req.query;
+    const { name, page = 1, limit = 10 } = req.query; 
     const filters = { sampling: true };
+
+    // Apply name filter if provided
     if (name) filters.name = { $regex: name, $options: "i" };
+
     console.log("filters", filters);
-    const sampleSurveys = await Survey.find(filters);
+
+    // Convert page and limit to integers and calculate skip
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Query the database with filters, skip, and limit
+    const sampleSurveys = await Survey.find(filters).skip(skip).limit(limitNum);
+
+    // Get total count of documents for the filters
+    const totalSurveys = await Survey.countDocuments(filters);
+
     console.log(sampleSurveys);
-    return res.status(200).json({ success: true, data: sampleSurveys });
+
+    // Return paginated data along with metadata
+    return res.status(200).json({
+      success: true,
+      data: sampleSurveys,
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalSurveys / limitNum),
+        totalSurveys,
+      },
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({
@@ -247,6 +287,7 @@ exports.getSampleSurveys = async (req, res) => {
     });
   }
 };
+
 exports.getGroupsWithSurveyCollectors = async (req, res) => {
   const { survey_id, user_id } = req.query; // Assuming survey_id and user_id are passed as query parameters
 
@@ -300,3 +341,24 @@ exports.getGroupsWithSurveyCollectors = async (req, res) => {
     return res.status(500).json({ message: "Server error", error });
   }
 };
+
+exports.deleteSampling = async (req, res) => {
+  const { surveyId, groupId , mode } = req.body;
+  try{
+    if(mode === "survey"){
+      const survey = await Survey.findById(surveyId);
+      if(!survey){
+        return res.status(404).json({ success:false, message: "Survey not found" });
+      }
+      survey.sampling = false
+      await survey.save();
+      await SampleResponse.deleteMany({ survey_id: surveyId });
+      return res.status(200).json({success:true,message:"Sample survey deleted!"})
+    }else if(mode === "group"){
+      await SampleResponse.deleteMany({ survey_id: surveyId, group_id: groupId });
+      return res.status(200).json({success:true,message:"Sample group deleted!"})
+    }
+  }catch(error){
+    return res.status(500).json({ success:false,message: "Server error", error });
+  }
+}

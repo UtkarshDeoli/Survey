@@ -83,7 +83,7 @@ function SampleResponses({
                 key={rowIndex}
               >
                 <td className="min-w-32 px-4 py-4 border-b h-full sticky left-0 bg-white w-full text-center">
-                  status
+                  <p className={`font-bold ${response.status === "Pending" ? "text-amber-400" : response.status === "Approved" ? "text-green-600" :"text-red-500"}`}>{response.status}</p>
                 </td>
                 <td className="min-w-32 px-4 py-4 border-b text-center">
                   {response.quality_check_remarks

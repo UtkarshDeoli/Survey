@@ -9,6 +9,7 @@ import ButtonFilled from "../ui/buttons/ButtonFilled";
 import { IoIosAddCircle } from "react-icons/io";
 import ChooseSurveyModal from "./ChooseSurveyModal";
 import { useRouter } from "next/navigation";
+import Pagination from "../ui/pagination/Pagination";
 
 function AllSampleSurveys() {
   // states
@@ -16,7 +17,10 @@ function AllSampleSurveys() {
   const [loading, setLoading] = useState<boolean>(false);
   const [chooseSurveyModal, setChooseSurveyModal] = useState<boolean>(false);
   const [refetch, setRefetch] = useState<boolean>(false);
-  const router = useRouter()
+  const [page, setPage] = useState<number>(1);
+  const [pageLimit, setPageLimit] = useState<number>(10);
+  const [totalResponsePages, setTotalResponsePages] = useState<number>(0);
+  const router = useRouter();
 
   //   event handlers
   const handleChooseSurvey = () => {
@@ -26,9 +30,12 @@ function AllSampleSurveys() {
   //   api calls
   async function fetchSampleSurveys() {
     setLoading(true);
-    const response = await getSampleSurveys({});
+    const response = await getSampleSurveys({page, limit: pageLimit });
     if (response.success) {
       setSampleSurveys(response.data);
+      setPage(response.pagination.currentPage);
+      setPageLimit(response.pagination.limit);
+      setTotalResponsePages(response.pagination.totalPages);
     } else {
       toast.error("Error fetching sample surveys");
     }
@@ -36,11 +43,11 @@ function AllSampleSurveys() {
   }
   useEffect(() => {
     fetchSampleSurveys();
-  }, [refetch]);
+  }, [refetch, page, pageLimit]);
 
   return (
     <div
-      className={`w-[96%] mt-1 mx-auto text-sm py-5 overflow-y-auto vertical-scrollbar`}
+      className={`w-[96%] mt-1 mx-auto text-sm py-5 flex flex-col overflow-y-auto vertical-scrollbar`}
     >
       {/* navabr */}
       {sampleSurveys && sampleSurveys.length > 0 && (
@@ -54,6 +61,9 @@ function AllSampleSurveys() {
           </ButtonFilled>
         </div>
       )}
+      {loading && (
+        <Loader className="h-[40vh] w-full flex justify-center items-center text-primary-300" />
+      )}
       {/* surveys */}
       {sampleSurveys && sampleSurveys.length > 0 && (
         <div className="sticky top-0 z-10 grid grid-cols-6 text-white font-semibold bg-dark-gray px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
@@ -62,15 +72,16 @@ function AllSampleSurveys() {
           <p className="col-span-2">Date created</p>
         </div>
       )}
-      {loading && (
-        <Loader className="h-[40vh] w-full flex justify-center items-center text-primary-300" />
-      )}
       {!loading && sampleSurveys && sampleSurveys.length > 0
         ? sampleSurveys.map((el: any, index: number) => (
             <div
-              onClick={()=>{router.push(`/admin/survey-sampling/samples?survey_id=${el._id}`)}}
+              onClick={() => {
+                router.push(
+                  `/admin/survey-sampling/samples?survey_id=${el._id}`
+                );
+              }}
               key={index}
-              className="cursor-pointer grid grid-cols-6 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-mid-gray"
+              className="cursor-pointer grid grid-cols-6 px-8 py-6 border-l border-r border-b border-secondary-200 w-full bg-mid-gray"
             >
               <p className="col-span-2 cursor-pointer font-semibold">
                 {el.name}
@@ -91,6 +102,14 @@ function AllSampleSurveys() {
               </ButtonFilled>
             </div>
           )}
+
+      <Pagination
+        page={page}
+        pageLimit={pageLimit}
+        setPage={setPage}
+        setPageLimit={setPageLimit}
+        totalResponsePages={totalResponsePages}
+      />
       <ChooseSurveyModal
         refetch={() => setRefetch(!refetch)}
         open={chooseSurveyModal}
