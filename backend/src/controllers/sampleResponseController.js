@@ -162,8 +162,43 @@ exports.getSampleResponses = async (req, res) => {
     // Build the query based on the provided filters
     const filterQuery = { survey_id: surveyId };
 
-    if (groupId) {
+    let selectedGroupId = groupId; // Track the groupId to send in the response
+    let selectedGroupDetails = null; // To store additional details like sampling method and sample size
+
+    // If no groupId is provided, find the latest groupId for the survey
+    if (!groupId) {
+      const latestGroup = await SampleResponse.findOne({ survey_id: surveyId })
+        .sort({ group_id: -1 }) // Sort to get the latest group
+        .select("group_id sampling_method sampling_size user_id") // Fetch additional details
+        .populate("user_id"); // Populate user_id to get the collector's name
+      console.log("latest group --->",latestGroup)
+      if (latestGroup) {
+        filterQuery.group_id = latestGroup.group_id;
+        selectedGroupId = latestGroup.group_id;
+        selectedGroupDetails = {
+          sampling_method: latestGroup.sampling_method,
+          sample_size: latestGroup.sampling_size,
+          collector_name: latestGroup.user_id?.name || "Unknown Collector",
+        };
+      }
+    } else {
       filterQuery.group_id = groupId;
+
+      // Fetch group details if groupId is provided
+      const selectedGroup = await SampleResponse.findOne({
+        survey_id: surveyId,
+        group_id: groupId,
+      })
+        .select("sampling_method sampling_size user_id")
+        .populate("user_id");
+
+      if (selectedGroup) {
+        selectedGroupDetails = {
+          sampling_method: selectedGroup.sampling_method,
+          sample_size: selectedGroup.sampling_size,
+          collector_name: selectedGroup.user_id?.name || "Unknown Collector",
+        };
+      }
     }
 
     if (userId) {
@@ -171,14 +206,17 @@ exports.getSampleResponses = async (req, res) => {
     }
 
     // Fetch filtered sample responses
-    const sampleResponses = await SampleResponse.find(filterQuery).populate(
-      "response_id"
-    );
+    const sampleResponses = await SampleResponse.find(filterQuery)
+      .populate("response_id") // Populate the response details
+      .populate("user_id") // Populate user_id to get the collector's name for each response
+      .lean(); // Convert the data to plain JavaScript objects for easier manipulation
 
     return res.status(200).json({
       success: true,
       message: "Filtered sample responses fetched successfully",
       data: sampleResponses,
+      group_id: selectedGroupId,
+      group_details: selectedGroupDetails, // Include sampling method and sample size
     });
   } catch (error) {
     console.error("Error filtering sample responses:", error);
@@ -188,6 +226,8 @@ exports.getSampleResponses = async (req, res) => {
     });
   }
 };
+
+
 
 exports.getSampleSurveys = async (req, res) => {
   try {
@@ -208,17 +248,25 @@ exports.getSampleSurveys = async (req, res) => {
   }
 };
 exports.getGroupsWithSurveyCollectors = async (req, res) => {
-  const { survey_id } = req.query; // Assuming survey_id is passed as a query parameter
+  const { survey_id, user_id } = req.query; // Assuming survey_id and user_id are passed as query parameters
 
   if (!survey_id) {
     return res.status(400).json({ message: "Survey ID is required" });
   }
+
   try {
+    const matchStage = {
+      survey_id: new mongoose.Types.ObjectId(String(survey_id)), // Match the specified survey_id
+    };
+
+    // Include user_id in the match condition if it's provided
+    if (user_id) {
+      matchStage.user_id = new mongoose.Types.ObjectId(String(user_id));
+    }
+
     const groupsWithCollectors = await SampleResponse.aggregate([
       {
-        $match: {
-          survey_id: new mongoose.Types.ObjectId(String(survey_id)), // Match the specified survey_id
-        },
+        $match: matchStage,
       },
       {
         $lookup: {
@@ -246,7 +294,7 @@ exports.getGroupsWithSurveyCollectors = async (req, res) => {
       },
     ]);
 
-    return res.status(200).json({success:true,data:groupsWithCollectors});
+    return res.status(200).json({ success: true, data: groupsWithCollectors });
   } catch (error) {
     console.error("Error fetching groups with survey collectors:", error);
     return res.status(500).json({ message: "Server error", error });
