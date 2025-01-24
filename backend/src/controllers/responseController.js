@@ -1408,3 +1408,32 @@ exports.saveContactedStatus = async (req, res) => {
     return res.status(400).json({ success: "false", message: error.message });
   }
 };
+
+
+exports.saveCallRating = async (req, res) => {
+  try {
+    const { response_id, rating, comment } = req.body;
+    if ( !rating || !response_id) {
+      return res.status(400).json({ success: false, message: "Bad Request" });
+    }
+    const responseToUpdate = {
+      call_rating: {
+        rating,
+        comment
+      },
+    };
+    const updatedResponse = await Responses.findByIdAndUpdate(
+      response_id,
+      responseToUpdate,
+      {
+        new: true,
+      },
+    );
+    console.log("updatedResponse Call Rating");
+
+    return res.status(201).json({ success: true, message: "Call rating saved successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};

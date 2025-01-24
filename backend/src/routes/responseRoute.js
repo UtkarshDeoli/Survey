@@ -52,5 +52,6 @@ router.post("/saveVoteStatus", responseController.saveVoteStatus);
 router.post("/saveContactedStatus", responseController.saveContactedStatus);
 router.post("/saveRemark", responseController.saveRemark);
 router.post("/saveQualityRemark", responseController.saveQualityRemark);
+router.post("/saveCallRating", responseController.saveCallRating);
 
 module.exports = router;
