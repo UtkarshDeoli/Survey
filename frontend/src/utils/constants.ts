@@ -76,6 +76,7 @@ export const create_sampling = "api/sampling/assign-sample-responses"
 export const get_sampling = "api/sampling/sample-responses"
 export const get_sample_surveys = "api/sampling/sample-surveys"
 export const get_sample_groups = "api/sampling/groups"
+export const delete_sampling = "api/sampling/delete"
 
 
 // variables

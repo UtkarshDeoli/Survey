@@ -1,6 +1,6 @@
 "use client";
 
-import { getSampling } from "@/networks/sampling_networks";
+import { deleteSampling, getSampling } from "@/networks/sampling_networks";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
@@ -11,6 +11,9 @@ import toast from "react-hot-toast";
 import Loader from "../ui/Loader";
 import SampleResponseModal from "./SampleResponseModal";
 import FilterModal from "./FilterModal";
+import Pagination from "../ui/pagination/Pagination";
+import { MdDelete } from "react-icons/md";
+import DeleteModal from "./DeleteModal";
 
 function AllSampleResponses() {
   const [samples, setSamples] = useState<any>(null);
@@ -24,6 +27,10 @@ function AllSampleResponses() {
   const [selectedCollector, setSelectedCollector] = useState<any>(null); // Tracks the selected collector
   const [selectedGroup, setSelectedGroup] = useState<any>(null); // Tracks the selected group
   const [currentGroupId, setCurrrentGroupId] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [pageLimit, setPageLimit] = useState<number>(10);
+  const [totalResponsePages, setTotalResponsePages] = useState<number>(0);
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const params = useSearchParams();
   const surveyId = params.get("survey_id");
@@ -34,11 +41,16 @@ function AllSampleResponses() {
       surveyId,
       groupId: selectedGroup?.value,
       userId: selectedCollector?.value,
+      page,
+      limit: pageLimit || 10,
     });
     if (response.success) {
       setSamples(response.data);
       setGroupDetails(response.group_details);
       setCurrrentGroupId(response.group_id);
+      setTotalResponsePages(response.pagination.totalPages);
+      setPage(response.pagination.currentPage);
+      setPageLimit(response.pagination.limit);
     } else {
       toast.error("Error fetching samples");
     }
@@ -47,7 +59,7 @@ function AllSampleResponses() {
 
   useEffect(() => {
     fetchSamples();
-  }, [refetch]);
+  }, [refetch, page, pageLimit]);
 
   if (loading) return <Loader />;
 
@@ -60,9 +72,19 @@ function AllSampleResponses() {
         {/* filter button */}
         <div className="flex items-center gap-3">
           {hasSamples && (
-            <ButtonFilled onClick={() => setFilterModal(true)}>
-              Filter
-            </ButtonFilled>
+            <div className="flex gap-3 items-center">
+              <ButtonFilled
+                onClick={() => {
+                  setDeleteModal(true);
+                }}
+                className="bg-red-400 hover:bg-red-500 gap-3"
+              >
+                <MdDelete /> Delete
+              </ButtonFilled>
+              <ButtonFilled onClick={() => setFilterModal(true)}>
+                Filter
+              </ButtonFilled>
+            </div>
           )}
 
           <ButtonFilled
@@ -126,7 +148,15 @@ function AllSampleResponses() {
           <p>No samplings yet for this survey</p>
         </div>
       )}
-
+      {hasSamples && (
+        <Pagination
+          page={page}
+          pageLimit={pageLimit}
+          setPage={setPage}
+          setPageLimit={setPageLimit}
+          totalResponsePages={totalResponsePages}
+        />
+      )}
       <AddSampleModal
         surveyId={surveyId}
         open={addSampleModal}
@@ -147,6 +177,14 @@ function AllSampleResponses() {
         closeModal={() => setFilterModal(false)}
         refetch={() => setRefetch(!refetch)}
         surveyId={surveyId}
+      />
+      <DeleteModal
+        closeModal={() => setDeleteModal(false)}
+        currentGroupId={currentGroupId}
+        open={deleteModal}
+        surveyId={surveyId || ""}
+        refetch={() => setRefetch(!refetch)}
+        setSelectedGroup={setSelectedGroup}
       />
     </div>
   );

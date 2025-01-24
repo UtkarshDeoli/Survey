@@ -1,4 +1,4 @@
-import { SERVER_URI, create_sampling,get_sample_groups,get_sample_surveys,get_sampling } from "@/utils/constants";
+import { SERVER_URI, create_sampling,delete_sampling,get_sample_groups,get_sample_surveys,get_sampling } from "@/utils/constants";
 import axios from "axios";
 
 export const createSampling = async (params: any) => {
@@ -6,6 +6,23 @@ export const createSampling = async (params: any) => {
       const options = {
         method: "POST",
         url: `${SERVER_URI}/${create_sampling}`,
+        headers:{
+          "Content-Type": "application/json"
+        },
+        data: params,
+      };
+      const response = await axios.request(options);
+      console.log(response)
+      return response.data;
+    } catch (error) {
+      return { success: false, message: "Something Went Wrong", error };
+    }
+  };
+export const deleteSampling = async (params: any) => {
+    try {
+      const options = {
+        method: "POST",
+        url: `${SERVER_URI}/${delete_sampling}`,
         headers:{
           "Content-Type": "application/json"
         },

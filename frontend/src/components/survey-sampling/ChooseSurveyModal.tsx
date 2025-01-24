@@ -95,15 +95,16 @@ function ChooseSurveyModal({
                 surveys.map((survey) => (
                   <label
                     key={survey._id}
-                    className="flex items-center gap-2 cursor-pointer"
+                    className={`flex items-center gap-2  ${survey.sampling ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                   >
                     <input
+                      disabled={survey.sampling}
                       type="radio"
                       name="survey"
                       value={survey._id}
                       checked={selectedSurvey === survey._id}
                       onChange={() => handleSurveySelection(survey._id)}
-                      className="cursor-pointer appearance-none w-4 h-4 border-2 border-primary-300 checked:bg-primary-100 checked:text-white rounded-full"
+                      className="cursor-pointer disabled:cursor-not-allowed text-gray-400 appearance-none w-4 h-4 border-2 border-primary-300 checked:bg-primary-100 checked:text-white rounded-full"
                     />
                     {survey.name}
                   </label>
