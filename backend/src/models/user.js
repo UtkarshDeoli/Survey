@@ -112,6 +112,12 @@ const userSchema = new Schema(
         type: Date,
       },
     },
+    assigned_sample_surveys: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Survey99",
+      },
+    ],
   },
   { timestamps: true },
 );

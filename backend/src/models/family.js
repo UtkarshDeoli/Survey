@@ -34,6 +34,7 @@ const familySchema = new Schema(
         question: String,
         question_id: Number,
         question_type: String,
+        other_response: String,
       },
     ],
   },
