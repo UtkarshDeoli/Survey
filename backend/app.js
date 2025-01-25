@@ -17,7 +17,7 @@ const contactRoutes = require("./src/routes/contactRoutes");
 const dashboardRoutes = require("./src/routes/dashboardRoutes");
 const notificationsRoutes = require("./src/routes/notificationsRoutes");
 const samplingRoutes = require("./src/routes/sampleResponseRoutes");
-
+const callRatingRouter = require("./src/routes/callRatingRoutes")
 const app = express();
 
 if (process.env.NODE_ENV === "development") {
@@ -43,6 +43,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/sampling", samplingRoutes);
+app.use("/api/call-rating",callRatingRouter)
 
 app.use(express.static(path.join(__dirname, "../frontend/out/")));
 app.get("*", (req, res) =>
