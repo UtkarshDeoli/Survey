@@ -351,14 +351,16 @@ exports.getAllResponses = async (req, res) => {
     console.log("user id ---------->", userId);
     if (userId) {
       const userData = await User.findById(userId).populate("role");
-      console.log("userData is --->",userData)
+      console.log("userData is --->", userData);
       let isNotCollector = false;
       userData.role.forEach((role) => {
         if (
           role.name === "District President" ||
           role.name === "Shakti Kendra" ||
           role.name === "Booth Adhyaksh" ||
-          role.name === "Quality Check"
+          role.name === "Quality Check" ||
+          role.name === "VRM Voter Relationship Executive" ||
+          role.name === "VRM Team Manager"
         ) {
           console.log("not a collector");
           isNotCollector = true;
@@ -1119,7 +1121,7 @@ exports.updateResponse = async (req, res) => {
       if (alreadyExists) {
         updateFields.family_id = alreadyExists._id;
 
-         const commonResponseMap = new Map(
+        const commonResponseMap = new Map(
           alreadyExists.common_responses.map((response) => [
             response.question_id,
             response,
@@ -1132,9 +1134,8 @@ exports.updateResponse = async (req, res) => {
           }
           return response;
         });
-
       } else {
-         let commonResponses = [];
+        let commonResponses = [];
 
         //console.log("responseToSave", parsedResponses);
         responses.map((response) => {
@@ -1142,7 +1143,6 @@ exports.updateResponse = async (req, res) => {
             commonResponses.push(response);
           }
         });
-
 
         const newFamily = await Family.create({
           survey_id,
@@ -1409,31 +1409,3 @@ exports.saveContactedStatus = async (req, res) => {
   }
 };
 
-
-exports.saveCallRating = async (req, res) => {
-  try {
-    const { response_id, rating, comment } = req.body;
-    if ( !rating || !response_id) {
-      return res.status(400).json({ success: false, message: "Bad Request" });
-    }
-    const responseToUpdate = {
-      call_rating: {
-        rating,
-        comment
-      },
-    };
-    const updatedResponse = await Responses.findByIdAndUpdate(
-      response_id,
-      responseToUpdate,
-      {
-        new: true,
-      },
-    );
-    console.log("updatedResponse Call Rating");
-
-    return res.status(201).json({ success: true, message: "Call rating saved successfully" });
-  } catch (error) {
-    console.error(error);
-    return res.status(400).json({ success: false, message: error.message });
-  }
-};
