@@ -78,39 +78,52 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name !== "Karyakarta" && item.name !== "Users"
       );
-    } else if(roleName.includes("Supervisor")){
-      SidebarScreens.push( {
+    } else if (roleName.includes("Supervisor")) {
+      SidebarScreens.push({
         icon: "/images/karyakarta.png",
         name: "Collectors",
         path: "/admin/collectors",
         tooltip: "Collectors",
-      },)
+      });
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name === "Collectors"
       );
-    } else if(roleName.includes("Survey Manager")){
+    } else if (roleName.includes("Survey Manager")) {
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name === "Surveys"
       );
-    }else if(roleName.includes("Quality Check")){
-      SidebarScreens.push( {
+    } else if (roleName.includes("Quality Check")) {
+      SidebarScreens.push({
         icon: "/images/karyakarta.png",
         name: "All surveys",
         path: "/admin/quality-check-surveys",
         tooltip: "All surveys",
-      },)
+      });
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name === "All surveys"
       );
-    } else if(roleName.includes("Data Analyst") || roleName.includes("Data Manager")){
+    } else if (
+      roleName.includes("Data Analyst") ||
+      roleName.includes("Data Manager")
+    ) {
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name === "Data"
       );
-    } else if(roleName.includes("Support Executive")){
+    } else if (roleName.includes("Support Executive")) {
       SidebarScreens = SidebarScreens.filter(
         (item: any) => item.name === "Support"
       );
-    }else {
+    } else if (roleName.includes("VRM Team Manager")) {
+      SidebarScreens = SidebarScreens.filter(
+        (item: any) => item.name === "Support"
+      );
+      SidebarScreens.push({
+        icon: "/images/dashboard.png",
+        name: "VRM Dashboard",
+        path: "/admin/vrm-dashboard",
+        tooltip: "VRM Dashboard",
+      },);
+    } else {
       SidebarScreens.push(
         {
           icon: "/images/karyakarta.png",

@@ -1,5 +1,5 @@
-export const SERVER_URI = "http://localhost:6969";
-// export const SERVER_URI = "https://survey-3uf0.onrender.com";
+// export const SERVER_URI = "http://localhost:6969";
+export const SERVER_URI = "https://survey-3uf0.onrender.com";
 
 // users
 export const get_user = "api/user/getUser";
@@ -78,6 +78,9 @@ export const get_sample_surveys = "api/sampling/sample-surveys"
 export const get_sample_groups = "api/sampling/groups"
 export const delete_sampling = "api/sampling/delete"
 
+// vrm team manager
+export const get_vrm_dashboard = "api/call-rating/dashboard"
+
 
 // variables
 export const supervisorId = "675985aaa6b36c1fa78d5517"
@@ -87,12 +90,14 @@ export const qualityCheckId = "675a92c24bbe3577d16bcb64"
 export const districtPresidentId = "67713c803e1c10c39195a9cc"
 export const shaktiKendraId = "67713c9a3e1c10c39195a9ce"
 export const boothAdhyakshId = "671f99d938863c2bfc859e7f"
+export const VREId = "6793cb217ad0c3539d615831"
 export const validRoles = [
-    "675985aaa6b36c1fa78d5517",
-    "672bbdbfbdbe172165452e7d",
-    "671f999c38863c2bfc859e7a",
-    "675a92c24bbe3577d16bcb64",
-    "675bece5305e5a3192324a7a",
-    "675bed08305e5a3192324a7c",
-    "671f999538863c2bfc859e78"
-  ];
+  'Supervisor',
+  'Panna Pramukh',
+  'Survey Manager',
+  'Quality Check',
+  'Data Analyst',
+  'Data Manager',
+  'Support Executive',
+  'VRM Team Manager'
+]

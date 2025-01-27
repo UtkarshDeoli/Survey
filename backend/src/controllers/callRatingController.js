@@ -1,4 +1,22 @@
-const CallRating = require("../models/callRating"); // Import your CallRating model
+const CallRating = require("../models/callRating");
+const moment = require("moment");
+const {
+  getBadDailyRatingCount,
+  getBadMonthlyRatingCount,
+  getBadWeeklyRatingCount,
+  getGoodDailyRatingCount,
+  getGoodMonthlyRatingCount,
+  getGoodWeeklyRatingCount,
+  getGreatDailyRatingCount,
+  getGreatMonthlyRatingCount,
+  getGreatWeeklyRatingCount,
+  getRatingCount,
+  getRecentCallRatings,
+  getTotalCallRatings,
+  overallDailyRatingCount,
+  overallMonthlyRatingCount,
+  overallWeeklyRatingCount,
+} = require("../utils/helper/call-rating");
 
 // Create a new CallRating
 exports.createCallRating = async (req, res) => {
@@ -105,5 +123,51 @@ exports.deleteCallRating = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting Call Rating", error: err.message });
+  }
+};
+
+exports.getDashboardData = async (req, res) => {
+  try {
+    // Total Call Ratings Pipeline
+    const totalCallRatingsData = await getRatingCount();
+    const recentCallRatingsData = await getRecentCallRatings();
+    const totalRatingCountData = await getTotalCallRatings();
+    const dailyOverallRatingData = await overallDailyRatingCount();
+    const weeklyOverallRatingData = await overallWeeklyRatingCount();
+    const monthlyOverallRatingData = await overallMonthlyRatingCount();
+    const dailyGoodRatingData = await getGoodDailyRatingCount();
+    const weeklyGoodRatingData = await getGoodWeeklyRatingCount();
+    const monthlyGoodRatingData = await getGoodMonthlyRatingCount();
+    const dailyBadRatingData = await getBadDailyRatingCount();
+    const weeklyBadRatingData = await getBadWeeklyRatingCount();
+    const monthlyBadRatingData = await getBadMonthlyRatingCount();
+    const dailyGreatRatingData = await getGreatDailyRatingCount();
+    const weeklyGreatRatingData = await getGreatWeeklyRatingCount();
+    const monthlyGreatRatingData = await getGreatMonthlyRatingCount();
+
+    // Return the aggregated data in one response
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalCallRatings: totalCallRatingsData,
+        recentCallRatings: recentCallRatingsData,
+        ratingCount: totalRatingCountData,
+        overallDailyRatingCount: dailyOverallRatingData,
+        overallWeeklyRatingCount: weeklyOverallRatingData,
+        overallMonthlyRatingCount: monthlyOverallRatingData,
+        goodDailyRatingCount: dailyGoodRatingData,
+        goodWeeklyRatingCount: weeklyGoodRatingData,
+        goodMonthlyRatingCount: monthlyGoodRatingData,
+        badDailyRatingCount: dailyBadRatingData,
+        badWeeklyRatingCount: weeklyBadRatingData,
+        badMonthlyRatingCount: monthlyBadRatingData,
+        greatDailyRatingCount: dailyGreatRatingData,
+        greatWeeklyRatingCount: weeklyGreatRatingData,
+        greatMonthlyRatingCount: monthlyGreatRatingData,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
   }
 };

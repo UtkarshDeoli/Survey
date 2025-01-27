@@ -6,7 +6,7 @@ import ButtonFilled from "../ui/buttons/ButtonFilled";
 import toast from "react-hot-toast";
 import { assignBooth, getAllKaryakarta } from "@/networks/user_networks";
 import { getAllUsers } from "@/networks/user_networks";
-import { boothAdhyakshId, districtPresidentId, shaktiKendraId, surveyCollectorId } from "@/utils/constants";
+import { boothAdhyakshId, districtPresidentId, shaktiKendraId, surveyCollectorId, VREId } from "@/utils/constants";
 
 interface Props {
   isImported:boolean;
@@ -22,6 +22,7 @@ function AssignBoothModal({ boothModal, setBoothModal, acList, survey_id,isImpor
     { value: districtPresidentId, label: "District President" },
     { value: shaktiKendraId, label: "Shakti Kendra" },
     { value: boothAdhyakshId, label: "Booth Adhyaksh" },
+    { value: VREId, label: "Voter Relationship executive" },
   ];
   
   const [roles, setRoles] = useState(allRoles);
@@ -40,7 +41,7 @@ function AssignBoothModal({ boothModal, setBoothModal, acList, survey_id,isImpor
       if(selectedRole === districtPresidentId || selectedRole === shaktiKendraId || selectedRole === boothAdhyakshId) {
         response = await getAllKaryakarta({role:selectedRole})
       }
-      else{
+      else{ 
         response = await getAllUsers({ selectedRole: role });
       }
       console.log("users ---->",response);

@@ -1,4 +1,5 @@
 const express = require("express");
+const Role = require("../models/role")
 const router = express.Router();
 require("dotenv").config();
 const User = require("../models/user");
@@ -75,20 +76,26 @@ exports.adminLogin = async (req, res) => {
     }
     const roles = user.role;
     console.log("roles are --->", roles);
+    const roleNames = [
+      'Supervisor',
+      'Panna Pramukh',
+      'Survey Manager',
+      'Quality Check',
+      'Data Analyst',
+      'Data Manager',
+      'Support Executive',
+      'VRM Team Manager'
+    ]
 
-    const validRoles = [
-      "675985aaa6b36c1fa78d5517",
-      "672bbdbfbdbe172165452e7d",
-      "671f999c38863c2bfc859e7a",
-      "675a92c24bbe3577d16bcb64",
-      "675bece5305e5a3192324a7a",
-      "675bed08305e5a3192324a7c",
-      "671f999538863c2bfc859e78"
-    ];
+    const validRoles =  await Role.find({name: { $in: roleNames } });
+    console.log("valid roles are --->",validRoles)
+   // Extract the valid role IDs for comparison
+   const validRoleIds = validRoles.map((role) => role._id.toString());
 
-    const isAuthorized = roles.find((role) =>
-      validRoles.includes(role._id.toString()),
-    );
+   // Check if the user has any of the valid roles
+   const isAuthorized = roles.some((role) =>
+     validRoleIds.includes(role._id.toString())
+   );
     console.log("user ---->", isAuthorized);
     console.log(roles);
     if (roles.length > 0 && roles[0].category !== "admin") {
