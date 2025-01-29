@@ -4,7 +4,6 @@ import React from "react";
 function page() {
   return (
     <main className="bg-[#ECF0FA] min-h-screen">
-      <div className="p-5 font-bold text-[24px]">Activity</div>
       <Dashboard />
     </main>
   );

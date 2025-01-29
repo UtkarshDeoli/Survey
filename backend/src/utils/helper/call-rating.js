@@ -113,7 +113,7 @@ exports.overallMonthlyRatingCount = async () => {
 
 exports.getGoodDailyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "good" } },
+      { $match: { rating: "positive" } },
       {
         $match: {
           createdAt: {
@@ -139,7 +139,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getGoodWeeklyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "good" } },
+      { $match: { rating: "positive" } },
       {
         $match: {
           createdAt: {
@@ -165,7 +165,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getGoodMonthlyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "good" } },
+      { $match: { rating: "positive" } },
       {
         $match: {
           createdAt: {
@@ -192,7 +192,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getBadDailyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "bad" } },
+      { $match: { rating: "negative" } },
       {
         $match: {
           createdAt: {
@@ -218,7 +218,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getBadWeeklyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "bad" } },
+      { $match: { rating: "negative" } },
       {
         $match: {
           createdAt: {
@@ -244,7 +244,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getBadMonthlyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "bad" } },
+      { $match: { rating: "negative" } },
       {
         $match: {
           createdAt: {
@@ -271,7 +271,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getGreatDailyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "great" } },
+      { $match: { rating: "neutral" } },
       {
         $match: {
           createdAt: {
@@ -297,7 +297,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getGreatWeeklyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "great" } },
+      { $match: { rating: "neutral" } },
       {
         $match: {
           createdAt: {
@@ -323,7 +323,7 @@ exports.getGoodDailyRatingCount = async () => {
   
   exports.getGreatMonthlyRatingCount = async () => {
     return await CallRating.aggregate([
-      { $match: { rating: "great" } },
+      { $match: { rating: "neutral" } },
       {
         $match: {
           createdAt: {

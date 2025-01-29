@@ -11,7 +11,7 @@ const callRatingSchemma = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Response99",
     },
-    rating: { type: String, enum: ["good", "bad", "great"] },
+    rating: { type: String, enum: ["positive", "negative", "neutral"] },
     comment: { type: String },
   },
   { timestamps: true }
