@@ -127,6 +127,7 @@ exports.deleteCallRating = async (req, res) => {
   }
 };
 
+
 exports.getDashboardData = async (req, res) => {
   try {
     // Total Call Ratings Pipeline
@@ -136,15 +137,15 @@ exports.getDashboardData = async (req, res) => {
     const dailyOverallRatingData = await overallDailyRatingCount();
     const weeklyOverallRatingData = await overallWeeklyRatingCount();
     const monthlyOverallRatingData = await overallMonthlyRatingCount();
-    const dailyGoodRatingData = await getGoodDailyRatingCount();
-    const weeklyGoodRatingData = await getGoodWeeklyRatingCount();
-    const monthlyGoodRatingData = await getGoodMonthlyRatingCount();
-    const dailyBadRatingData = await getBadDailyRatingCount();
-    const weeklyBadRatingData = await getBadWeeklyRatingCount();
-    const monthlyBadRatingData = await getBadMonthlyRatingCount();
-    const dailyGreatRatingData = await getGreatDailyRatingCount();
-    const weeklyGreatRatingData = await getGreatWeeklyRatingCount();
-    const monthlyGreatRatingData = await getGreatMonthlyRatingCount();
+    const dailyPositiveRatingData = await getGoodDailyRatingCount();
+    const weeklyPositiveRatingData = await getGoodWeeklyRatingCount();
+    const monthlyPositiveRatingData = await getGoodMonthlyRatingCount();
+    const dailyNegativeRatingData = await getBadDailyRatingCount();
+    const weeklyNegativeRatingData = await getBadWeeklyRatingCount();
+    const monthlyNegativeRatingData = await getBadMonthlyRatingCount();
+    const dailyNeutralRatingData = await getGreatDailyRatingCount();
+    const weeklyNeutralRatingData = await getGreatWeeklyRatingCount();
+    const monthlyNeutralRatingData = await getGreatMonthlyRatingCount();
 
     // Return the aggregated data in one response
     return res.status(200).json({
@@ -156,15 +157,15 @@ exports.getDashboardData = async (req, res) => {
         overallDailyRatingCount: dailyOverallRatingData,
         overallWeeklyRatingCount: weeklyOverallRatingData,
         overallMonthlyRatingCount: monthlyOverallRatingData,
-        goodDailyRatingCount: dailyGoodRatingData,
-        goodWeeklyRatingCount: weeklyGoodRatingData,
-        goodMonthlyRatingCount: monthlyGoodRatingData,
-        badDailyRatingCount: dailyBadRatingData,
-        badWeeklyRatingCount: weeklyBadRatingData,
-        badMonthlyRatingCount: monthlyBadRatingData,
-        greatDailyRatingCount: dailyGreatRatingData,
-        greatWeeklyRatingCount: weeklyGreatRatingData,
-        greatMonthlyRatingCount: monthlyGreatRatingData,
+        positiveDailyRatingCount: dailyPositiveRatingData,
+        positiveWeeklyRatingCount: weeklyPositiveRatingData,
+        positiveMonthlyRatingCount: monthlyPositiveRatingData,
+        negativeDailyRatingCount: dailyNegativeRatingData,
+        negativeWeeklyRatingCount: weeklyNegativeRatingData,
+        negativeMonthlyRatingCount: monthlyNegativeRatingData,
+        neutralDailyRatingCount: dailyNeutralRatingData,
+        neutralWeeklyRatingCount: weeklyNeutralRatingData,
+        neutralMonthlyRatingCount: monthlyNeutralRatingData,
       },
     });
   } catch (error) {
@@ -172,3 +173,4 @@ exports.getDashboardData = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+

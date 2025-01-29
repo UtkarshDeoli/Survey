@@ -19,6 +19,7 @@ import {
   Filler,
 } from "chart.js";
 import RecentRatings from "./RecentRatings";
+import Loader from "../ui/Loader";
 
 ChartJS.register(
   Title,
@@ -52,17 +53,17 @@ function Dashboard() {
   const [callRatingCategoryData, setCallRatingCategoryData] = useState<any>(null);
   const [totalRatings, setTotalRatings] = useState<number>(0);
 
-  const [goodBarChartData, setGoodBarChartData] = useState<any>({
+  const [positiveBarChartData, setPositiveBarChartData] = useState<any>({
     daily: null,
     weekly: null,
     monthly: null,
   });
-  const [badBarChartData, setBadBarChartData] = useState<any>({
+  const [negativeBarChartData, setNegativeBarChartData] = useState<any>({
     daily: null,
     weekly: null,
     monthly: null,
   });
-  const [greatBarChartData, setGreatBarChartData] = useState<any>({
+  const [neutralBarChartData, setNeutralBarChartData] = useState<any>({
     daily: null,
     weekly: null,
     monthly: null,
@@ -110,102 +111,102 @@ function Dashboard() {
       }
 
       // Bar chart data for all ratings
-      if (data?.goodDailyRatingCount) {
-        setGoodBarChartData({
+      if (data?.positiveDailyRatingCount) {
+        setPositiveBarChartData({
           daily: {
-            labels: data.goodDailyRatingCount.map((el: any) => el._id),
+            labels: data.positiveDailyRatingCount.map((el: any) => el._id),
             datasets: [
               {
                 label: "Good Ratings",
-                data: data.goodDailyRatingCount.map((el: any) => el.count),
+                data: data.positiveDailyRatingCount.map((el: any) => el.count),
               },
             ],
           },
           weekly: {
-            labels: data.goodWeeklyRatingCount.map((el: any) => el._id),
+            labels: data.positiveWeeklyRatingCount.map((el: any) => el._id),
             datasets: [
               {
                 label: "Good Ratings",
-                data: data.goodWeeklyRatingCount.map((el: any) => el.count),
+                data: data.positiveWeeklyRatingCount.map((el: any) => el.count),
               },
             ],
           },
           monthly: {
-            labels: data.goodMonthlyRatingCount.map(
+            labels: data.positiveMonthlyRatingCount.map(
               (el: any) => `${el._id.month}-${el._id.year}`
             ),
             datasets: [
               {
                 label: "Good Ratings",
-                data: data.goodMonthlyRatingCount.map((el: any) => el.count),
+                data: data.positiveMonthlyRatingCount.map((el: any) => el.count),
               },
             ],
           },
         });
       }
 
-      if (data?.badDailyRatingCount) {
-        setBadBarChartData({
+      if (data?.negativeDailyRatingCount) {
+        setNegativeBarChartData({
           daily: {
-            labels: data.badDailyRatingCount.map((el: any) => el._id),
+            labels: data.negativeDailyRatingCount.map((el: any) => el._id),
             datasets: [
               {
                 label: "Bad Ratings",
-                data: data.badDailyRatingCount.map((el: any) => el.count),
+                data: data.negativeDailyRatingCount.map((el: any) => el.count),
               },
             ],
           },
           weekly: {
-            labels: data.badWeeklyRatingCount.map((el: any) => el._id),
+            labels: data.negativeWeeklyRatingCount.map((el: any) => el._id),
             datasets: [
               {
                 label: "Bad Ratings",
-                data: data.badWeeklyRatingCount.map((el: any) => el.count),
+                data: data.negativeWeeklyRatingCount.map((el: any) => el.count),
               },
             ],
           },
           monthly: {
-            labels: data.badMonthlyRatingCount.map(
+            labels: data.negativeMonthlyRatingCount.map(
               (el: any) => `${el._id.month}-${el._id.year}`
             ),
             datasets: [
               {
                 label: "Bad Ratings",
-                data: data.badMonthlyRatingCount.map((el: any) => el.count),
+                data: data.negativeMonthlyRatingCount.map((el: any) => el.count),
               },
             ],
           },
         });
       }
 
-      if (data?.greatDailyRatingCount) {
-        setGreatBarChartData({
+      if (data?.neutralDailyRatingCount) {
+        setNeutralBarChartData({
           daily: {
-            labels: data.greatDailyRatingCount.map((el: any) => el._id),
+            labels: data.neutralDailyRatingCount.map((el: any) => el._id),
             datasets: [
               {
                 label: "Great Ratings",
-                data: data.greatDailyRatingCount.map((el: any) => el.count),
+                data: data.neutralDailyRatingCount.map((el: any) => el.count),
               },
             ],
           },
           weekly: {
-            labels: data.greatWeeklyRatingCount.map((el: any) => el._id),
+            labels: data.neutralWeeklyRatingCount.map((el: any) => el._id),
             datasets: [
               {
                 label: "Great Ratings",
-                data: data.greatWeeklyRatingCount.map((el: any) => el.count),
+                data: data.neutralWeeklyRatingCount.map((el: any) => el.count),
               },
             ],
           },
           monthly: {
-            labels: data.greatMonthlyRatingCount.map(
+            labels: data.neutralMonthlyRatingCount.map(
               (el: any) => `${el._id.month}-${el._id.year}`
             ),
             datasets: [
               {
                 label: "Great Ratings",
-                data: data.greatMonthlyRatingCount.map((el: any) => el.count),
+                data: data.neutralMonthlyRatingCount.map((el: any) => el.count),
               },
             ],
           },
@@ -262,12 +263,12 @@ function Dashboard() {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <Loader/>;
   }
 
   return (
     <div className="p-4 flex flex-col gap-8">
-      <h1 className="text-xl font-bold mb-4">VRM Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-4">VRM Team manager Dashboard</h1>
 
       <div className="flex gap-6 rounded-lg">
         {/* Pie Chart */}
@@ -300,29 +301,29 @@ function Dashboard() {
       {recentRatings && <RecentRatings data={recentRatings} />}
 
       <div className="flex gap-6">
-        {goodBarChartData && (
+        {positiveBarChartData && (
           <div className="w-1/2 bg-white p-4 rounded-xl border-2">
             <VRMChart
-              title="Good Ratings"
-              barChartData={goodBarChartData}
+              title="Positive Ratings"
+              barChartData={positiveBarChartData}
             />
           </div>
         )}
-        {badBarChartData && (
+        {negativeBarChartData && (
           <div className="w-1/2 bg-white p-4 rounded-xl border-2">
             <VRMChart
-              title="Bad Ratings"
-              barChartData={badBarChartData}
+              title="Negative Ratings"
+              barChartData={negativeBarChartData}
             />
           </div>
         )}
       </div>
 
-      {greatBarChartData && (
+      {neutralBarChartData && (
         <div className="w-1/2 bg-white p-4 rounded-xl border-2">
           <VRMChart
-            title="Great Ratings"
-            barChartData={greatBarChartData}
+            title="Neutral Ratings"
+            barChartData={neutralBarChartData}
           />
         </div>
       )}

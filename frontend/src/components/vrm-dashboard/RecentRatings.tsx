@@ -1,10 +1,8 @@
 "use client";
 import { formatDate, truncateText } from "@/utils/common_functions";
-import { useRouter } from "next/navigation";
 import React from "react";
 
 function RecentRatings({ data }: any) {
-  const router = useRouter();
   return (
     <div className="w-full rounded-[25px] flex flex-col gap-4 bg-white shadow-md p-5">
       <h3 className="text-[20px] font-bold">Recent Logs and Ratings</h3>
@@ -23,12 +21,21 @@ function RecentRatings({ data }: any) {
             <div
               key={rating._id}
               className="cursor-pointer grid grid-cols-5 w-full place-items-center text-[13px] py-2 hover:bg-gray-100 rounded-md"
-              onClick={() => router.push(`/ratings/${rating._id}`)} // Example navigation to rating details
             >
               <p>{truncateText(rating.comment, 20)}</p>
               <p>{truncateText(rating.response_id, 10)}</p>
               <p>{truncateText(rating.user.name, 20)}</p>
-              <p className="text-center">{rating.rating || "N/A"}</p>
+              <p
+                className={`text-center font-semibold ${
+                  rating.rating === "positive"
+                    ? "text-green-500"
+                    : rating.rating === "negative"
+                    ? "text-red-500"
+                    : "text-amber-500"
+                }`}
+              >
+                {rating.rating || "N/A"}
+              </p>
               <p className="text-dark-gray">{formatDate(rating.createdAt)}</p>
             </div>
           ))
