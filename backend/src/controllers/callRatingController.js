@@ -20,6 +20,7 @@ const {
 
 // Create a new CallRating
 exports.createCallRating = async (req, res) => {
+  console.log('create call rating');
   try {
     const { user_id, response_id, rating, comment } = req.body;
     const newCallRating = new CallRating({
