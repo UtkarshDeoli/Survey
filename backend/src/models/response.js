@@ -77,7 +77,7 @@ const responseSchema = new Schema(
     ],
     call_rating: {
         // uid: {type: String},
-        rating: {type: String, enum: ["good", "bad", "great"]},
+        rating: {type: String, enum: ["positive", "negative", "neutral"]},
         comment: {type: String},
     }
     
