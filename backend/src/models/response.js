@@ -75,6 +75,12 @@ const responseSchema = new Schema(
         date: { type: Date, default: Date.now },
       },
     ],
+    call_rating: {
+        // uid: {type: String},
+        rating: {type: String, enum: ["positive", "negative", "neutral"]},
+        comment: {type: String},
+    }
+    
   },
   { strict: false, timestamps: true },
 );
