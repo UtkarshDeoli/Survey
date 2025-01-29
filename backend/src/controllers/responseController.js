@@ -1204,7 +1204,7 @@ exports.markAsContacted = async (req, res) => {
 exports.saveRemark = async (req, res) => {
   try {
     const { response_id, remark_text } = req.body;
-
+    console.log("Inside save Remark", response_id);
     const response = await Responses.findById(response_id);
     if (!response) {
       return res
