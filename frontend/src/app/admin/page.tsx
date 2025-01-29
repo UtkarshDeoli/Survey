@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import IndiaMap from "@/components/ui/IndianMap";
 
 import { Pie } from "react-chartjs-2";
 import {

@@ -26,7 +26,11 @@ router.post("/assignBooth", userController.assignBoothToUsers);
 router.get("/getAssignedBooth", userController.getAssignedAcBooths);
 
 // karyakarta
-router.post("/importKaryakartas",upload.single("file"),userController.importKaryakartas)
+router.post(
+  "/importKaryakartas",
+  upload.single("file"),
+  userController.importKaryakartas,
+);
 router.post("/createKaryakarta", userController.createKaryakarta);
 router.post("/updateKaryakarta", userController.updateKaryakarta);
 router.get("/getAllKaryakarta", userController.getAllKaryakarta);
@@ -35,11 +39,12 @@ router.get("/getPannaPramukh", userController.getPannaPramukh);
 router.get("/getBoothAdhyaksh", userController.getBoothAdhyaksh);
 router.post(
   "/updateMultipleKaryakarta",
-  userController.updateMultipleKaryakarta
+  userController.updateMultipleKaryakarta,
 );
 router.post("/getUsersByAcList", userController.getUsersByAcList);
 
 // notification settings
 router.post("/saveToken", userController.saveToken);
+router.get("/assignedSamplingSurveys", userController.getUserSamplingSurveys);
 
 module.exports = router;

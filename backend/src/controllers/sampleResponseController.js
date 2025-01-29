@@ -1,6 +1,7 @@
 const Response = require("../models/response");
 const SampleResponse = require("../models/sampleResponse");
 const Survey = require("../models/survey");
+const User = require("../models/user");
 const mongoose = require("mongoose");
 
 //helper functions /////////////---------------------------------------------------------------------------------------------------------------
@@ -58,7 +59,7 @@ async function createSampleResponses(
   sampleResponses,
   groupId,
   samplingMethod,
-  samplingSize
+  samplingSize,
 ) {
   try {
     const sampleResponseDocs = sampleResponses.map((response) => ({
@@ -114,6 +115,19 @@ exports.assignResponsesToCollector = async (req, res) => {
     // Step 3: Assign responses based on the selected method (random or index)
     const sampleResponses = assignToCollector(groups, sampleMethod, index);
 
+    // Step 4: add sample survey to survey collector's assigned sample surveys field
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    if (!user.assigned_sample_surveys.includes(surveyId)) {
+      user.assigned_sample_surveys.push(surveyId);
+    }
+    await user.save();
+
     console.log("sampleResponses", sampleResponses);
 
     if (sampleResponses.length === 0) {
@@ -131,7 +145,7 @@ exports.assignResponsesToCollector = async (req, res) => {
       sampleResponses,
       groupId,
       sampleMethod, // Pass sampling method
-      sampleSize // Pass sampling size
+      sampleSize, // Pass sampling size
     );
 
     return res.status(200).json({
@@ -219,8 +233,7 @@ exports.getSampleResponses = async (req, res) => {
       .populate("response_id") // Populate the response details
       .populate("user_id") // Populate user_id to get the collector's name for each response
       .skip(skip) // Skip records for pagination
-      .limit(limitNum) // Limit the number of records
-      .lean(); // Convert the data to plain JavaScript objects for easier manipulation
+      .limit(limitNum); // Limit the number of records
 
     return res.status(200).json({
       success: true,
@@ -243,12 +256,10 @@ exports.getSampleResponses = async (req, res) => {
   }
 };
 
-
-
 exports.getSampleSurveys = async (req, res) => {
   try {
     console.log("route hitting");
-    const { name, page = 1, limit = 10 } = req.query; 
+    const { name, page = 1, limit = 10 } = req.query;
     const filters = { sampling: true };
 
     // Apply name filter if provided
@@ -343,22 +354,34 @@ exports.getGroupsWithSurveyCollectors = async (req, res) => {
 };
 
 exports.deleteSampling = async (req, res) => {
-  const { surveyId, groupId , mode } = req.body;
-  try{
-    if(mode === "survey"){
+  const { surveyId, groupId, mode } = req.body;
+  try {
+    if (mode === "survey") {
       const survey = await Survey.findById(surveyId);
-      if(!survey){
-        return res.status(404).json({ success:false, message: "Survey not found" });
+      if (!survey) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Survey not found" });
       }
-      survey.sampling = false
+      survey.sampling = false;
       await survey.save();
       await SampleResponse.deleteMany({ survey_id: surveyId });
-      return res.status(200).json({success:true,message:"Sample survey deleted!"})
-    }else if(mode === "group"){
-      await SampleResponse.deleteMany({ survey_id: surveyId, group_id: groupId });
-      return res.status(200).json({success:true,message:"Sample group deleted!"})
+      return res
+        .status(200)
+        .json({ success: true, message: "Sample survey deleted!" });
+    } else if (mode === "group") {
+      await SampleResponse.deleteMany({
+        survey_id: surveyId,
+        group_id: groupId,
+      });
+      return res
+        .status(200)
+        .json({ success: true, message: "Sample group deleted!" });
     }
-  }catch(error){
-    return res.status(500).json({ success:false,message: "Server error", error });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error", error });
   }
-}
+};
+

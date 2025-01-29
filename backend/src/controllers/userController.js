@@ -96,7 +96,7 @@ exports.updateUser = async (req, res) => {
     const updatedUser = await User.findOneAndUpdate(
       { _id: user_id },
       { $set: userData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     return res.status(200).json({
@@ -137,7 +137,7 @@ exports.assignBoothToUsers = async (req, res) => {
       const existingAcIndex = updatedAcList.findIndex(
         (existingAc) =>
           existingAc.ac_no === newAc.ac_no &&
-          existingAc.survey_id.toString() === survey_id
+          existingAc.survey_id.toString() === survey_id,
       );
 
       if (existingAcIndex !== -1) {
@@ -151,7 +151,7 @@ exports.assignBoothToUsers = async (req, res) => {
         ];
         console.log(
           "updated ac list booth numbers--->",
-          existingAc.booth_numbers
+          existingAc.booth_numbers,
         );
       } else {
         // If AC does not exist for the survey, add it
@@ -170,13 +170,13 @@ exports.assignBoothToUsers = async (req, res) => {
           survey_id,
           ac_no,
           booth_no,
-        }))
+        })),
       );
 
       // Update responses in a single operation
       await Response.updateMany(
         { $or: filterCriteria },
-        { $set: { user_id: userId } }
+        { $set: { user_id: userId } },
       );
     }
 
@@ -202,7 +202,7 @@ exports.getAssignedAcBooths = async (req, res) => {
     }
     console.log("ac_list is", user.ac_list);
     const assignedAcBooths = user.ac_list.filter(
-      (ac) => ac.survey_id.toString() === survey_id
+      (ac) => ac.survey_id.toString() === survey_id,
     );
     console.log("assignedAcBooths --- >", assignedAcBooths);
     return res.status(200).json({ success: true, assignedAcBooths });
@@ -225,7 +225,7 @@ exports.updateUsers = async (req, res) => {
 
     const updatePromises = users.map(async (user) => {
       const fetchedUserData = await User.findById(user.user_id).select(
-        "notification_token"
+        "notification_token",
       );
 
       if (!user.user_id) {
@@ -317,7 +317,7 @@ exports.getUser = async (req, res) => {
             user_id: _id,
           });
           return { ...survey.toObject(), collected_count: collectedCount };
-        })
+        }),
       );
 
       return res.status(200).json({
@@ -371,7 +371,7 @@ exports.getAllUsers = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validUserRoleIds.filter(
-        (ro) => ro.toString() === role.toString()
+        (ro) => ro.toString() === role.toString(),
       );
     }
     if (role && roleExists.length > 0) {
@@ -425,7 +425,7 @@ exports.uploadProfilePicture = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { profile_picture: profilePicture._id } },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({
@@ -509,13 +509,13 @@ exports.importKaryakartas = async (req, res) => {
     // Validate if the file contains required fields
     const requiredFields = ["username", "name", "email", "password", "role"];
     const missingFields = requiredFields.filter(
-      (field) => !data[0] || !Object.keys(data[0]).includes(field)
+      (field) => !data[0] || !Object.keys(data[0]).includes(field),
     );
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
         message: `Missing required fields in Excel: ${missingFields.join(
-          ", "
+          ", ",
         )}`,
       });
     }
@@ -617,7 +617,7 @@ exports.createKaryakarta = async (req, res) => {
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("ROLE ISS:", role);
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString()
+      (el) => el.toString() === role.toString(),
     );
 
     if (roleExists.length === 0) {
@@ -634,7 +634,7 @@ exports.createKaryakarta = async (req, res) => {
       "Booth Adhyaksh",
     ];
     const roleName = karyakartaRoles.find(
-      (el) => el._id.toString() === role
+      (el) => el._id.toString() === role,
     )?.name;
     const karyakartaData = {
       email,
@@ -702,7 +702,7 @@ exports.updateMultipleKaryakarta = async (req, res) => {
     responses.forEach(async (response) => {
       await Response.findOneAndUpdate(
         { _id: response },
-        { panna_pramukh_assigned: id }
+        { panna_pramukh_assigned: id },
       );
     });
     return res
@@ -737,7 +737,7 @@ exports.updateKaryakarta = async (req, res) => {
     const validRoles = karyakartaRoles.map((el) => el._id);
     console.log("valid roles are -->", validRoles);
     const roleExists = validRoles.filter(
-      (el) => el.toString() === role.toString()
+      (el) => el.toString() === role.toString(),
     );
     console.log("role exists->>>>", roleExists);
     if (roleExists.length === 0) {
@@ -812,7 +812,7 @@ exports.getAllKaryakarta = async (req, res) => {
     let roleExists = [];
     if (role) {
       roleExists = validRoleIds.filter(
-        (ro) => ro.toString() === role.toString()
+        (ro) => ro.toString() === role.toString(),
       );
     }
 
@@ -1004,6 +1004,64 @@ exports.saveToken = async (req, res) => {
     return res.status(400).json({
       success: false,
       message: "Error saving token",
+    });
+  }
+};
+
+exports.getUserSamplingSurveys = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const allUserSurveys = await User.findById(user_id)
+      .populate("assigned_sample_surveys")
+      .select("assigned_sample_surveys _id");
+
+    const totalSurveys = allUserSurveys.assigned_sample_surveys.length;
+    const totalPages = Math.ceil(totalSurveys / limit);
+
+    const assignedSampleSurveys = await User.findById(user_id)
+      .populate({
+        path: "assigned_sample_surveys",
+        options: {
+          sort: { createdAt: -1 },
+          skip,
+          limit,
+        },
+      })
+      .select("assigned_sample_surveys _id");
+
+    const assignedSampleSurveysWithCount = await Promise.all(
+      assignedSampleSurveys.assigned_sample_surveys.map(async (survey) => {
+        const collectedCount = await Response.countDocuments({
+          survey_id: survey._id,
+          user_id: user_id,
+        });
+        return { ...survey.toObject(), collected_count: collectedCount };
+      }),
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        ...assignedSampleSurveys.toObject(),
+        assigned_sample_surveys: assignedSampleSurveysWithCount,
+      },
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalSurveys: totalSurveys,
+        surveyPerPage: limit,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(400).json({
+      success: false,
+      message: "Error fetching user sampling surveys",
     });
   }
 };

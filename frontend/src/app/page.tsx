@@ -11,7 +11,6 @@ import ReactModal from "react-modal";
 import toast, { Toaster } from "react-hot-toast";
 import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import { checkToken } from "@/utils/common_functions";
-import { validRoles } from "@/utils/constants";
 
 ReactModal.setAppElement("#main");
 
@@ -37,14 +36,10 @@ export default function login() {
         if (res.success) {
           toast.success(res.message);
           localStorage.setItem("jwt", res.token);
-          const user = checkToken();
-          const isAuthorized = user?.role.find((el: any) =>
-            validRoles.includes(el._id.toString())
-          );
-          console.log("isAuthorized ----->",isAuthorized)
           router.push("/admin");
+          console.log(res)
         } else {
-          console.log("res ----->", res);
+          console.log("res ----->", res);   
           if (res.error) {
             toast.error(res.error.message);
           } else {

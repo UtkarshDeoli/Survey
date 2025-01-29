@@ -28,9 +28,12 @@ const withAuth = (WrappedComponent: any) => {
     
       const isAdmin = payload?.role[0].category === "admin";
       const isAuthorized = payload?.role.find((el: any) =>
-        validRoles.includes(el._id.toString())
+        validRoles.includes(el.name)
       );
-    
+      console.log("ius admin -->",isAdmin)
+      console.log("ius auth -->",isAuthorized
+
+      )
       if (isAdmin) {
         setUserData(payload);
         return;
@@ -42,7 +45,7 @@ const withAuth = (WrappedComponent: any) => {
       }
     
       const { category, name } = payload.role[0];
-    
+      console.log("role name is -- >",name)
       // Define allowed paths for each role
       const allowedPaths: Record<string, string[]> = {
         "Operation team": ["/admin/surveys", "/admin/data", "/admin/todos","/admin/support"],
@@ -51,7 +54,8 @@ const withAuth = (WrappedComponent: any) => {
         "Quality Check": ["/admin/quality-check-surveys","/admin/support"],
         "Data Analyst": ["/admin/data","/admin/support"],
         "Data Manager": ["/admin/data","/admin/support"],
-        "Support Executive" : ["/admin/support"]
+        "Support Executive" : ["/admin/support"],
+        "VRM Team Manager":["/admin/vrm-dashboard","/admin/support"]
       };
     
       const allowedForRole = allowedPaths[name] || [];
@@ -68,9 +72,10 @@ const withAuth = (WrappedComponent: any) => {
           "Quality Check": "/admin/quality-check-surveys",
           "Data Analyst": "/admin/data",
           "Data Manager": "/admin/data",
-          "Support Executive" : "/admin/support"
+          "Support Executive" : "/admin/support",
+          "VRM Team Manager":"/admin/vrm-dashboard"
         };
-    
+        console.log("default redirtect to -->",defaultRedirect[name])
         router.replace(defaultRedirect[name]);
       }
     
