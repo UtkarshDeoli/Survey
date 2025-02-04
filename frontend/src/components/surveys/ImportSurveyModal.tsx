@@ -61,7 +61,8 @@ function ImportSurveyModal({
             seen[key] = true;
             uniquePairs.push({
               AC_NO: item.AC_NO,
-              SECTION_NO: item.SECTION_NO,
+              SECTION_NO: item.BOOTH_NO,
+              // SECTION_NO: item.SECTION_NO,
             });
           }
         });
@@ -108,10 +109,10 @@ function ImportSurveyModal({
           };
           console.log("survey structure --- >", params);
           const response = await createSurvey(params);
+          // const response = {success:true}
 
           if (response.success) {
             toast.success("Survey created successfully!");
-            console.log(response.survey._id);
             const allResponses: any = [];
             jsonData.forEach((data: any, index: number) => {
               const responses: any = [];
@@ -128,17 +129,24 @@ function ImportSurveyModal({
               allResponses.push({
                 survey_id: response.survey._id,
                 ac_no: data.AC_NO,
-                booth_no: data.SECTION_NO,
-                house_no: data.C_HOUSE_NO,
+                booth_no: data.BOOTH_NO,
+                house_no: data.houseno,
                 phone_no: data.MOBILE_NO,
-                name: data.FM_NAME_EN,
+                name: data["Voter Name"],
+                // ac_no: data.AC_NO,
+                // booth_no: data.SECTION_NO,
+                // house_no: data.C_HOUSE_NO,
+                // phone_no: data.MOBILE_NO,
+                // name: data.FM_NAME_EN,
                 responses,
               });
             });
+            console.log("all-responses -->",allResponses)
             handleSaveResponses(allResponses);
           } else {
             toast.error("Failed to create survey!");
           }
+          
           closeImportModal();
           setUpdated((prev: any) => !prev);
         }
