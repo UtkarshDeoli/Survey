@@ -27,6 +27,7 @@ function ImportSurveyModal({
   const [user, setUser] = useState<any>(null);
   const [excelData, setExcelData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [saving, setSaving] = useState<boolean>(false);
 
   useEffect(() => {
     const userData = checkToken();
@@ -37,14 +38,14 @@ function ImportSurveyModal({
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setLoading(true);
     event.preventDefault();
     const file = event.target.files?.[0];
-
+    
     if (file) {
       const reader = new FileReader();
       let jsonData: any;
       reader.onload = async (e) => {
+        setLoading(true);
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
@@ -158,17 +159,21 @@ function ImportSurveyModal({
   };
 
   async function handleSaveResponses(params: any) {
+    setSaving(true)
     const response = await saveResponses(params);
+    console.log("saving responses response --->",response)
     if (response.success) {
       toast.success("Responses saved successfully");
     } else {
       toast.error("Something went wrong while saving responses");
     }
+    setSaving(false)
   }
+  if(saving) return <Loader/>
   return (
     <CustomModal open={importModalOpen} closeModal={closeImportModal}>
       <div className="relative min-w-[600px] h-[400px] flex flex-col justify-center items-center">
-        {loading && (
+        {(loading || saving) && (
           <div className="absolute inset-0 z-30 bg-black/65 flex flex-col justify-center items-center gap-10 h-full w-full">
             <PropagateLoader speedMultiplier={1.25} color="#FF8437" />
             <h3 className="text-white font-semibold">
