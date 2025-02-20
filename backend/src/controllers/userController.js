@@ -507,7 +507,7 @@ exports.importKaryakartas = async (req, res) => {
     const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
     // Validate if the file contains required fields
-    const requiredFields = ["username", "name", "email", "password", "role"];
+    const requiredFields = ["booth_no", "voter_serial_no", "username", "name", "caste", "mobile", "email", "password", "role", "user_status"];
     const missingFields = requiredFields.filter(
       (field) => !data[0] || !Object.keys(data[0]).includes(field),
     );
@@ -528,7 +528,7 @@ exports.importKaryakartas = async (req, res) => {
     const errors = [];
 
     for (const row of data) {
-      const { username, name, email, password, role, userStatus } = row;
+      const { booth_no, voter_serial_no, username, name, caste, mobile, email, password, role, userStatus:user_status } = row;
 
       // Check if email already exists
       const userExists = await User.findOne({ email });
@@ -553,12 +553,13 @@ exports.importKaryakartas = async (req, res) => {
 
       // Create karyakarta data
       const karyakartaData = {
+        booth_no, voter_serial_no, caste, phone_number:mobile,
         username,
         name,
         email,
         password: hashedPassword,
         role: [roleId], // Store the role ID
-        userStatus: userStatus || "active", // Default userStatus to 'active' if not provided
+        userStatus: user_status || "active", // Default userStatus to 'active' if not provided
       };
 
       try {
@@ -605,6 +606,7 @@ exports.createKaryakarta = async (req, res) => {
       district,
       password,
       role,
+      voter_serial_no, caste, phone_number
     } = req.body;
     const userExists = await User.find({ email: email });
     if (userExists.length > 0) {
@@ -644,6 +646,9 @@ exports.createKaryakarta = async (req, res) => {
       district,
       password: hashedPass,
       role: [role],
+      voter_serial_no,
+      caste,
+      phone_number: phone_number,
     };
 
     if (!excludeFieldsRoles.includes(roleName)) {

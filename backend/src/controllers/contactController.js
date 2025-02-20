@@ -43,24 +43,26 @@ exports.sendSMS = async (req, res) => {
 };
 
 exports.initiateCall = async (req, res) => {
-  const {phone_no} = req.body;
+  const {phone_no1 , phone_no2} = req.body;
 
   // Define the payload for initiating the call
-  const payload = {
-    sourcetype: "0",
-    campaigntype: "4",
-    filetype: "2",
-    voicefile: "Test.wav",
-    ukey: process.env.VOICENSMS_KEY,
-    serviceno: process.env.SERVICE_NO,
-    ivrtemplateid: "1",
-    retryatmpt: "3",
-    retryduration: "15",
-    msisdn: [phone_no],
-  };
+  // const payload = {
+  //   sourcetype: "0",
+  //   campaigntype: "4",
+  //   filetype: "2",
+  //   voicefile: "Test.wav",
+  //   ukey: process.env.VOICENSMS_KEY,
+  //   serviceno: process.env.SERVICE_NO,
+  //   ivrtemplateid: "1",
+  //   retryatmpt: "3",
+  //   retryduration: "15",
+  //   msisdn: [phone_no],
+  // };
+
 
   try {
-    const response = await initiateCallService(payload);
+    // const response = await initiateCallService(payload);
+    const response = await initiateCallService({phone_no1 , phone_no2});
     res.status(200).json({
       success: true,
       data: response,

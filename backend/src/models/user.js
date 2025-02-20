@@ -16,6 +16,17 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    caste:{
+      type: String,
+      required:
+      false,
+    },
+    voter_serial_no:{
+      type: String,
+      required:
+      false,
+    },
+    
     ac_no: String,
     booth_no: String,
     district: String,

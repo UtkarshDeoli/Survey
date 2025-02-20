@@ -46,6 +46,7 @@ exports.login = async (req, res) => {
         booth_no: user.booth_no,
         name: user.name,
         role: roles,
+        mobile: user.phone_number,
       },
       JWT_SECRET,
     );
