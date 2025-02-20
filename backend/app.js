@@ -26,9 +26,14 @@ if (process.env.NODE_ENV === "development") {
 
 // app.use(fileUpload());
 app.use(cors({ origin: "*", exposedHeaders: ["Content-Disposition"] }));
+app.use((req,res,next)=>{
+  console.log("middleware running");
+  next()
+})
+app.use(express.json({ limit: '200mb' ,extended:true}));
+app.use(express.urlencoded({ limit: '200mb', extended: true }));
 
-app.use(express.json({ limit: '100mb' }));
-app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
 
 app.use("/api/survey/", surveyRoutes);
 app.use("/api/auth/", authRoutes);

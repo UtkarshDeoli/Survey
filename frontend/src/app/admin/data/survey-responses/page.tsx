@@ -4,12 +4,12 @@ import ButtonFilled from "@/components/ui/buttons/ButtonFilled";
 import FilledGreyButton from "@/components/ui/buttons/FilledGreyButton";
 import TwoDatePicker from "@/components/ui/date/TwoDatePicker";
 import { Suspense, useEffect, useState } from "react";
-import { downloadResponses, getSurveyResponses } from "@/networks/response_networks";
-import { useSearchParams } from "next/navigation";
 import {
-  getAllUsers,
-  getPannaPramukhByAcList,
-} from "@/networks/user_networks";
+  downloadResponses,
+  getSurveyResponses,
+} from "@/networks/response_networks";
+import { useSearchParams } from "next/navigation";
+import { getAllUsers, getPannaPramukhByAcList } from "@/networks/user_networks";
 
 import { useRouter } from "next/navigation"; // For routing
 import toast from "react-hot-toast";
@@ -64,16 +64,16 @@ function Page() {
 
   //  pagination
   const [totalResponsePages, setTotalResponsePages] = useState<number>(1);
-  const [pageLimit,setPageLimit] = useState<number>(10)
-  const [page,setPage] = useState<number>(1)
+  const [pageLimit, setPageLimit] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
 
   // downloading
-  const [downloading,setDownloading] = useState<boolean>(false)
-  const [acList,setAcList] = useState<any>([]);
-  const [isImported,setIsImported] = useState<boolean>(false);
+  const [downloading, setDownloading] = useState<boolean>(false);
+  const [acList, setAcList] = useState<any>([]);
+  const [isImported, setIsImported] = useState<boolean>(false);
 
   // assign booth modal
-  const [boothModal,setBoothModal] = useState<boolean>(false);
+  const [boothModal, setBoothModal] = useState<boolean>(false);
 
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
@@ -83,17 +83,19 @@ function Page() {
     googleMapsApiKey: "AIzaSyAAOwDBvpg5ZDv5JFG-CoDW23GsKkOPeuA",
   });
   useEffect(() => {
-    getQuestions();
     getUserResponses();
-    getUsers();
-  }, [reset,page,pageLimit,userId,appliedFilters]);
-
+  }, [reset, page, pageLimit, userId, appliedFilters]);
 
   useEffect(() => {
-    if(acList.length > 0){
+    getQuestions();
+    getUsers();
+  }, []);
+
+  useEffect(() => {
+    if (acList.length > 0) {
       handleGetPannaPramukh();
     }
-  }, [userSearch,acList]);
+  }, [userSearch, acList]);
 
   async function getUserResponses() {
     let nStartDate, nEndDate;
@@ -109,8 +111,8 @@ function Page() {
       endDate: nEndDate,
       userId,
       filters: appliedFilters,
-      limit:pageLimit,
-      page
+      limit: pageLimit,
+      page,
     };
     setLoading(true);
     const response = await getSurveyResponses(params);
@@ -130,34 +132,34 @@ function Page() {
 
   async function getQuestions() {
     const response = await getSurvey({ _id: surveyId });
-    console.log("current survey-->",response);
-    if(response.success){
-      console.log("setting ac_list",response.data.ac_list)
+    console.log("current survey-->", response);
+    if (response.success) {
+      console.log("setting ac_list", response.data.ac_list);
       setIsImported(response.data.imported);
       setAcList(response.data.ac_list);
       const questions = response.data.questions.map((el: any) => el);
       setSurveyQuestions(questions);
-    }else{
-      toast.error("Error fetching the survey!")
+    } else {
+      toast.error("Error fetching the survey!");
     }
   }
 
   async function getUsers() {
-    setLoading(true);
-    const response = await getAllUsers({selectedRole:surveyCollectorId});
+    // setLoading(true);
+    const response = await getAllUsers({ selectedRole: surveyCollectorId });
     console.log("users-------->", response.data);
     setUsers(response.data);
-    setLoading(false);
+    // setLoading(false);
   }
   async function handleGetPannaPramukh() {
-    setLoading(true);
+    // setLoading(true);
     const response = await getPannaPramukhByAcList({
       // ac_list:acList,
       filter: userSearch,
     });
     console.log("panna below-------->", response);
     setPannaPramukh(response);
-    setLoading(false);
+    // setLoading(false);
   }
 
   const openModal = () => {
@@ -196,30 +198,29 @@ function Page() {
         endDate: nEndDate,
         userId,
         filters: appliedFilters,
-        download:true
+        download: true,
       };
-      let filename= "response.xlsx"
-      const response:any = await downloadResponses(params);
-    
+      let filename = "response.xlsx";
+      const response: any = await downloadResponses(params);
+
       const contentDisposition = response.headers["content-disposition"];
-      console.log("header ======>",contentDisposition);
-      const file= contentDisposition.split('filename=')[1].replace(/"/g, ''); 
-      if(file) filename=file
-      
+      console.log("header ======>", contentDisposition);
+      const file = contentDisposition.split("filename=")[1].replace(/"/g, "");
+      if (file) filename = file;
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", filename); 
+      link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
       toast.error("Failed to export to Excel");
-    }finally{
+    } finally {
       setDownloading(false);
     }
   };
-  
 
   const options = users?.map((user) => ({
     value: user._id,
@@ -232,11 +233,11 @@ function Page() {
   };
 
   const handleNextPage = () => {
-   setPage(page+1)
+    setPage(page + 1);
   };
 
   const handlePreviousPage = () => {
-   setPage(page-1)
+    setPage(page - 1);
   };
 
   return (
@@ -256,7 +257,7 @@ function Page() {
           />
           <div className="flex space-x-2 text-black text-base font-semibold">
             <ButtonFilled
-              loading={downloading} 
+              loading={downloading}
               onClick={exportToExcel}
               className="rounded-[20px] h-fit px-4 py-2 w-44 justify-center"
             >
@@ -358,14 +359,12 @@ function Page() {
             </div>
 
             <div className="flex gap-2">
-              {
-                acList && acList.length > 0 && (
-                  <ButtonFilled onClick={() => setUserModal(true)}>
-                    Assign Data
-                  </ButtonFilled>
-                )
-              }
-               <ButtonFilled onClick={() => setBoothModal(true)}>
+              {acList && acList.length > 0 && (
+                <ButtonFilled onClick={() => setUserModal(true)}>
+                  Assign Data
+                </ButtonFilled>
+              )}
+              <ButtonFilled onClick={() => setBoothModal(true)}>
                 Assign Booth
               </ButtonFilled>
             </div>
@@ -373,7 +372,10 @@ function Page() {
         </div>
       </div>
       {loading && (
-        <Loader className="h-[30vh] w-full flex justify-center items-center" />
+        <Loader
+          text="Fetching responses, please wait..."
+          className="h-[30vh] w-full flex justify-center items-center"
+        />
       )}
       {!loading && responses && responses.length > 0 ? (
         <ResponseTable
@@ -397,51 +399,49 @@ function Page() {
           </div>
         )
       )}
-       {/* Pagination Controls */}
-       {
-        !loading && (
-          <div className="flex gap-3 items-center mt-4 pl-4 py-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
-            {/* Limit Select */}
-            <div>
-              <label htmlFor="limit-select" className="mr-2">
-                Show:
-              </label>
-              <select
-                id="limit-select"
-                value={pageLimit}
-                onChange={handleLimitChange}
-                className="p-2 border rounded-md"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-
-            {/* Navigation Arrows */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handlePreviousPage}
-                disabled={page === 1}
-                className="p-2 border rounded-md disabled:opacity-50"
-              >
-                <IoIosArrowBack />
-              </button>
-              <span>
-                Page {page} of {totalResponsePages}
-              </span>
-              <button
-                onClick={handleNextPage}
-                disabled={page === totalResponsePages}
-                className="p-2 border rounded-md disabled:opacity-50"
-              >
-                <IoIosArrowForward />
-              </button>
-            </div>
+      {/* Pagination Controls */}
+      {!loading && (
+        <div className="flex gap-3 items-center mt-4 pl-4 py-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
+          {/* Limit Select */}
+          <div>
+            <label htmlFor="limit-select" className="mr-2">
+              Show:
+            </label>
+            <select
+              id="limit-select"
+              value={pageLimit}
+              onChange={handleLimitChange}
+              className="p-2 border rounded-md"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
           </div>
-        )
-       }
+
+          {/* Navigation Arrows */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowBack />
+            </button>
+            <span>
+              Page {page} of {totalResponsePages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalResponsePages}
+              className="p-2 border rounded-md disabled:opacity-50"
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Custom Modal for Data Filter */}
       <DataFilterModal
@@ -486,7 +486,13 @@ function Page() {
         userModal={userModal}
         userSearch={userSearch || ""}
       />
-      <AssignBoothModal survey_id ={surveyId || ""} acList={acList} boothModal={boothModal} setBoothModal={setBoothModal} isImported = {isImported}/>
+      <AssignBoothModal
+        survey_id={surveyId || ""}
+        acList={acList}
+        boothModal={boothModal}
+        setBoothModal={setBoothModal}
+        isImported={isImported}
+      />
     </div>
   );
 }

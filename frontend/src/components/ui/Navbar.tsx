@@ -24,7 +24,7 @@ function Navbar() {
     setUserData(payload);
   }, [router]);
   return (
-    <nav className="sicky z-50 top-0 flex px-8 py-[18px] h-[80px] shadow-md justify-end gap-5 bg-white">
+    <nav className="sicky z-10 top-0 flex px-8 py-[18px] h-[80px] shadow-md justify-end gap-5 bg-white">
       {/* </ButtonBordered> */}
       {userData && (
         <div className="flex gap-2 items-center">

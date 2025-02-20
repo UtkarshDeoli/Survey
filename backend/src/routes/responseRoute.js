@@ -16,7 +16,11 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB file size limit
+});
+
 router.post(
   "/saveResponse",
   upload.single("audio"),

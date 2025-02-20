@@ -247,9 +247,11 @@ exports.saveResponses = async (req, res) => {
       const acNo = response.ac_no || null;
       const boothNo = response.booth_no || null;
       const houseNo = response.responses.find(
-        (r) => r.question === "C_HOUSE_NO",
+        (r) => r.question === "houseno",
       )?.response;
 
+      console.log("ac_no -->",acNo)
+      console.log("booth_no -->",boothNo)
       let familyId = null;
 
       if (acNo && boothNo && houseNo) {
@@ -592,12 +594,12 @@ exports.getAllResponses = async (req, res) => {
     const totalResponses = await Responses.aggregate([
       ...aggregationPipeline,
       { $count: "totalResponses" },
-    ]);
+    ]).allowDiskUse(true);
     const totalCount =
       totalResponses.length > 0 ? totalResponses[0].totalResponses : 0;
 
     if (download) {
-      const filteredResponse = await Responses.aggregate(aggregationPipeline);
+      const filteredResponse = await Responses.aggregate(aggregationPipeline).allowDiskUse(true);
       const fin = filteredResponse.map((f) =>
         Responses.findById(f._id)
           .populate("panna_pramukh_assigned")
@@ -620,7 +622,7 @@ exports.getAllResponses = async (req, res) => {
 
       aggregationPipeline.push({ $skip: skip }, { $limit: limitNum });
 
-      const filteredResponse = await Responses.aggregate(aggregationPipeline);
+      const filteredResponse = await Responses.aggregate(aggregationPipeline).allowDiskUse(true);
 
       const fin = filteredResponse.map((f) =>
         Responses.findById(f._id).populate("panna_pramukh_assigned"),
@@ -715,7 +717,7 @@ exports.getResponsesGroupedByFamily = async (req, res) => {
       },
       { $skip: skip },
       { $limit: limit },
-    ]);
+    ]).allowDiskUse(true);
 
     const totalItems = await Responses.countDocuments({ survey_id: surveyId });
     const totalPages = Math.ceil(totalItems / limit);
@@ -798,14 +800,14 @@ exports.getSurveyResponses = async (req, res) => {
       },
     );
 
-    const results = await Responses.aggregate(pipeline);
+    const results = await Responses.aggregate(pipeline).allowDiskUse(true);
 
     // Get the total count of matching documents for calculating total pages
     const countPipeline = pipeline.slice(0, -2); // Remove $skip and $limit stages for count
     countPipeline.push({
       $count: "totalCount",
     });
-    const countResult = await Responses.aggregate(countPipeline);
+    const countResult = await Responses.aggregate(countPipeline).allowDiskUse(true);
     const totalCount = countResult.length > 0 ? countResult[0].totalCount : 0;
     const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -1026,7 +1028,7 @@ exports.getSurveyResponseStats = async (req, res) => {
 
     console.log(JSON.stringify(aggregationPipeline, null, 2));
 
-    const stats = await Responses.aggregate(aggregationPipeline);
+    const stats = await Responses.aggregate(aggregationPipeline).allowDiskUse(true);
     return res.status(200).json({ success: true, data: stats });
   } catch (error) {
     console.error("Error fetching survey response stats:", error);

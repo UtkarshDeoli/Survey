@@ -249,7 +249,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
     <div className="w-full flex-1 flex flex-col">
       <div
         className={`w-[96%] mt-1 mx-auto text-sm pb-5  ${
-          isSurveyManager ? "max-h-[65vh]" : "max-h-[60vh]"
+          isSurveyManager ? "h-[60vh] max-h-[65vh]" : " h-[50vh] max-h-[60vh]"
         } overflow-y-auto vertical-scrollbar`}
       >
         {/* surveys */}

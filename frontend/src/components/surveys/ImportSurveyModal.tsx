@@ -21,13 +21,13 @@ function ImportSurveyModal({
   closeImportModal,
   setUpdated,
 }: props) {
-  const [acNo, setAcNo] = useState<string>("");
-  const [boothNo, setBoothNo] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [user, setUser] = useState<any>(null);
   const [excelData, setExcelData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [creatingSurvey, setCreatingSurvey] = useState<boolean>(false)
   const [saving, setSaving] = useState<boolean>(false);
+  const [loadingText, setLoadingText] = useState<string>("Getting survey ready...");
 
   useEffect(() => {
     const userData = checkToken();
@@ -42,10 +42,11 @@ function ImportSurveyModal({
     const file = event.target.files?.[0];
     
     if (file) {
+      setLoading(true);
       const reader = new FileReader();
       let jsonData: any;
       reader.onload = async (e) => {
-        setLoading(true);
+        setLoadingText("Parsing Excel file...");
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
@@ -57,13 +58,12 @@ function ImportSurveyModal({
         const seen: any = {}; // Hashmap to track unique pairs
 
         jsonData.forEach((item: any) => {
-          const key = `${item.AC_NO}-${item.SECTION_NO}`;
+          const key = `${item.AC_NO}-${item.BOOTH_NO}`;
           if (!seen[key]) {
             seen[key] = true;
             uniquePairs.push({
               AC_NO: item.AC_NO,
-              SECTION_NO: item.BOOTH_NO,
-              // SECTION_NO: item.SECTION_NO,
+              BOOTH_NO: item.BOOTH_NO,
             });
           }
         });
@@ -73,7 +73,7 @@ function ImportSurveyModal({
           if (!ac_obj[item.AC_NO]) {
             ac_obj[item.AC_NO] = [];
           }
-          ac_obj[item.AC_NO] = [...ac_obj[item.AC_NO], item.SECTION_NO];
+          ac_obj[item.AC_NO] = [...ac_obj[item.AC_NO], item.BOOTH_NO];
         });
         console.log("ac_object is --->", ac_obj);
         const ac_list = Object.keys(ac_obj).map((key) => ({
@@ -86,7 +86,7 @@ function ImportSurveyModal({
           const questions: any[] = [];
           const responseObj = jsonData[0];
           Object.keys(responseObj).forEach((key, index) => {
-            if (["AC_NO", "SECTION_NO"].includes(key)) return;
+            if (["AC_NO", "BOOTH_NO"].includes(key)) return;
             const questionObj = {
               question_id: index + 10,
               type: "Single line Text Input",
@@ -108,18 +108,19 @@ function ImportSurveyModal({
             published: false,
             questions,
           };
-          console.log("survey structure --- >", params);
+          setLoadingText("Creating survey...");
+          setCreatingSurvey(true)
           const response = await createSurvey(params);
-          // const response = {success:true}
-
+          setCreatingSurvey(false)
           if (response.success) {
             toast.success("Survey created successfully!");
             const allResponses: any = [];
+            setLoadingText("Preparing responses...");
             jsonData.forEach((data: any, index: number) => {
               const responses: any = [];
 
               Object.keys(data).forEach((key, ind) => {
-                if (["AC_NO", "SECTION_NO"].includes(key)) return;
+                if (["AC_NO", "BOOTH_NO"].includes(key)) return;
                 let obj: any = {};
                 obj.response = String(data[key]);
                 obj.question_id = ind + 10;
@@ -134,15 +135,11 @@ function ImportSurveyModal({
                 house_no: data.houseno,
                 phone_no: data.MOBILE_NO,
                 name: data["Voter Name"],
-                // ac_no: data.AC_NO,
-                // booth_no: data.SECTION_NO,
-                // house_no: data.C_HOUSE_NO,
-                // phone_no: data.MOBILE_NO,
-                // name: data.FM_NAME_EN,
                 responses,
               });
             });
             console.log("all-responses -->",allResponses)
+            setLoadingText("Saving responses...");
             handleSaveResponses(allResponses);
           } else {
             toast.error("Failed to create survey!");
@@ -152,9 +149,9 @@ function ImportSurveyModal({
           setUpdated((prev: any) => !prev);
         }
         setExcelData(jsonData);
+        setLoading(false);
       };
       reader.readAsArrayBuffer(file);
-      setLoading(false);
     }
   };
 
@@ -169,7 +166,9 @@ function ImportSurveyModal({
     }
     setSaving(false)
   }
-  if(saving) return <Loader/>
+  
+  if(saving) return <Loader text="Saving families and responses, this might take a while..."/>
+  
   return (
     <CustomModal open={importModalOpen} closeModal={closeImportModal}>
       <div className="relative min-w-[600px] h-[400px] flex flex-col justify-center items-center">
@@ -177,7 +176,7 @@ function ImportSurveyModal({
           <div className="absolute inset-0 z-30 bg-black/65 flex flex-col justify-center items-center gap-10 h-full w-full">
             <PropagateLoader speedMultiplier={1.25} color="#FF8437" />
             <h3 className="text-white font-semibold">
-              Getting survey ready...
+              {loadingText}
             </h3>
           </div>
         )}
