@@ -9,6 +9,7 @@ import { useCreateSurveyContext } from "@/hooks/contextHooks/useCreateSurvey";
 import ButtonFilled from "../ui/buttons/ButtonFilled";
 import { IoIosAddCircle } from "react-icons/io";
 import { CgImport } from "react-icons/cg";
+import Button from "@mui/material/Button";
 
 interface props {
   setUpdated: any;
@@ -16,44 +17,48 @@ interface props {
 function SurveyHeader({ setUpdated }: props) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
-  const {setName,setAcList } =
-    useCreateSurveyContext();
+  const { setName, setAcList } = useCreateSurveyContext();
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => {
     setName("");
     setAcList([]);
-    setModalIsOpen(false)
+    setModalIsOpen(false);
   };
   const openImportModal = () => setImportModalOpen(true);
   const closeImportModal = () => setImportModalOpen(false);
 
   return (
-    <header className="top-0 left-0 z-20 w-full h-16">
-      <div className="h-16 w-full py-3 px-8 flex justify-between ">
-        <h3 className="text-secondary-300 text-2xl">Surveys</h3>
+    <header className="w-full">
+      <div className="w-full py-3 px-6 flex justify-between items-center">
+        <h3 className="text-[18px] font-[600]">Surveys</h3>
         <div className="flex gap-2">
-          <ButtonFilled
-            onClick={openModal}
-            className=" font-semibold gap-2"
-          >
-            {" "}
-          <p className="text-2xl"><IoIosAddCircle /></p> <p>Create survey</p>
-          </ButtonFilled>
-          <ButtonFilled
+          <Button onClick={openModal} variant="contained" size="small" className="!capitalize gap-2">
+            <IoIosAddCircle size={18}/> <span>Create survey</span>
+          </Button>
+          <Button
             onClick={openImportModal}
-            className="flex gap-2 items-center  font-semibold"
+            className="gap-2 !capitalize"
+            variant="contained" size="small"
+            color="success"
           >
-            <CgImport className="text-2xl"/>
-            <p>Import survey</p>
-          </ButtonFilled>
+            <CgImport size={18}/>
+            <span>Import survey</span>
+          </Button>
         </div>
       </div>
 
       {/* modal */}
-      <CreateSurveyModal setUpdated ={setUpdated} modalIsOpen={modalIsOpen} closeModal={closeModal}/>
-      <ImportSurveyModal setUpdated = {setUpdated} importModalOpen={importModalOpen} closeImportModal={closeImportModal}/>
-      
+      <CreateSurveyModal
+        setUpdated={setUpdated}
+        modalIsOpen={modalIsOpen}
+        closeModal={closeModal}
+      />
+      <ImportSurveyModal
+        setUpdated={setUpdated}
+        importModalOpen={importModalOpen}
+        closeImportModal={closeImportModal}
+      />
     </header>
   );
 }

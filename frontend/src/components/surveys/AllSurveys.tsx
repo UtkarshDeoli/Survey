@@ -27,6 +27,8 @@ import useUser from "@/hooks/useUser";
 import PropagateLoader from "react-spinners/PropagateLoader";
 import AssignQcBoothModal from "../survey-manager/AssignQcBoothModal";
 
+
+
 interface AllSurveysProps {
   queryParams: Params;
   setQueryParams: (params: any) => void;
@@ -63,9 +65,9 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   const [user, setUser] = useState<any>(null);
   const [userSearch, setUserSearch] = useState<string>("");
   const [qcModal, setQcModal] = useState<boolean>(false);
-  const [deleting,setDeleting] = useState<boolean>(false);
-  const [publishing,setPublishing] = useState<boolean>(false);
-  const [selectedSurvey,setSelectedSurvey] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<boolean>(false);
+  const [publishing, setPublishing] = useState<boolean>(false);
+  const [selectedSurvey, setSelectedSurvey] = useState<string | null>(null);
 
   const userData = useUser();
   const isSurveyManager = userData?.role
@@ -139,14 +141,14 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
       setPublishModal(false);
       setSurveyToPublish(null);
       setisSurveyPublished(null);
-      setPublishing(false)
+      setPublishing(false);
       toast.success(
         `Survey ${isSurveyPublished ? "Unpublished" : "Published"} successfully`
       );
     } else {
       toast.error("Failed to Publish survey");
     }
-    setPublishing(false)
+    setPublishing(false);
   }
 
   async function handleGetAllSurveys() {
@@ -246,46 +248,56 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
   }
 
   return (
-    <div className="w-full flex-1 flex flex-col">
-      <div
-        className={`w-[96%] mt-1 mx-auto text-sm pb-5  ${
-          isSurveyManager ? "h-[60vh] max-h-[65vh]" : " h-[50vh] max-h-[60vh]"
-        } overflow-y-auto vertical-scrollbar`}
-      >
-        {/* surveys */}
-        <div className="sticky top-0 z-10 grid grid-cols-8 text-white font-semibold bg-dark-gray px-8 py-[16px] rounded-tl-2xl rounded-tr-2xl border border-secondary-200">
-          <p className="col-span-2">All surveys</p>
-          <p className="col-span-2">Total responses</p>
-          <p className="col-span-2">Date created</p>
-          <p className="col-span-2">{isSurveyManager ? "Action" : "Status"}</p>
-        </div>
-        {loading && (
-          <Loader className="h-[40vh] w-full flex justify-center items-center text-primary-300" />
-        )}
-        {!loading && allSurveys && allSurveys.length > 0
+    <div className="w-full flex-1 flex flex-col px-6">
+      {loading && (
+        <Loader className="h-[40vh] w-full flex justify-center items-center text-primary-300" />
+      )}
+      <div className="card shadow-md p-4 bg-white rounded-md">
+        <div className="relative">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  All surveys
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Total responses
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Date created
+                </th>
+              
+                <th scope="col" className="px-6 py-3">
+                  {isSurveyManager ? "Action" : "Status"}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+            {!loading && allSurveys && allSurveys.length > 0
           ? allSurveys.map((el: any, index: number) => (
-              <div
+              <tr
                 key={index}
-                className="grid grid-cols-8 px-8 py-[16px] border-l border-r border-b border-secondary-200 w-full bg-mid-gray"
+              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
               >
-                <p
+                 <td className="px-6 py-4 font-[500]"
                   onClick={() => {
                     if (!isSurveyManager)
                       router.push(`/admin/surveys/edit?survey_id=${el._id}`);
                     if (!isSurveyManager)
                       router.push(`/admin/surveys/edit?survey_id=${el._id}`);
                   }}
-                  className="col-span-2 cursor-pointer font-semibold"
                 >
-                  {el.name}
-                </p>
-                <p className="col-span-2 pl-8">{el.response_count || 0}</p>
-                <p className="col-span-2">{formatDate(el.createdAt)}</p>
+                  <span className="text-blue-500 cursor-pointer">{el.name}</span>
+                </td>
+                <td className="px-6 py-4 font-[500]">{el.response_count || 0}</td>
+                <td className="px-6 py-4 font-[500]">{formatDate(el.createdAt)}</td>
+                <td className="px-6 py-4 font-[500]">
                 {isSurveyManager ? (
                   <ButtonFilled
-                    onClick={()=>{
-                      setQcModal(true)
-                      setSelectedSurvey(el._id)
+                    onClick={() => {
+                      setQcModal(true);
+                      setSelectedSurvey(el._id);
                     }}
                     className="w-full col-span-2"
                   >
@@ -319,14 +331,14 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                         <BsThreeDotsVertical />
                       </button>
                       {activeDropdown === el._id && (
-                        <div className="absolute right-0 top-8 h-auto w-48 bg-white shadow-lg border rounded-md py-2 z-10">
+                        <div className="absolute right-0 top-8 h-auto w-48 bg-white shadow-lg rounded-sm py-2 z-10">
                           <button
                             onClick={() =>
                               router.push(
                                 `/admin/surveys/edit?survey_id=${el._id}`
                               )
                             }
-                            className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full"
+                            className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full text-[13px]"
                           >
                             <FaRegEdit /> Edit
                           </button>
@@ -337,7 +349,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                               setActiveDropdown(null);
                               setAssignModal(true);
                             }}
-                            className="flex gap-2 items-center disabled:cursor-not-allowed disabled:bg-gray-100 px-4 py-2 hover:bg-gray-100 cursor-pointer w-full"
+                            className="flex gap-2 items-center disabled:cursor-not-allowed disabled:bg-gray-100 px-4 py-2 hover:bg-gray-100 cursor-pointer w-full  text-[13px]"
                           >
                             <FaRegUser /> Assign to user
                           </button>
@@ -346,7 +358,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                               setActiveDropdown(null);
                               setDeleteModal(true);
                             }}
-                            className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full"
+                            className="flex gap-2 items-center px-4 py-2 hover:bg-gray-100 cursor-pointer w-full  text-[13px]"
                           >
                             <MdDeleteOutline /> Delete
                           </button>
@@ -355,7 +367,9 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
                     </div>
                   </div>
                 )}
-              </div>
+                </td>
+               
+              </tr>
             ))
           : !loading &&
             !allSurveys && (
@@ -364,155 +378,25 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
               </p>
             )}
 
-        {/* modals */}
-        <CustomModal
-          open={publishModal}
-          closeModal={() => {
-            setPublishModal(false);
-            setSurveyToPublish(null);
-            setisSurveyPublished(null);
-          }}
-        >
-          <div className="flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
-          {publishing && (
-              <div className="absolute inset-0 z-30 bg-black/65 flex flex-col justify-center items-center gap-10 h-full w-full">
-                <PropagateLoader speedMultiplier={1.25} color="#FF8437" />
-                <h3 className="text-white font-semibold">
-                {isSurveyPublished ? "Unpublishing" : "Publishing"} survey...
-                </h3>
-              </div>
-            )}
-            <h1 className="text-xl">
-              Do you want to {isSurveyPublished ? "Unpublish" : "Publish"} this
-              survey?
-            </h1>
-            <div className="flex gap-2">
-              <ButtonFilled onClick={handlePublishSurvey} className="w-40">
-                {isSurveyPublished ? "Unpublish" : "Publish"}
-              </ButtonFilled>
-              <ButtonFilled
-                onClick={() => {
-                  setPublishModal(false);
-                  setSurveyToPublish(null);
-                  setisSurveyPublished(null);
-                }}
-                className="w-40"
-              >
-                No
-              </ButtonFilled>
-            </div>
-          </div>
-        </CustomModal>
-
-        <CustomModal
-          open={deleteModal}
-          preventOutsideClose={deleting}
-          closeModal={() => {
-            setDeleteModal(false);
-            setActiveDropdown(null);
-            setSurveyToDelete(null);
-          }}
-        >
-          <div className="relative flex flex-col h-[40vh] w-[40vw] justify-center items-center gap-10 ">
-            {deleting && (
-              <div className="absolute inset-0 z-30 bg-black/65 flex flex-col justify-center items-center gap-10 h-full w-full">
-                <PropagateLoader speedMultiplier={1.25} color="#FF8437" />
-                <h3 className="text-white font-semibold">
-                  Deleting survey...
-                </h3>
-              </div>
-            )}
-            <h1 className="text-xl">
-              Are you sure you want to delete this survey?
-            </h1>
-            <div className="flex gap-2">
-              <ButtonFilled onClick={handleDeleteSurvey} className="w-40">
-                Yes
-              </ButtonFilled>
-              <ButtonFilled
-                onClick={() => {
-                  setDeleteModal(false);
-                  setActiveDropdown(null);
-                  setSurveyToDelete(null);
-                }}
-                className="w-40"
-              >
-                No
-              </ButtonFilled>
-            </div>
-          </div>
-        </CustomModal>
-
-        {/* assign booth to qc */}
-        <AssignQcBoothModal boothModal={qcModal}
-          setBoothModal={setQcModal} survey_id={selectedSurvey}/>
-        {/* Assign Survey to users Modal */}
-        <CustomModal
-          open={assignModal}
-          closeModal={() => {
-            setAssignModal(false);
-            setSelectedUsers([]);
-          }}
-        >
-          <div className="flex flex-col h-[70vh] w-[40vw] items-center gap-5 p-4">
-            <h1 className="text-xl w-full text-center">
-              Select survey collectors to assign the survey
-            </h1>
-            <input
-              value={userSearch}
-              onChange={(e) => setUserSearch(e.target.value)}
-              placeholder="Search user"
-              className="px-4 py-2 rounded-md border outline-none w-full"
-            />
-            <div className="grid grid-cols-2 gap-4  w-full overflow-y-auto max-h-[60vh]">
-              {user && users && users.length > 0 ? (
-                users.map(({ _id, email, name, assigned_survey }, index) => {
-                  if (user.id === _id) return null;
-                  return (
-                    <label
-                      key={_id}
-                      className="cursor-pointer flex items-center h-fit  min-w-[50%] justify-between"
-                    >
-                      <div>
-                        {index + 1}. {name || email}
-                      </div>
-                      <input
-                        className="h-5 w-5 disabled:cursor-not-allowed"
-                        type="checkbox"
-                        defaultChecked={assigned_survey.includes(
-                          surveyToAssign
-                        )}
-                        onChange={() => handleUserSelection(_id)}
-                      />
-                    </label>
-                  );
-                })
-              ) : (
-                <div>No users available</div>
-              )}
-            </div>
-            <ButtonFilled
-              onClick={handleAssignSurvey}
-              className="whitespace-nowrap mt-auto"
-            >
-              Update Assigned Surveys
-            </ButtonFilled>
-          </div>
-        </CustomModal>
+             
+            </tbody>
+          </table>
+        </div>
       </div>
+
       {/* Pagination Controls */}
       {!loading && (
-        <div className="flex gap-3 items-center p-4 mt-auto bg-[#ECF0FA]">
+        <div className="flex gap-3 items-center p-4 mt-2 bg-[#ECF0FA]">
           {/* Limit Select */}
           <div>
-            <label htmlFor="limit-select" className="mr-2">
+            <label htmlFor="limit-select" className="mr-2 text-[13px]">
               Show:
             </label>
             <select
               id="limit-select"
               value={queryParams.limit}
               onChange={handleLimitChange}
-              className="p-2 border rounded-md"
+              className="p-2 border rounded-sm outline-none text-[14px] h-[35px]"
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -522,7 +406,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
           </div>
 
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <button
               onClick={handlePreviousPage}
               disabled={queryParams.page === 1}
@@ -530,7 +414,7 @@ function AllSurveys({ queryParams, setQueryParams, updated }: AllSurveysProps) {
             >
               <IoIosArrowBack />
             </button>
-            <span>
+            <span className="text-[13px]">
               Page {queryParams.page} of {totalPages}
             </span>
             <button

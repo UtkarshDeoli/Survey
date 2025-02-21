@@ -6,6 +6,14 @@ import Image from "next/image";
 import bell from "../../../public/icons/active.png";
 import profile from "../../../public/icons/profile.png";
 import { validRoles } from "@/utils/constants";
+import { RiMenuFold3Line } from "react-icons/ri";
+import { RiMenuFold4Line } from "react-icons/ri";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
+import { FaRegBell } from "react-icons/fa";
+import { styled } from "@mui/material/styles";
+import Badge from "@mui/material/Badge";
 
 interface UserData {
   id: string;
@@ -14,7 +22,18 @@ interface UserData {
   name: string;
 }
 
-function Navbar() {
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    right: -3,
+    top: 13,
+    border: `2px solid ${theme.palette.background.paper}`,
+    padding: "0 4px",
+  },
+}));
+
+
+function Navbar({ sidebarOpen, onSidebarToggle }: any) {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
   const path = usePathname();
@@ -24,19 +43,49 @@ function Navbar() {
     setUserData(payload);
   }, [router]);
   return (
-    <nav className="sicky z-10 top-0 flex px-8 py-[18px] h-[80px] shadow-md justify-end gap-5 bg-white">
-      {/* </ButtonBordered> */}
-      {userData && (
-        <div className="flex gap-2 items-center">
-          <Image src={profile.src} height={40} width={40} alt="profile icon" />
-          <h3 className="text-primary-300 text-[14px]">
-            Welcome{" "}
-            <span className="font-semibold text-[18px]">{userData.name}</span>
-          </h3>
-        </div>
-      )}
-      {/* bell icon */}
-      <img src={bell.src} alt="bell icon" className="object-contain w-[25px]" />
+    <nav className="sicky z-50 top-0 flex items-center px-5 py-3 h-auto shadow-md justify-between gap-5 bg-[#112143]">
+      <Button
+        onClick={onSidebarToggle}
+        className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !text-white"
+      >
+        {!sidebarOpen ? (
+          <RiMenuFold3Line size={18} />
+        ) : (
+          <RiMenuFold4Line size={18} />
+        )}
+      </Button>
+
+      <div className="flex items-center gap-4 pr-4">
+         {/* bell icon */}
+         <Tooltip title="Notifications">
+          <IconButton aria-label="cart" className="!text-[rgba(255,255,255,0.8)]">
+            <StyledBadge badgeContent={4} color="secondary">
+              <FaRegBell className="text-white"/>
+            </StyledBadge>
+          </IconButton>
+        </Tooltip>
+
+        {/* </ButtonBordered> */}
+        {userData && (
+          <Button className="flex gap-2 items-center ml-2 !justify-start !text-left !text-gray-300">
+            <Image
+              src={profile.src}
+              height={37}
+              width={37}
+              alt="profile icon"
+            />
+            <div className="flex flex-col">
+              <span className="font-[400] !text-[rgba(255,255,255,0.8)] !capitalize text-[13px] leading-4 opacity-80">
+                {userData.name}
+              </span>
+              <span className="font-[400px] !text-[rgba(255,255,255,0.8)] !capitalize text-[14px] leading-5">
+                {userData.email}
+              </span>
+            </div>
+          </Button>
+        )}
+       
+      </div>
     </nav>
   );
 }

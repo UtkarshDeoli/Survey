@@ -149,14 +149,14 @@ function Page() {
   }
 
   async function getUsers() {
-    // setLoading(true);
+    setLoading(true);
     const response = await getAllUsers({selectedRole:surveyCollectorId});
     console.log("users-------->", response.data);
     setUsers(response.data);
-    // setLoading(false);
+    setLoading(false);
   }
   async function handleGetPannaPramukh() {
-    // setLoading(true);
+    setLoading(true);
     console.log("ac list is coming  --->",acList)
     const response = await getPannaPramukhByAcList({
       ac_list:acList,
@@ -164,7 +164,7 @@ function Page() {
     });
     console.log("panna below-------->", response);
     setPannaPramukh(response);
-    // setLoading(false);
+    setLoading(false);
   }
 
   const openModal = () => {

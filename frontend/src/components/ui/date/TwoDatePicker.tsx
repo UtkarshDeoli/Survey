@@ -2,11 +2,11 @@ import { format } from "date-fns";
 import DatePicker from "react-datepicker";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { twMerge } from "tailwind-merge";
-import doubleArrow from "/public/images/doubleArrow.png"
+import doubleArrow from "/public/images/doubleArrow.png";
 import "react-datepicker/dist/react-datepicker.css";
+import { MdCompareArrows } from "react-icons/md";
 
-
-interface props{
+interface props {
   startDate: Date | null;
   endDate: Date | null;
   setStartDate: (date: Date | null) => void;
@@ -14,8 +14,13 @@ interface props{
   className?: string;
 }
 
-function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className }: props) {
-
+function TwoDatePicker({
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  className,
+}: props) {
   const formatDate = (date: Date | null) => {
     return date ? format(date, "dd-MMM-yyyy") : "";
   };
@@ -29,9 +34,13 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
   };
 
   return (
-    <div className={twMerge("w-fit flex font-medium text-lg py-2 items-center space-x-2 rounded-md focus:outline-none cursor-pointer", className)}>
-
-      <div className="flex items-center">
+    <div
+      className={twMerge(
+        "w-fit flex font-medium text-lg py-2 items-center space-x-2 rounded-md focus:outline-none cursor-pointer",
+        className
+      )}
+    >
+      <div className="flex items-center gap-3">
         <DatePicker
           selected={startDate}
           onChange={(date) => setStartDate(normalizeDate(date))}
@@ -47,12 +56,13 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
                   console.log("inside input");
                 }}
                 placeholder={`Select start`}
-                className="my-2 w-[150px] px-4 py-2 rounded-[20px] shadow-floating  text-center outline-none font-normal text-sm"
+                className="w-[150px] h-[40px] rounded-md bg-white pl-2 text-[13px] border border-[rgba(0,0,0,0.1)] outline-none"
               />
             </div>
           }
         />
-       <img src={doubleArrow.src} className="object-contain w-[30px] mx-4"/>
+        <MdCompareArrows size={27} />
+
         <DatePicker
           selected={endDate}
           onChange={(date) => setEndDate(normalizeDate(date))}
@@ -68,7 +78,7 @@ function TwoDatePicker({ startDate, setStartDate, endDate, setEndDate, className
                   console.log("inside input");
                 }}
                 placeholder={`Select end`}
-                className="my-2 w-[150px] px-4 py-2 rounded-[20px] shadow-floating text-center outline-none font-normal text-sm"
+                 className="w-[150px] h-[40px] rounded-md bg-white pl-2 text-[13px] border border-[rgba(0,0,0,0.1)] outline-none"
               />
             </div>
           }

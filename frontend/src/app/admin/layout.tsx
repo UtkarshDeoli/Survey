@@ -28,10 +28,10 @@ function Layout({ children }: LayoutProps) {
     <div className="flex h-screen w-screen overflow-hidden">
       <Sidebar onSidebarToggle={handleToggle} sidebarOpen={sidebarOpen} />
       <div className={`flex flex-col flex-1`}>
-        <Navbar />
+        <Navbar onSidebarToggle={handleToggle} sidebarOpen={sidebarOpen} />
         <main
           className={`flex-1 h-full overflow-auto vertical-scrollbar ${
-            sidebarOpen ? "w-[calc(100vw-300px)]" : "w-[calc(100vw-75px)]"
+            sidebarOpen ? "w-[calc(100vw-280px)]" : "w-[calc(100vw-75px)]"
           }`}
         >
           <CreateSurveyContextProvider>

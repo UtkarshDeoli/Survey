@@ -4,6 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
+*{margin:0px; padding: 0px; box-sizing: border-box;}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -90,3 +92,58 @@
  .calendar{
   background:blue
  }
+
+ .activeTab button{font-weight: 500 !important; color: rgba(255,255,255,.8) !important;}
+ .activeTab svg:first-child{color: #ff8437 !important;}
+ 
+ body{background: #f1f1f1;}
+
+ ::-webkit-scrollbar {width: 7px !important;
+	cursor:pointer;
+	transition:all 0.4s;
+	-webkit-transition:all 0.4s;
+	-moz-transition:all 0.4s;
+	-o-transition:all 0.4s;
+	 -webkit-overflow-scrolling: touch;
+}
+
+
+.height-box:hover::-webkit-scrollbar{
+	width:14px;
+} 
+
+
+
+/* Track */
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+	cursor:pointer;
+	background:#fff !important;
+}
+
+ 
+.sidebarScroll::-webkit-scrollbar-track {background:rgba(255,255,255,0.5) !important;}
+ 
+
+/* Handle */
+
+
+
+::-webkit-scrollbar-thumb { 
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background:#c6c6c6; 
+	cursor:pointer;
+}
+
+.MuiBadge-standard{@apply !bg-red-600}
+
+
+.formInput{height: 35px; border: 1px solid rgba(0,0,0,0.1); outline: none !important; padding-left:10px ; border-radius: 5px !important;}
+.formInput:focus,.formInput:hover{border: 1px solid rgba(0,0,0,0.3) !important;}
+
+.MuiPaper-root.MuiPaper-elevation ul{zoom: 85% !important;}
+.transition-switch{zoom: 75%;}
+
+.btn-custom{padding: 6px 15px !important; text-transform: capitalize !important; border-radius: 5px !important;}

@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation"; // For routing
 import toast from "react-hot-toast";
 import Loader from "@/components/ui/Loader";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import Select from "react-select";
+import Select2 from "react-select";
 import { getSurvey } from "@/networks/survey_networks";
 import Filters from "@/components/survey-responses/Filters";
 import DataFilterModal from "@/components/survey-responses/DataFilterModal";
@@ -29,6 +29,10 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { surveyCollectorId } from "@/utils/constants";
 import useUser from "@/hooks/useUser";
 import AssignBoothModal from "@/components/survey-responses/AssignBoothModal";
+import Button from "@mui/material/Button";
+import { SlCalender } from "react-icons/sl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 function Page() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -64,8 +68,8 @@ function Page() {
 
   //  pagination
   const [totalResponsePages, setTotalResponsePages] = useState<number>(1);
-  const [pageLimit, setPageLimit] = useState<number>(10);
-  const [page, setPage] = useState<number>(1);
+  const [pageLimit, setPageLimit] = useState<any>(10);
+  const [page, setPage] = useState<any>(1);
 
   // downloading
   const [downloading, setDownloading] = useState<boolean>(false);
@@ -83,13 +87,10 @@ function Page() {
     googleMapsApiKey: "AIzaSyAAOwDBvpg5ZDv5JFG-CoDW23GsKkOPeuA",
   });
   useEffect(() => {
-    getUserResponses();
-  }, [reset, page, pageLimit, userId, appliedFilters]);
-
-  useEffect(() => {
     getQuestions();
+    getUserResponses();
     getUsers();
-  }, []);
+  }, [reset, page, pageLimit, userId, appliedFilters]);
 
   useEffect(() => {
     if (acList.length > 0) {
@@ -145,21 +146,21 @@ function Page() {
   }
 
   async function getUsers() {
-    // setLoading(true);
+    setLoading(true);
     const response = await getAllUsers({ selectedRole: surveyCollectorId });
     console.log("users-------->", response.data);
     setUsers(response.data);
-    // setLoading(false);
+    setLoading(false);
   }
   async function handleGetPannaPramukh() {
-    // setLoading(true);
+    setLoading(true);
     const response = await getPannaPramukhByAcList({
       // ac_list:acList,
       filter: userSearch,
     });
     console.log("panna below-------->", response);
     setPannaPramukh(response);
-    // setLoading(false);
+    setLoading(false);
   }
 
   const openModal = () => {
@@ -232,6 +233,11 @@ function Page() {
     setPageLimit(newLimit);
   };
 
+  const handleChange = (event: SelectChangeEvent) => {
+    const newLimit = event.target.value;
+    setPageLimit(newLimit);
+  };
+
   const handleNextPage = () => {
     setPage(page + 1);
   };
@@ -241,9 +247,9 @@ function Page() {
   };
 
   return (
-    <div className="flex flex-col w-full font-medium bg-light-gray">
-      <nav className="w-full py-3 px-8 flex flex-col gap-10 font-semibold">
-        <h3 className="text-[24px] font-semibold">Survey Response</h3>
+    <div className="flex flex-col w-full px-8">
+      <nav className="w-full py-3 flex flex-col gap-3">
+        <h3 className="text-[18px] font-[500]">Survey Response</h3>
 
         <div className="flex w-full gap-12">
           <Filters
@@ -255,62 +261,62 @@ function Page() {
             setSelectedFilter={setSelectedFilter}
             surveyQuestions={surveyQuestions}
           />
-          <div className="flex space-x-2 text-black text-base font-semibold">
-            <ButtonFilled
-              loading={downloading}
-              onClick={exportToExcel}
-              className="rounded-[20px] h-fit px-4 py-2 w-44 justify-center"
-            >
-              Export to Excel
-            </ButtonFilled>
-            <FilledGreyButton
-              onClick={() => router.back()}
-              className="rounded-[20px] h-fit px-4 py-2"
-            >
-              Back
-            </FilledGreyButton>
+
+          <div>
+            <div className="flex space-x-2 text-black text-base font-semibold">
+              <ButtonFilled
+                view={
+                  "btn-custom bg-green-500 flex items-center justify-center !text-[13px] !rounded-md !text-white !h-[40px] !w-[140px]"
+                }
+                loading={downloading}
+                onClick={exportToExcel}
+              >
+                Export to Excel
+              </ButtonFilled>
+              <FilledGreyButton
+                onClick={() => router.back()}
+                className="btn-custom !bg-gray-600 flex items-center justify-center !text-[13px] !rounded-md !text-white !h-[40px]"
+              >
+                Back
+              </FilledGreyButton>
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="p-5 font-semibold text-sm ">
-        <div className="bg-light-gray space-y-4 w-full rounded-lg px-4 py-6">
-          <div className="w-[780px] space-y-8 pb-6 ">
+      <div className="mt-2 font-semibold text-sm ">
+        <div className="bg-light-gray  w-full rounded-md shadow-md px-4 py-6 mb-5">
+          <div className="w-full">
             <div className="flex gap-10">
               {/* Date Range */}
               <div>
                 <div className="flex gap-3 items-center mb-5">
-                  <h1 className="">Date Range</h1>
-                  <Image
-                    src={survey_analytics_calender.src}
-                    alt="calender"
-                    height={18}
-                    width={18}
-                  />
+                  <h2 className="text-[16px]">Date Range</h2>
+                  <SlCalender size={20} />
                 </div>
-                <div className="w-fit">
+                <div className="w-fit flex items-center gap-4">
                   <TwoDatePicker
-                    className="w-[352px] h-10"
+                    className="w-[352px] h-10 relative"
                     startDate={startDate}
                     endDate={endDate}
                     setStartDate={setStartDate}
                     setEndDate={setEndDate}
                   />
+
+                  <ButtonFilled
+                    className="btn-custom bg-orange-500 flex items-center justify-center !text-[13px] !rounded-md !text-white !h-[40px] !w-[180px]"
+                    onClick={openModal}
+                  >
+                    Advanced data filter
+                  </ButtonFilled>
                 </div>
               </div>
-
-              <ButtonFilled
-                className=" flex justify-center items-center h-fit self-end"
-                onClick={openModal}
-              >
-                Advanced data filter +
-              </ButtonFilled>
             </div>
 
-            <div className="flex gap-5 items-center">
+            <div className="flex gap-5 items-center pt-4">
               {/* Selected User */}
-              <div className="flex flex-col space-y-2 w-[352px]">
-                <Select
+              <div className="flex flex-col  w-[352px]">
+                <Select2
                   value={options.find((option) => option.value === userId)}
                   onChange={(selectedOption) =>
                     setUserId(selectedOption?.value || "")
@@ -323,7 +329,7 @@ function Page() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex space-x-4">
+              <div className="flex space-x-2">
                 <FilledGreyButton
                   onClick={() => {
                     setStartDate(null);
@@ -332,7 +338,7 @@ function Page() {
                     setAppliedFilters([]);
                     setReset(!reset);
                   }}
-                  className="bg-dark-gray text-white"
+                  className="btn-custom bg-gray-800 flex items-center justify-center !text-[13px] !rounded-md !text-white !h-[40px]"
                 >
                   Reset
                 </FilledGreyButton>
@@ -351,20 +357,26 @@ function Page() {
                       getUserResponses();
                     }
                   }}
-                  className="disabled:cursor-not-allowed disabled:bg-primary-100 disabled:text-secondary-100"
+                  className="btn-custom bg-orange-700 flex items-center justify-center !text-[13px] !rounded-md !text-white !h-[40px]"
                 >
                   Apply
                 </ButtonFilled>
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-3">
               {acList && acList.length > 0 && (
-                <ButtonFilled onClick={() => setUserModal(true)}>
+                <ButtonFilled
+                  onClick={() => setUserModal(true)}
+                  className="text-blue-700 hover:text-gray-900 text-[14px]"
+                >
                   Assign Data
                 </ButtonFilled>
               )}
-              <ButtonFilled onClick={() => setBoothModal(true)}>
+              <ButtonFilled
+                onClick={() => setBoothModal(true)}
+                className="text-blue-700 hover:text-gray-900 text-[14px]"
+              >
                 Assign Booth
               </ButtonFilled>
             </div>
@@ -372,10 +384,7 @@ function Page() {
         </div>
       </div>
       {loading && (
-        <Loader
-          text="Fetching responses, please wait..."
-          className="h-[30vh] w-full flex justify-center items-center"
-        />
+        <Loader className="h-[30vh] w-full flex justify-center items-center" />
       )}
       {!loading && responses && responses.length > 0 ? (
         <ResponseTable
@@ -394,20 +403,20 @@ function Page() {
         />
       ) : (
         !loading && (
-          <div className="flex w-full justify-center items-center h-[30vh]">
-            <p>No responses found</p>
+          <div className="flex w-full justify-center items-center">
+            <p className="font-[500]">No responses found</p>
           </div>
         )
       )}
       {/* Pagination Controls */}
-      {!loading && (
-        <div className="flex gap-3 items-center mt-4 pl-4 py-3 sticky bottom-0 left-0 bg-[#ECF0FA]">
+      {!loading && responses && responses.length > 0 && (
+        <div className="flex gap-3 items-center mt-4 pb-5">
           {/* Limit Select */}
           <div>
-            <label htmlFor="limit-select" className="mr-2">
+            <label htmlFor="limit-select" className="mr-2 text-[13px]">
               Show:
             </label>
-            <select
+            {/* <select
               id="limit-select"
               value={pageLimit}
               onChange={handleLimitChange}
@@ -417,11 +426,25 @@ function Page() {
               <option value={20}>20</option>
               <option value={50}>50</option>
               <option value={100}>100</option>
-            </select>
+            </select> */}
+
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={pageLimit}
+              onChange={handleChange}
+              size="small"
+              style={{zoom:"80%"}}
+            >
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </Select>
           </div>
 
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <button
               onClick={handlePreviousPage}
               disabled={page === 1}
@@ -429,7 +452,7 @@ function Page() {
             >
               <IoIosArrowBack />
             </button>
-            <span>
+            <span className=" text-[13px]">
               Page {page} of {totalResponsePages}
             </span>
             <button

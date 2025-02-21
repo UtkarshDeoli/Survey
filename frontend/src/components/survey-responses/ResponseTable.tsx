@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { truncateText, formatDate } from "@/utils/common_functions";
 import React, { useState } from "react";
@@ -9,6 +9,9 @@ import toast from "react-hot-toast";
 import { updateKaryakartas } from "@/networks/user_networks";
 import { useSearchParams } from "next/navigation";
 import Response from "./Response";
+import { IoLocationOutline } from "react-icons/io5";
+import { FaRegEye } from "react-icons/fa";
+
 
 interface ResponseTableProps {
   responses: any;
@@ -22,10 +25,10 @@ interface ResponseTableProps {
   setMapModalIsOpen: (isOpen: boolean) => void;
   setMore: (questionId: string | null) => void;
   more: string | null;
-  setAssignedMode:(val:boolean)=>void
-  selectedPanna:string|null,
-  getUserResponses:any,
-  setSelectedPanna:(val:string|null)=>void
+  setAssignedMode: (val: boolean) => void;
+  selectedPanna: string | null;
+  getUserResponses: any;
+  setSelectedPanna: (val: string | null) => void;
 }
 function ResponseTable({
   responses,
@@ -39,9 +42,9 @@ function ResponseTable({
   setAssignedMode,
   selectedPanna,
   getUserResponses,
-  setSelectedPanna
+  setSelectedPanna,
 }: ResponseTableProps) {
-  console.log("all responses /////////////// ",responses)
+  console.log("all responses /////////////// ", responses);
 
   const [startIndex, setStartIndex] = useState<number | null>(null);
   const [endIndex, setEndIndex] = useState<number | null>(null);
@@ -50,8 +53,8 @@ function ResponseTable({
   const searchParams = useSearchParams();
   const surveyId = searchParams.get("survey_id");
 
-  console.log("selectedResponses are from outside --->",selectedResponses)
-  
+  console.log("selectedResponses are from outside --->", selectedResponses);
+
   function handleMemberClick(responseId: string, index: number) {
     // If no start index is set, set the current index as the start index
     if (startIndex === null) {
@@ -87,12 +90,13 @@ function ResponseTable({
           toast.error("Maximum of 60 responses are allowed");
           return;
         }
-        console.log("all responses are ------>",responses)
+        console.log("all responses are ------>", responses);
         // Create an array to hold selected responses
         const selected: string[] = [];
         for (let i = startIndex; i <= index; i++) {
-          if(!responses[i].panna_pramukh_assigned){ //only if response is not assigned to any panna pramukh
-            selected.push(responses[i]._id); // Use `_id` from the `responses` array   
+          if (!responses[i].panna_pramukh_assigned) {
+            //only if response is not assigned to any panna pramukh
+            selected.push(responses[i]._id); // Use `_id` from the `responses` array
           }
         }
         // console.log("selected response are ------>",selected);
@@ -122,7 +126,7 @@ function ResponseTable({
       responses: selectedResponses,
       surveyId,
     });
-    console.log("after updation ----->",response)
+    console.log("after updation ----->", response);
     if (response.success) {
       toast.success("Data assigned successfully");
       setAssignedMode(false);
@@ -130,45 +134,45 @@ function ResponseTable({
       setSelectedPanna(null);
       getUserResponses();
     } else {
-      console.log("error response --->",response)
+      console.log("error response --->", response);
       toast.error(response.message);
     }
   }
 
-  
   return (
     <div
       id="scrollableDiv"
-      className="w-[96%] mx-auto max-h-[80vh] overflow-auto  scrollbar rounded-t-2xl border border-secondary-200"
+      className="w-full max-h-[80vh] overflow-auto  scrollbar rounded-t-2xl border border-secondary-200"
     >
-      <table className="w-full table-auto">
-        <thead className="">
-          <tr className="bg-dark-gray text-white sticky top-0">
-            <td className="min-w-32 px-4 py-2 border-b text-center"></td>
-            <td className="min-w-32 px-4 py-2 border-b text-center"></td>
-            {assignMode && <td className="min-w-32 px-4 py-2 border-b text-center"></td> }
+      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" className="px-6 py-3"></th>
+            <th scope="col" className="px-6 py-3"></th>
+            {assignMode && <th scope="col" className="px-6 py-3"></th>}
 
-            <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
+            <th scope="col" className="px-6 py-3 whitespace-nowrap">
               Panna pramukh
-            </td>
-            <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
+            </th>
+            <th scope="col" className="px-6 py-3">
               Status
-            </td>
-            <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
+            </th>
+            <th scope="col" className="px-6 py-3">
               Remark
-            </td>
-            <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
+            </th>
+            <th scope="col" className="px-6 py-3 whitespace-nowrap">
               Response date
-            </td>
-            <td className="px-4 py-2 border-b min-w-32 whitespace-nowrap text-center font-semibold">
+            </th>
+            <th scope="col" className="px-6 py-3">
               User
-            </td>
+            </th>
             {responses &&
               responses.length > 0 &&
               responses[0].responses.map((response: any, index: number) => (
-                <td
+                <th
                   key={index}
-                  className="gap-2 font-semibold px-4 py-2 border-b min-w-32 whitespace-nowrap text-center"
+                  scope="col"
+                  className="px-6 py-3 whitespace-nowrap"
                 >
                   {more !== response.question_id
                     ? truncateText(response.question, 10)
@@ -191,7 +195,7 @@ function ResponseTable({
                       ? "Less"
                       : ""}
                   </button>
-                </td>
+                </th>
               ))}
           </tr>
         </thead>
@@ -203,13 +207,13 @@ function ResponseTable({
                   setSelectedResponse(response);
                   setResponseModalIsOpen(true);
                 }}
-                className="cursor-pointer"
+                className="odd:bg-white even:bg-gray-50 border-b dark:bg-gray-800 dark:border-gray-700"
                 key={rowIndex}
               >
                 {assignMode && (
                   <td
                     onClick={(e) => e.stopPropagation()}
-                    className="min-w-32 px-4 py-2 border-b text-center"
+                    className="px-6 py-4 font-[500]"
                   >
                     <input
                       disabled={response.panna_pramukh_assigned}
@@ -220,56 +224,63 @@ function ResponseTable({
                     />
                   </td>
                 )}
-                <td className="min-w-32 px-4 py-2 border-b text-center">
+                <td className="px-6 py-4 font-[500]">
                   <ButtonFilled
-                    className="w-10 p-0 flex justify-center items-center rounded-full h-10"
+                    className="w-10 p-0 cursor-pointer flex justify-center items-center rounded-full h-10"
                     onClick={(e) => {
                       e.stopPropagation();
                       setMapModalIsOpen(true);
                     }}
                   >
-                    <FaLocationDot />
+                    <IoLocationOutline size={20} />
                   </ButtonFilled>
                 </td>
-                <td className="min-w-32 px-4 py-2 border-b text-center">
-                  <FaEye />
+                <td className="px-6 py-4 font-[500] cursor-pointer">
+                  <FaRegEye size={18} />
                 </td>
-                <td className="min-w-32 px-4 py-2 border-b text-center">
+                <td className="px-6 py-4 font-[500]">
                   {response.panna_pramukh_assigned
                     ? response.panna_pramukh_assigned.name
                     : "--"}
                 </td>
-                <td className="min-w-32 px-4 py-2 border-b text-center">
+                <td className="px-6 py-4 font-[500]">
                   {response.contacted ? (
-                    <p className="w-full p-2 bg-green-200 rounded-md">
+                    <p className="w-full p-2 py-1 bg-green-200 rounded-md text-[12px] text-gray-800">
                       Complete
                     </p>
                   ) : response.panna_pramukh_assigned ? (
-                    <p className="w-full p-2 bg-amber-300 rounded-md">
+                    <p className="w-full p-2 py-1 bg-amber-300 rounded-md text-[12px] text-gray-800">
                       Pending
                     </p>
                   ) : (
                     "---"
                   )}
                 </td>
-                <td className="min-w-32 px-4 py-2 border-b text-center">
+                <td className="px-6 py-4 font-[500]">
                   {response.remark ? truncateText(response.remark, 15) : "---"}
                 </td>
 
-                <td className="min-w-32 px-4 py-2 border-b text-center">
+                <td className="px-6 py-4 font-[500]">
                   {formatDate(response.createdAt)}
                 </td>
-                <td className="min-w-44 whitespace-nowrap px-4 py-2 border-b text-center">
+                <td className="px-6 py-4 font-[500] whitespace-nowrap">
                   {users.find((user) => user._id === response.user_id)?.name ||
                     "-"}
                 </td>
 
                 {response.responses.map((res: any, colIndex: any) => (
-                  <Response expand={false} questionType={res.question_type} response={res.response}/>
+                  <Response
+                    expand={false}
+                    questionType={res.question_type}
+                    response={res.response}
+                  />
                 ))}
               </tr>
             ))}
           {/* </InfiniteScroll> */}
+
+            
+
         </tbody>
       </table>
       {assignMode && (
@@ -281,12 +292,14 @@ function ResponseTable({
           >
             Assign
           </ButtonFilled>
-          <ButtonFilled onClick={()=>{
-            setAssignedMode(false)
-            setSelectedResponses([])
-            setStartIndex(null);
-            setEndIndex(null);
-          }}>
+          <ButtonFilled
+            onClick={() => {
+              setAssignedMode(false);
+              setSelectedResponses([]);
+              setStartIndex(null);
+              setEndIndex(null);
+            }}
+          >
             Cancel
           </ButtonFilled>
         </div>

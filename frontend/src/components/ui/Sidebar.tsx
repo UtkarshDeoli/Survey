@@ -6,6 +6,19 @@ import { Tooltip } from "react-tooltip";
 import { checkToken } from "@/utils/common_functions";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { IoMdLogOut } from "react-icons/io";
+import Button from "@mui/material/Button";
+import { AiOutlineLogout } from "react-icons/ai";
+import { AiOutlineDashboard } from "react-icons/ai";
+import { GoChecklist } from "react-icons/go";
+import { BsDatabaseCheck } from "react-icons/bs";
+import { TbReportAnalytics } from "react-icons/tb";
+import { FaRegListAlt } from "react-icons/fa";
+import { LuListTodo } from "react-icons/lu";
+import { FaRegUser } from "react-icons/fa6";
+import { FiUsers } from "react-icons/fi";
+import { BiSupport } from "react-icons/bi";
+
+
 
 // Paths that should have a small sidebar
 function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
@@ -23,37 +36,37 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
   // Define Sidebar items
   let SidebarScreens: any = [
     {
-      icon: "/images/dashboard.png",
+      icon: <AiOutlineDashboard size={20} />,
       name: "Dashboard",
       path: "/admin",
       tooltip: "Dashboard",
     },
     {
-      icon: "/images/survey.png",
+      icon: <GoChecklist size={20}/>,
       name: "Surveys",
       path: "/admin/surveys",
       tooltip: "Surveys",
     },
     {
-      icon: "/images/database.png",
+      icon: <BsDatabaseCheck size={20} />,
       name: "Data",
       path: "/admin/data",
       tooltip: "Data",
     },
     {
-      icon: "/images/report.png",
+      icon: <TbReportAnalytics size={22}/>,
       name: "Report",
       path: "/admin/report",
       tooltip: "Report",
     },
     {
-      icon: "/icons/sample.png",
-      name: "Survey-sampling",
+      icon: <FaRegListAlt size={16}/>,
+      name: "Survey Sampling",
       path: "/admin/survey-sampling",
-      tooltip: "Survey-sampling",
+      tooltip: "Survey Sampling",
     },
     {
-      icon: "/images/todo.png",
+      icon: <LuListTodo size={20}/>,
       name: "To-Do list",
       path: "/admin/todos",
       tooltip: "todo-list",
@@ -62,7 +75,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
 
   let bottomTabs = [
     {
-      icon: "/images/support.png",
+      icon: <BiSupport size={20}/>,
       name: "Support",
       path: "/admin/support",
       tooltip: "Support",
@@ -80,7 +93,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       );
     } else if (roleName.includes("Supervisor")) {
       SidebarScreens.push({
-        icon: "/images/karyakarta.png",
+        icon: <FaRegUser size={17}/>,
         name: "Collectors",
         path: "/admin/collectors",
         tooltip: "Collectors",
@@ -94,7 +107,7 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
       );
     } else if (roleName.includes("Quality Check")) {
       SidebarScreens.push({
-        icon: "/images/karyakarta.png",
+        icon: <FaRegUser size={17}/>,
         name: "All surveys",
         path: "/admin/quality-check-surveys",
         tooltip: "All surveys",
@@ -122,17 +135,17 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
         name: "VRM Dashboard",
         path: "/admin/vrm-dashboard",
         tooltip: "VRM Dashboard",
-      },);
+      });
     } else {
       SidebarScreens.push(
         {
-          icon: "/images/karyakarta.png",
+          icon: <FaRegUser size={17}/>,
           name: "Karyakarta",
           path: "/admin/karyakarta",
           tooltip: "Karyakarta",
         },
         {
-          icon: "/images/survey-user.png",
+          icon: <FiUsers size={20}/>,
           name: "Users",
           path: "/admin/users",
           tooltip: "Users",
@@ -142,36 +155,28 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
   }
   function getSidebarButtonClass(el: any) {
     return `relative flex rounded-md ${
-      sidebarOpen ? "w-full mb-3" : "w-fit self-center mb-5"
+      sidebarOpen ? "w-full my-1" : "w-fit self-center mb-5"
     } transition-all ease-in-out duration-200 ${
       el.path === "/admin" // Exact match for Dashboard
         ? path === el.path
-          ? "bg-mid-gray hover:bg-mid-gray hover:scale-105"
-          : "text-secondary-300 hover:bg-mid-gray hover:scale-105"
+          ? "bg-[rgba(255,255,255,0.1)] activeTab hover:bg-[rgba(255,255,255,0.1)]"
+          : "text-[#fff] hover:bg-[rgba(255,255,255,0.1)] text-[14px]"
         : path.includes(el.path) // For all other paths
-        ? "bg-mid-gray border-l-8 border-mid-gray font-bold hover:bg-mid-gray hover:scale-105"
-        : "text-secondary-300 hover:bg-mid-gray hover:scale-105"
+        ? "bg-[rgba(255,255,255,0.1)] activeTab hover:bg-[rgba(255,255,255,0.1)]"
+        : "text-[#fff] hover:bg-[rgba(255,255,255,0.1)] text-[14px]"
     }`;
   }
 
   return (
     <aside
-      className={`font-montserrat h-screen overflow-visible relative border-2 border-secondary-100 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out pb-5 ${
-        sidebarOpen ? "w-[300px]" : "w-[75px]"
+      className={`sidebar font-nunito-sans h-screen overflow-visible relative flex flex-col transition-all duration-300 ease-in-out pb-5 bg-[#112143] ${
+        sidebarOpen ? "w-[280px]" : "w-[75px]"
       }`}
     >
-      <button
-        onClick={onSidebarToggle}
-        className={`transition-all duration-300 absolute z-10 -right-[25px] top-1/2 transform -translate-y-1/2 ${
-          !sidebarOpen ? "rotate-180" : ""
-        }`}
-      >
-        <img src="/images/arrow-left.png" className=" w-[50px]" />
-      </button>
       <div className="flex flex-col h-full w-full">
         <h1
           onClick={() => router.push("/admin")}
-          className="flex flex-col font-semibold gap-3 cursor-pointer justify-center pt-4 items-center"
+          className="flex flex-col font-semibold gap-3 cursor-pointer justify-center pt-4 px-3 items-center"
         >
           {sidebarOpen ? (
             // <Image
@@ -180,11 +185,11 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
             //   height={80}
             //   width={80}
             // />
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <div className="h-12 w-12 rounded-full bg-primary-300 flex-shrink-0">
                 <img src="/icons/logo.png" className="h-full w-full" />
               </div>
-              <h1 className="font-extrabold text-lg">
+              <h1 className="font-[500] text-[15px] text-white leading-5 opacity-90">
                 BHARAT DEMOGRAPHIC RESEARCH
               </h1>
             </div>
@@ -193,107 +198,118 @@ function Sidebar({ sidebarOpen, onSidebarToggle }: any) {
               <img src="/icons/logo.png" className="h-full w-full" />
             </div>
           )}
-          {/* <button>Profile</button> */}
+          {/* <Button>Profile</Button> */}
         </h1>
 
-        {/* upper section of tabs */}
-        <div
-          className={`flex flex-col items-start pt-10 ${
-            sidebarOpen ? "px-2" : ""
-          }`}
-        >
-          {SidebarScreens.map((el: any, ind: number) => (
-            <div key={ind} className={getSidebarButtonClass(el)}>
-              <button
-                onClick={() => {
-                  router.push(el.path);
-                }}
-                className={`rounded-md px-3 py-2 flex items-center gap-3 font-semibold ${
-                  !sidebarOpen ? "w-fit" : "w-full"
-                }`}
-              >
-                {!sidebarOpen && (
-                  <div
-                    className="w-full"
-                    data-tooltip-id={`tooltip-${ind}`}
-                    data-tooltip-content={el.tooltip}
-                    data-tooltip-place="right"
-                  >
-                    <img src={el.icon} className="w-[20px]" />
-                  </div>
-                )}
-                {sidebarOpen && <img src={el.icon} className="w-[20px]" />}
-                {sidebarOpen && el.name}
-                {sidebarOpen && <MdKeyboardArrowRight className="ml-auto" />}
-              </button>
-              <Tooltip
-                id={`tooltip-${ind}`}
-                style={{ zIndex: 30, position: "fixed" }}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* lower section of tabs */}
-        <div className={`flex flex-col w-full ${sidebarOpen ? "px-2" : ""}`}>
-          {bottomTabs.map((el: any, ind: number) => (
-            <div key={ind} className={getSidebarButtonClass(el)}>
-              <button
-                onClick={() => {
-                  router.push(el.path);
-                }}
-                className={`rounded-md px-3 py-2 flex items-center gap-3 w-full font-semibold ${
-                  !sidebarOpen ? "" : "w-[150px]"
-                }`}
-              >
-                {!sidebarOpen && (
-                  <div
-                    className="w-full"
-                    data-tooltip-id={`tooltip-${ind}`}
-                    data-tooltip-content={el.tooltip}
-                    data-tooltip-place="right"
-                  >
-                    <img src={el.icon} className="w-[20px]" />
-                  </div>
-                )}
-                {sidebarOpen && <img src={el.icon} className="w-[20px]" />}
-                {sidebarOpen && el.name}
-                {sidebarOpen && <MdKeyboardArrowRight className="ml-auto" />}
-              </button>
-              <Tooltip
-                id={`tooltip-${ind}`}
-                style={{ zIndex: 30, position: "fixed" }}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="mt-auto w-[96%] mx-auto relative flex justify-center items-center bg-[#fcbd95] h-32  rounded-lg transition-all duration-150 overflow-hidden before:content-[''] before:absolute before:rounded-full before:w-[40px] before:h-[40px] before:bg-[#eb7e3b] before:top-[10px] before:left-[10px] after:content-[''] after:absolute after:rounded-full after:w-[70px] after:h-[70px] after:bg-[#eb7e3b] after:top-[-20px] after:right-[-20px]">
-          <button
-            onClick={() => {
-              localStorage.removeItem("jwt");
-              router.push("/");
-            }}
-            className={` relative z-20 rounded-md px-3 py-2 flex items-center gap-3 text-[14px] font-bold bg-primary-300 h-fit text-white ${
-              !sidebarOpen ? "w-fit" : "w-[150px]"
+        <div className="sidebarScroll ">
+          {/* upper section of tabs */}
+          <div
+            className={`flex flex-col items-start pt-5 ${
+              sidebarOpen ? "px-2" : ""
             }`}
           >
-            {!sidebarOpen && (
-              <div
-                className="w-full"
-                data-tooltip-id={`tooltip-logout`}
-                data-tooltip-content={"Logout"}
-                data-tooltip-place="right"
-              >
-                <img src="/images/logout.png" className="w-[25px]" />
+            {SidebarScreens.map((el: any, ind: number) => (
+              <div key={ind} className={getSidebarButtonClass(el)}>
+                <Button
+                  onClick={() => {
+                    router.push(el.path);
+                  }}
+                  className={`!text-[rgba(255,255,255,0.8)] !capitalize font-[500]  rounded-md !px-3 !py-[9px] flex items-center gap-3  ${
+                    !sidebarOpen ? "w-fit" : "w-full"
+                  }`}
+                >
+                  {!sidebarOpen && (
+                    <div
+                      className="w-full"
+                      data-tooltip-id={`tooltip-${ind}`}
+                      data-tooltip-content={el.tooltip}
+                      data-tooltip-place="right"
+                    >
+                      {el.icon}
+                      
+                    </div>
+                  )}
+                  {sidebarOpen && el.icon}
+                  <span className="text-[14px]">{sidebarOpen && el.name}</span>
+                  {sidebarOpen && (
+                    <MdKeyboardArrowRight className="ml-auto text-[18px]" />
+                  )}
+                </Button>
+                <Tooltip
+                  id={`tooltip-${ind}`}
+                  style={{ zIndex: 30, position: "fixed" }}
+                />
               </div>
-            )}
-            {sidebarOpen && <IoMdLogOut className="text-[25px]" />}
-            {sidebarOpen && "Logout"}
-          </button>
-          <Tooltip
-            id={`tooltip-logout`}
-            style={{ zIndex: 30, position: "fixed" }}
-          />
+            ))}
+          </div>
+
+          {/* lower section of tabs */}
+          <div className={`flex flex-col w-full ${sidebarOpen ? "px-2" : ""}`}>
+            {bottomTabs.map((el: any, ind: number) => (
+              <div key={ind} className={getSidebarButtonClass(el)}>
+                <Button
+                  onClick={() => {
+                    router.push(el.path);
+                  }}
+                  className={`!text-[rgba(255,255,255,0.8)] !capitalize font-[500]  rounded-md !px-3 !py-[9px] flex items-center gap-3 ${
+                    !sidebarOpen ? "" : "w-full"
+                  }`}
+                >
+                  {!sidebarOpen && (
+                    <div
+                      className="w-full"
+                      data-tooltip-id={`tooltip-${ind}`}
+                      data-tooltip-content={el.tooltip}
+                      data-tooltip-place="right"
+                    >
+                      {el.icon}
+                    </div>
+                  )}
+                  {sidebarOpen &&  el.icon}
+                  {sidebarOpen && el.name}
+                  {sidebarOpen && (
+                    <MdKeyboardArrowRight className="ml-auto text-[18px]" />
+                  )}
+                </Button>
+                <Tooltip
+                  id={`tooltip-${ind}`}
+                  style={{ zIndex: 30, position: "fixed" }}
+                />
+              </div>
+            ))}
+
+            <div className="hover:bg-[rgba(255,255,255,0.1)] rounded-md">
+              <Button
+                onClick={() => {
+                  localStorage.removeItem("jwt");
+                  router.push("/");
+                }}
+                className={`!text-[rgba(255,255,255,0.8)] !capitalize font-[500]  rounded-md !px-3 !py-[9px] flex items-center gap-3 ${
+                  !sidebarOpen ? "" : "w-full"
+                }`}
+              >
+                {!sidebarOpen && (
+                  <div
+                    className="w-full"
+                    data-tooltip-id={`tooltip-logout`}
+                    data-tooltip-content={"Logout"}
+                    data-tooltip-place="right"
+                  >
+                    <AiOutlineLogout size={18} />
+                  </div>
+                )}
+                {sidebarOpen && <AiOutlineLogout size={18} />}
+                {sidebarOpen && "Logout"}
+                {sidebarOpen && (
+                  <MdKeyboardArrowRight className="ml-auto text-[18px]" />
+                )}
+              </Button>
+              <Tooltip
+                id={`tooltip-logout`}
+                style={{ zIndex: 30, position: "fixed" }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </aside>
